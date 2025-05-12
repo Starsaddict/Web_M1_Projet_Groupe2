@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ReaseauSocialApplication {
+public class ReseauSocialApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ReaseauSocialApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ReseauSocialApplication.class, args);
+    }
 
 }
