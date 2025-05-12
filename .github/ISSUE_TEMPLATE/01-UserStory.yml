@@ -1,0 +1,38 @@
+name: User Story
+description: File a user story.
+title: "[US]: "
+body:
+  - type: markdown
+    attributes:
+      value: Contenu de la user story
+  - type: input
+    id: persona
+    attributes:
+      label: En tant que ...
+      description: Identification du type d'utilisateur 
+      placeholder: Nom du persona
+    validations:
+      required: true
+  - type: textarea
+    id: feature
+    attributes:
+      label: Je souhaiterais ...
+      description: Description du besoin
+      placeholder: Détail du besoin
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Afin de ...
+      description: Description de l'objectif
+      placeholder: Détail de l'objectif
+    validations:
+      required: true
+  - type: checkboxes
+    id: to-test
+    attributes:
+      label: "ATTENTION: Pensez à ajouter les tests de cette user story en tant que sous-problèmes."
+      options:
+        - label: En cochant cette case, j'ai conscience qu'une user story sans test est inutile.
+          required: true
