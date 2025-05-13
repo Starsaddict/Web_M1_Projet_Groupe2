@@ -9,7 +9,7 @@ public class Commentaire {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCom;
     private String textCom;
-    private long dateC;
+    private long dateCom;
 
     @ManyToOne
     @JoinColumn(name = "numUtilisateur")

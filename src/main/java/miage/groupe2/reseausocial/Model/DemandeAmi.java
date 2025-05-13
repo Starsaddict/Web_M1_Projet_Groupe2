@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 public class DemandeAmi {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_demandeami;
+    private Long idDa;
     @ManyToOne
-    @JoinColumn(name = "numUDemandeur")
+    @JoinColumn(name = "numDemandeur")
     private Utilisateur demandeur;
     @ManyToOne
-    @JoinColumn(name = "numUReceveur")
+    @JoinColumn(name = "numReceveur")
     private Utilisateur receveur;
     private String statut; // "EN_ATTENTE", "ACCEPTEE", "REFUSEE"
     private long dateDA;

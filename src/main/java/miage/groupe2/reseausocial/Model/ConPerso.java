@@ -9,8 +9,8 @@ public class ConPerso extends Conversation {
     @ManyToMany
     @JoinTable(
             name = "discuter",
-            joinColumns = @JoinColumn(name = "con_perso_id"),
-            inverseJoinColumns = @JoinColumn(name = "etudiant_id")
+            joinColumns = @JoinColumn(name = "numUtilisateur1"),
+            inverseJoinColumns = @JoinColumn(name = "numUtilisateur2")
     )
     private List<Utilisateur> participants;
 

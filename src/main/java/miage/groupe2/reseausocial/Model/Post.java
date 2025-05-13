@@ -29,6 +29,7 @@ public class Post {
     private List<Reaction> reactions;
 
     @ManyToOne
+    @JoinColumn(name = "repostSource")
     private Post repostSource;
 
 }

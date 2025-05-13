@@ -10,8 +10,8 @@ public class Groupe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idGroupe;
-    private String nomG;
-    private String descriptionG;
+    private String nomGroupe;
+    private String descriptionGroupe;
     @ManyToOne
     private Utilisateur createur;
     @ManyToMany
