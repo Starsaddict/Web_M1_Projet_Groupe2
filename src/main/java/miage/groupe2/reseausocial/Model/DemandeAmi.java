@@ -1,7 +1,6 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "demandeAmi")

@@ -41,5 +41,7 @@ public class Utilisateur {
     )
     private List<Utilisateur> amis;
 
+    @ManyToMany(mappedBy = "utilisateursRepost")
+    private List<Post> repostes;
 
 }

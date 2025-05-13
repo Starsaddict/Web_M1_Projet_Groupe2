@@ -1,7 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Entity
@@ -28,8 +28,10 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reaction> reactions;
 
-    @ManyToOne
-    @JoinColumn(name = "repostSource")
-    private Post repostSource;
+    @ManyToMany
+    @JoinTable( name = "reposterPost",
+            joinColumns = @JoinColumn(name = "idPost"),
+            inverseJoinColumns = @JoinColumn(name = "numUtilisateur"))
+    private List<Utilisateur> utilisateursRepost;
 
 }
