@@ -19,6 +19,11 @@
                 <td th:text="${@dateUtil.formatTimestamp(post.datePost)}"></td>
             </tr>
             <tr>
+                <td colspan="2">
+                    <a th:href="@{/post(id=${post.idPost})}" th:text="${post.titrePost}"></a>
+                </td>
+            </tr>
+            <tr>
                 <td colspan="2" th:text="${post.textePost}"></td>
             </tr>
             </tbody>

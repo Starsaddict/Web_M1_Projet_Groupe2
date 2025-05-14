@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.titrePost}"></title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th colspan="2" th:text="${post.createur.prenomU + ' ' + post.createur.nomU}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td th:text="'date : '"></td>
+        <td th:text="${@dateUtil.formatTimestamp(post.datePost)}"></td>
+    </tr>
+    <tr>
+        <td colspan="2" th:text="${post.titrePost}"></td>
+    </tr>
+
+    <tr>
+        <td colspan="2" th:text="${post.textePost}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${session.user != null && session.user.idUti == post.createur.idUti}">
+    <a th:href="@{/post/modifier(id=${post.idPost})}" th:text="'Modifier le post'"></a>
+    <a th:href="@{/post/supprimer(id=${post.idPost})}" th:text="'Supprimer le post'"></a>
+</div>
+</body>
+</html>

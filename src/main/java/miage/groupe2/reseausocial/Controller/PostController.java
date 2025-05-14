@@ -85,4 +85,50 @@ public class PostController {
         model.addAttribute("posts", posts);
         return "listPostAmis";
     }
+
+    @GetMapping("")
+    public String afficherPostParId(@RequestParam("id") Integer id, Model model) {
+        Post post = postRepository.findById(id).orElse(null);
+
+        if (post == null) {
+            return "redirect:/home";
+        }
+
+        model.addAttribute("post", post);
+        return "detailPost";
+    }
+
+    @GetMapping("/modifier")
+    public String afficherFormulaireModification(@RequestParam("id") Integer id, Model model) {
+        Post post = postRepository.findById(id).orElse(null);
+        if (post == null) {
+            return "redirect:/home";
+        }
+
+        model.addAttribute("post", post);
+        return "modifierPost";
+    }
+
+    @PostMapping("/modifier")
+    public String modifierPost(@ModelAttribute("post") Post post, HttpSession session) {
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        post.setCreateur(user);
+        postRepository.save(post);
+        return "redirect:/user/" + user.getIdUti();
+    }
+
+    @GetMapping("/supprimer")
+    public String supprimerPost(@RequestParam("id") Integer id, HttpSession session) {
+        Post post = postRepository.findById(id).orElse(null);
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+
+        if (post != null && post.getCreateur().getIdUti().equals(user.getIdUti())) {
+            postRepository.delete(post);
+        }
+
+        return "redirect:/user/" + user.getIdUti();
+    }
+
+
+
 }
