@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<form action="/auth/login" method="post">
+    <label for="email">Email :</label>
+    <input type="text" name="email" id="email"required/>
+
+
+    <label for="mdp">Mot de passe :</label>
+    <input type="password" name="mdp" id="mdp"/>
+
+    <button type="submit">log in</button>
+</form>
+
+</body>
+</html>

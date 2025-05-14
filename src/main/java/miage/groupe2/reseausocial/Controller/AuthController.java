@@ -1,5 +1,6 @@
 package miage.groupe2.reseausocial.Controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,10 +58,15 @@ public class AuthController {
      * @return redirect or login page if failed
      */
     @PostMapping("/login")
-    public String authenticate(@RequestParam String email, @RequestParam String mdp, Model model) {
-        Utilisateur utilisateur = utilisateurRepository.findByEmailU(email);
+    public String authenticate(@RequestParam String email,
+                               @RequestParam String mdp,
+                               Model model,
+                               HttpSession session
+    ) {
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email);
         if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
             // Auth successful, redirect to home or profile
+            session.setAttribute("user", utilisateur);
             return "redirect:/home";
         } else {
             model.addAttribute("error", "Invalid credentials");
