@@ -1,0 +1,10 @@
+name: Other
+description: Permet de consigner les éléments à ajouter au backlog, autres que les user stories et les tests (par exemple, les éléments à faire après les revues de code).
+title: "[Other]: "
+body:
+  - type: input
+    id: todo
+    attributes:
+      label: Eléments à ajouter au backlog
+    validations:
+      required: true
