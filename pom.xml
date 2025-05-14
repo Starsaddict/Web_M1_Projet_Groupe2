@@ -73,7 +73,12 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.3</version> <!-- Ou la dernière version compatible -->
+            <version>42.7.3</version>
+        </dependency>
+        <dependency>
+        <groupId>org.mindrot</groupId>
+        <artifactId>jbcrypt</artifactId>
+        <version>0.4</version>
         </dependency>
 
     </dependencies>
