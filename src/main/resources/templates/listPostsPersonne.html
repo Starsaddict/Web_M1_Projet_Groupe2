@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>list de mon Post</title>
+</head>
+<body>
+<div th:if="${not #lists.isEmpty(Posts)}">
+    <div th:each="post : ${Posts}">
+        <table>
+            <thead>
+            <tr>
+                <th colspan="2" th:text="${post.createur.prenomU + ' ' + post.createur.nomU}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>date</td>
+                <td th:text="${post.datePost}"></td>
+            </tr>
+            <tr>
+                <td colspan="2" th:text="${post.textePost}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+<a th:href="@{'/user/' + ${Posts[0].createur.idUti}}">Retour à profil page</a>
+</html>

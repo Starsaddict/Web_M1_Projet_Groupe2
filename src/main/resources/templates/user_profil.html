@@ -28,6 +28,33 @@
   <a th:href="@{'/user/' + ${session.user.idUti} + '/modifierPassword'}">modifier password</a>
 
 </th:block>
+<p>
+<a th:href="@{'/post/' + ${session.user.idUti}}">voir tout mon post</a>
+</p>
+
+<div th:each="post, stat : ${user.posts}" th:if="${stat.index < 3}">
+  <table>
+    <thead>
+    <tr>
+      <th colspan="2" th:text="${user.prenomU + ' ' + user.nomU}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>date</td>
+      <td th:text="${post.datePost}"></td>
+    </tr>
+    <tr>
+      <td colspan="2" th:text="${post.textePost}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div>
+  <a th:href="@{'/post/poster/' + ${session.user.idUti}}">Créer un post</a>
+</div>
 
 </body>
 </html>
