@@ -1,4 +1,4 @@
-package miage.groupe2.reaseausocial.Model;
+package miage.groupe2.reseausocial;
 
 import jakarta.persistence.*;
 import lombok.*;
