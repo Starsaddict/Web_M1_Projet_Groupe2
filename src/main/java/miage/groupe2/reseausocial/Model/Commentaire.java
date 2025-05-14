@@ -1,14 +1,15 @@
-package miage.groupe2.reseausocial;
+package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
 @Entity
-public class Reaction {
+public class Commentaire {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idrea;
+    private Integer idCom;
 
-    private String type;
+    private String textCom;
+    private String dateC;
 
     @ManyToOne
     @JoinColumn(name = "idUti")
