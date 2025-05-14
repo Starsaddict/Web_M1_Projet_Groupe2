@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+    <title>Page profil</title>
+</head>
+<body>
+<p>
+  <span th:text="${user.nomU}"></span>
+  <span> </span>
+  <span th:text="${user.prenomU}"></span>
+</p>
+<table>
+  <tr>
+    <th>Nom</th>
+    <th>Prenom</th>
+    <th>Email</th>
+  </tr>
+  <tr>
+    <td th:text="${user.nomU}"></td>
+    <td th:text="${user.prenomU}"></td>
+    <td th:text="${user.emailU}"></td>
+  </tr>
+</table>
+
+<th:block th:if="${session.user != null and user != null and session.user == user}">
+  <a th:href="@{'/user/' + ${session.user.idUti} + '/modifierProfil'}">modifier profil</a>
+  <a th:href="@{'/user/' + ${session.user.idUti} + '/modifierPassword'}">modifier password</a>
+
+</th:block>
+
+</body>
+</html>

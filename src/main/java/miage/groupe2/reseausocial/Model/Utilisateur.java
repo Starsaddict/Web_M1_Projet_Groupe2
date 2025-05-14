@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Représente un utilisateur dans le réseau social.
@@ -158,7 +159,7 @@ public class Utilisateur {
     )
     private List<Conversation> conversationsParticipees;
 
-    // Getters et Setters
+
     public Integer getIdUti() {
         return idUti;
     }
@@ -318,4 +319,18 @@ public class Utilisateur {
     public void setConversationsParticipees(List<Conversation> conversationsParticipees) {
         this.conversationsParticipees = conversationsParticipees;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Utilisateur that = (Utilisateur) o;
+        return Objects.equals(getIdUti(), that.getIdUti());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getIdUti());
+    }
+
 }
