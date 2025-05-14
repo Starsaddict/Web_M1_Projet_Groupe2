@@ -6,48 +6,101 @@ import lombok.*;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Représente un utilisateur dans le réseau social.
+ * Contient toutes les informations et associations relatives à un utilisateur,
+ * y compris ses posts, groupes, conversations, amis, etc.
+ */
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Utilisateur {
 
+    /**
+     * Identifiant unique de l'utilisateur.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idUti;
 
+    /**
+     * Nom de l'utilisateur.
+     */
     private String nomU;
+
+    /**
+     * Prénom de l'utilisateur.
+     */
     private String prenomU;
+
+    /**
+     * Adresse email de l'utilisateur.
+     */
     private String emailU;
+
+    /**
+     * Mot de passe de l'utilisateur.
+     */
     private String mdpU;
 
+    /**
+     * Liste des posts créés par l'utilisateur.
+     */
     @OneToMany(mappedBy = "createur")
     private List<Post> posts;
 
+    /**
+     * Liste des événements créés par l'utilisateur.
+     */
     @OneToMany(mappedBy = "createur")
     private List<Evenement> evenements;
 
+    /**
+     * Liste des groupes créés par l'utilisateur.
+     */
     @OneToMany(mappedBy = "createur")
     private List<Groupe> groupes;
 
+    /**
+     * Liste des conversations créées par l'utilisateur.
+     */
     @OneToMany(mappedBy = "createur")
     private List<Conversation> conversations;
 
+    /**
+     * Liste des commentaires créés par l'utilisateur.
+     */
     @OneToMany(mappedBy = "utilisateur")
     private List<Commentaire> commentaires;
 
+    /**
+     * Liste des réactions de l'utilisateur aux posts.
+     */
     @OneToMany(mappedBy = "utilisateur")
     private List<Reaction> reactions;
 
+    /**
+     * Liste des messages envoyés par l'utilisateur.
+     */
     @OneToMany(mappedBy = "expediteur")
     private List<Message> messages;
 
+    /**
+     * Liste des demandes d'amitié envoyées par l'utilisateur.
+     */
     @OneToMany(mappedBy = "demandeur")
     private List<DemandeAmi> demandesEnvoyees;
 
+    /**
+     * Liste des demandes d'amitié reçues par l'utilisateur.
+     */
     @OneToMany(mappedBy = "recepteur")
     private List<DemandeAmi> demandesRecues;
 
+    /**
+     * Liste des groupes auxquels l'utilisateur appartient.
+     */
     @ManyToMany
     @JoinTable(
             name = "appartenirGrp",
@@ -56,6 +109,9 @@ public class Utilisateur {
     )
     private List<Groupe> groupesAppartenance;
 
+    /**
+     * Liste des événements auxquels l'utilisateur a assisté.
+     */
     @ManyToMany
     @JoinTable(
             name = "assisterEvent",
@@ -64,6 +120,9 @@ public class Utilisateur {
     )
     private List<Evenement> evenementsAssistes;
 
+    /**
+     * Liste des utilisateurs qui sont amis avec l'utilisateur.
+     */
     @ManyToMany
     @JoinTable(
             name = "etre_ami",
@@ -72,9 +131,15 @@ public class Utilisateur {
     )
     private List<Utilisateur> amis;
 
+    /**
+     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
+     */
     @ManyToMany(mappedBy = "amis")
     private List<Utilisateur> amisDe;
 
+    /**
+     * Liste des posts que l'utilisateur a repostés.
+     */
     @ManyToMany
     @JoinTable(
             name = "reposterPost",
@@ -83,6 +148,9 @@ public class Utilisateur {
     )
     private List<Post> postsRepostes;
 
+    /**
+     * Liste des conversations auxquelles l'utilisateur participe.
+     */
     @ManyToMany
     @JoinTable(
             name = "participerConv",
@@ -90,6 +158,7 @@ public class Utilisateur {
             inverseJoinColumns = @JoinColumn(name = "idConv")
     )
     private List<Conversation> conversationsParticipees;
+
 
     public Integer getIdUti() {
         return idUti;
@@ -251,6 +320,7 @@ public class Utilisateur {
         this.conversationsParticipees = conversationsParticipees;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -262,4 +332,5 @@ public class Utilisateur {
     public int hashCode() {
         return Objects.hashCode(getIdUti());
     }
+
 }
