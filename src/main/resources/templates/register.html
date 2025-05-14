@@ -8,7 +8,7 @@
 
 <h2>Créer un compte</h2>
 
-<form th:action="@{/inscription}" th:object="${utilisateur}" method="post">
+<form th:action="@{/user/register}" th:object="${utilisateur}" method="post">
     <label for="nomU">Nom :</label>
     <input type="text" id="nomU" th:field="*{nomU}" required/><br/>
 
