@@ -24,7 +24,7 @@ public class DemandeAmi {
     /**
      * Date à laquelle la demande a été envoyée.
      */
-    private String dateDA;
+    private long dateDA;
 
     /**
      * Utilisateur ayant envoyé la demande.
@@ -49,7 +49,7 @@ public class DemandeAmi {
      * @param dateDA date d’envoi
      * @param statut statut de la demande
      */
-    public DemandeAmi(Integer idDA, Utilisateur recepteur, Utilisateur demandeur, String dateDA, String statut) {
+    public DemandeAmi(Integer idDA, Utilisateur recepteur, Utilisateur demandeur, long dateDA, String statut) {
         this.idDA = idDA;
         this.recepteur = recepteur;
         this.demandeur = demandeur;
@@ -108,14 +108,14 @@ public class DemandeAmi {
     /**
      * @return la date d’envoi de la demande
      */
-    public String getDateDA() {
+    public long getDateDA() {
         return dateDA;
     }
 
     /**
      * @param dateDA date d’envoi à définir
      */
-    public void setDateDA(String dateDA) {
+    public void setDateDA(long dateDA) {
         this.dateDA = dateDA;
     }
 

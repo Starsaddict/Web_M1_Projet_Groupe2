@@ -23,7 +23,7 @@ public class Commentaire {
     /**
      * Date à laquelle le commentaire a été posté.
      */
-    private String dateC;
+    private long dateC;
 
     /**
      * Utilisateur ayant rédigé le commentaire.
@@ -48,7 +48,7 @@ public class Commentaire {
      * @param dateC       date du commentaire
      * @param textCom     contenu du commentaire
      */
-    public Commentaire(Integer idCom, Post post, Utilisateur utilisateur, String dateC, String textCom) {
+    public Commentaire(Integer idCom, Post post, Utilisateur utilisateur, long dateC, String textCom) {
         this.idCom = idCom;
         this.post = post;
         this.utilisateur = utilisateur;
@@ -107,14 +107,14 @@ public class Commentaire {
     /**
      * @return la date du commentaire
      */
-    public String getDateC() {
+    public long getDateC() {
         return dateC;
     }
 
     /**
      * @param dateC date du commentaire
      */
-    public void setDateC(String dateC) {
+    public void setDateC(long dateC) {
         this.dateC = dateC;
     }
 

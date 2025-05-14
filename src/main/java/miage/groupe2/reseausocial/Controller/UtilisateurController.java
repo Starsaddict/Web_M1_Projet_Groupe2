@@ -1,14 +1,18 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
+import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
-import org.apache.logging.log4j.util.PerformanceSensitive;
+
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+
+import java.util.*;
+
 
 @Controller
 @RequestMapping("/user")
@@ -31,7 +35,17 @@ public class UtilisateurController {
      */
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute Utilisateur utilisateur) {
+    public String registerUser(
+            @ModelAttribute Utilisateur utilisateur,
+            Model model
+    ) {
+
+        List<String> emails = utilisateurRepository.findAllEmailU();
+        if (emails.contains(utilisateur.getEmailU())) {
+            model.addAttribute("error", "email exist");
+            return "register";
+        }
+
         String hashedPassword = BCrypt.hashpw(utilisateur.getMdpU(), BCrypt.gensalt());
         utilisateur.setMdpU(hashedPassword);
         utilisateurRepository.save(utilisateur);
@@ -47,6 +61,12 @@ public class UtilisateurController {
     ){
         Utilisateur user = utilisateurRepository.findByidUti(id);
         model.addAttribute("user", user);
+        List<Post> posts = user.getPosts().stream()
+                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost())) // 降序
+                .limit(3)
+                .toList();
+
+        model.addAttribute("posts", posts);
         return "user_profil";
     }
 

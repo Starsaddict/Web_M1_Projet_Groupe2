@@ -1,7 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ public class Groupe {
     /**
      * Date de création du groupe.
      */
-    private LocalDate dateCreation;
+    private long dateCreation;
 
     /**
      * Utilisateur ayant créé le groupe.
@@ -56,7 +56,7 @@ public class Groupe {
      * @param nomG nom du groupe
      * @param description description du groupe
      */
-    public Groupe(Integer idGrp, List<Utilisateur> membres, Utilisateur createur, LocalDate dateCreation, String nomG, String description) {
+    public Groupe(Integer idGrp, List<Utilisateur> membres, Utilisateur createur, long dateCreation, String nomG, String description) {
         this.idGrp = idGrp;
         this.membres = membres;
         this.createur = createur;
@@ -116,14 +116,14 @@ public class Groupe {
     /**
      * @return la date de création du groupe
      */
-    public LocalDate getDateCreation() {
+    public long getDateCreation() {
         return dateCreation;
     }
 
     /**
      * @param dateCreation date de création à définir
      */
-    public void setDateCreation(LocalDate dateCreation) {
+    public void setDateCreation(long dateCreation) {
         this.dateCreation = dateCreation;
     }
 

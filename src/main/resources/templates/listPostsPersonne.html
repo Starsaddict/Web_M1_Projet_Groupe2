@@ -15,8 +15,8 @@
             </thead>
             <tbody>
             <tr>
-                <td>date</td>
-                <td th:text="${post.datePost}"></td>
+                <td th:text=" 'date : '"></td>
+                <td th:text="${@dateUtil.formatTimestamp(post.datePost)}"></td>
             </tr>
             <tr>
                 <td colspan="2" th:text="${post.textePost}"></td>

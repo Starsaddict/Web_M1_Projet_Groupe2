@@ -60,14 +60,23 @@ public class AuthController {
                                HttpSession session
     ) {
         Utilisateur utilisateur = utilisateurRepository.findByEmailU(email);
-        if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
+        if (utilisateur == null) {
+            model.addAttribute("error", "email exist pas");
+            return "login";
+        }else if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
             // Auth successful, redirect to home or profile
             session.setAttribute("user", utilisateur);
             return "redirect:/user/" + utilisateur.getIdUti();
         } else {
-            model.addAttribute("error", "Invalid credentials");
+            model.addAttribute("error", "wrong password");
             return "login";
         }
+    }
+
+    @RequestMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/home";
     }
 
 

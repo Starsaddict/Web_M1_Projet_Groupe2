@@ -32,7 +32,7 @@
 <a th:href="@{'/post/' + ${session.user.idUti}}">voir tout mon post</a>
 </p>
 
-<div th:each="post, stat : ${user.posts}" th:if="${stat.index < 3}">
+<div th:each="post : ${posts}">
   <table>
     <thead>
     <tr>
@@ -41,8 +41,11 @@
     </thead>
     <tbody>
     <tr>
-      <td>date</td>
-      <td th:text="${post.datePost}"></td>
+      <td th:text="'date : '"></td>
+      <td th:text="${@dateUtil.formatTimestamp(post.datePost)}"></td>
+    </tr>
+    <tr>
+      <td colspan="2" th:text="${post.titrePost}"></td>
     </tr>
     <tr>
       <td colspan="2" th:text="${post.textePost}"></td>
@@ -52,8 +55,8 @@
 </div>
 
 
-<div>
-  <a th:href="@{'/post/poster/' + ${session.user.idUti}}">Créer un post</a>
+<div th:if="${session.user != null and user != null and session.user == user}">
+  <a href="/post/creer">Créer un post</a>
 </div>
 
 </body>
