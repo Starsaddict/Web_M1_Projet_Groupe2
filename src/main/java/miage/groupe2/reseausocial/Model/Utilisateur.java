@@ -44,4 +44,102 @@ public class Utilisateur {
     @ManyToMany(mappedBy = "utilisateursRepost")
     private List<Post> repostes;
 
+    public Utilisateur() {
+    }
+
+    public Long getNumUtilisateur() {
+        return numUtilisateur;
+    }
+
+    public void setNumUtilisateur(Long numUtilisateur) {
+        this.numUtilisateur = numUtilisateur;
+    }
+
+    public String getNomUtilisateur() {
+        return nomUtilisateur;
+    }
+
+    public void setNomUtilisateur(String nomUtilisateur) {
+        this.nomUtilisateur = nomUtilisateur;
+    }
+
+    public String getPrenomUtilisateur() {
+        return prenomUtilisateur;
+    }
+
+    public void setPrenomUtilisateur(String prenomUtilisateur) {
+        this.prenomUtilisateur = prenomUtilisateur;
+    }
+
+    public String getEmailUtilisateur() {
+        return emailUtilisateur;
+    }
+
+    public void setEmailUtilisateur(String emailUtilisateur) {
+        this.emailUtilisateur = emailUtilisateur;
+    }
+
+    public String getPasswordUtilisateur() {
+        return passwordUtilisateur;
+    }
+
+    public void setPasswordUtilisateur(String passwordUtilisateur) {
+        this.passwordUtilisateur = passwordUtilisateur;
+    }
+
+    public List<ConPerso> getConPersos() {
+        return conPersos;
+    }
+
+    public void setConPersos(List<ConPerso> conPersos) {
+        this.conPersos = conPersos;
+    }
+
+    public List<Groupe> getGroupes() {
+        return groupes;
+    }
+
+    public void setGroupes(List<Groupe> groupes) {
+        this.groupes = groupes;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<Evenement> getEvenementsCrees() {
+        return evenementsCrees;
+    }
+
+    public void setEvenementsCrees(List<Evenement> evenementsCrees) {
+        this.evenementsCrees = evenementsCrees;
+    }
+
+    public List<Evenement> getEvenements() {
+        return evenements;
+    }
+
+    public void setEvenements(List<Evenement> evenements) {
+        this.evenements = evenements;
+    }
+
+    public List<Utilisateur> getAmis() {
+        return amis;
+    }
+
+    public void setAmis(List<Utilisateur> amis) {
+        this.amis = amis;
+    }
+
+    public List<Post> getRepostes() {
+        return repostes;
+    }
+
+    public void setRepostes(List<Post> repostes) {
+        this.repostes = repostes;
+    }
 }

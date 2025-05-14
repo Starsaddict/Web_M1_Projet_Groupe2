@@ -23,4 +23,55 @@ public class Evenement {
             inverseJoinColumns = @JoinColumn(name = "numUtilisateur")
     )
     private List<Utilisateur> participants;
+
+    public Evenement() {
+    }
+
+    public Long getIdEv() {
+        return idEv;
+    }
+
+    public void setIdEv(Long idEv) {
+        this.idEv = idEv;
+    }
+
+    public String getNomEv() {
+        return nomEv;
+    }
+
+    public void setNomEv(String nomEv) {
+        this.nomEv = nomEv;
+    }
+
+    public String getDescriptionEv() {
+        return descriptionEv;
+    }
+
+    public void setDescriptionEv(String descriptionEv) {
+        this.descriptionEv = descriptionEv;
+    }
+
+    public long getDateEv() {
+        return dateEv;
+    }
+
+    public void setDateEv(long dateEv) {
+        this.dateEv = dateEv;
+    }
+
+    public Utilisateur getOrganisateur() {
+        return organisateur;
+    }
+
+    public void setOrganisateur(Utilisateur organisateur) {
+        this.organisateur = organisateur;
+    }
+
+    public List<Utilisateur> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Utilisateur> participants) {
+        this.participants = participants;
+    }
 }

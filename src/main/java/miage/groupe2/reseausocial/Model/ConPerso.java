@@ -14,4 +14,14 @@ public class ConPerso extends Conversation {
     )
     private List<Utilisateur> participants;
 
+    public ConPerso() {
+    }
+
+    public List<Utilisateur> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Utilisateur> participants) {
+        this.participants = participants;
+    }
 }

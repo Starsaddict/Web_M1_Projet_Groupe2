@@ -21,4 +21,47 @@ public class Groupe {
             inverseJoinColumns = @JoinColumn(name = "numUtilisateur")
     )
     private List<Utilisateur> membres;
+
+    public Groupe() {
+    }
+
+    public Long getIdGroupe() {
+        return idGroupe;
+    }
+
+    public void setIdGroupe(Long idGroupe) {
+        this.idGroupe = idGroupe;
+    }
+
+    public String getNomGroupe() {
+        return nomGroupe;
+    }
+
+    public void setNomGroupe(String nomGroupe) {
+        this.nomGroupe = nomGroupe;
+    }
+
+    public String getDescriptionGroupe() {
+        return descriptionGroupe;
+    }
+
+    public void setDescriptionGroupe(String descriptionGroupe) {
+        this.descriptionGroupe = descriptionGroupe;
+    }
+
+    public Utilisateur getCreateur() {
+        return createur;
+    }
+
+    public void setCreateur(Utilisateur createur) {
+        this.createur = createur;
+    }
+
+    public List<Utilisateur> getMembres() {
+        return membres;
+    }
+
+    public void setMembres(List<Utilisateur> membres) {
+        this.membres = membres;
+    }
 }
