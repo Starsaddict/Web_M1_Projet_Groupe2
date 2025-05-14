@@ -45,27 +45,7 @@ public class AuthController {
      * @param model the model to pass to the view
      * @return the registration view name
      */
-    @GetMapping("/register")
-    public String showRegisterForm(Model model) {
-        model.addAttribute("utilisateur", new Utilisateur());
-        return "register";
-    }
 
-    /**
-     * Handles user registration with password hashing.
-     *
-     * @param utilisateur the user to register
-     * @return redirection to login page after successful registration
-     */
-    
-    @PostMapping("/register")
-    public String registerUser(@ModelAttribute Utilisateur utilisateur) {
-        String hashedPassword = BCrypt.hashpw(utilisateur.getMdpU(), BCrypt.gensalt());
-        utilisateur.setMdpU(hashedPassword);
-        utilisateurRepository.save(utilisateur);
-        return "redirect:/auth/login";
-    }
-    
 
 
     /**
