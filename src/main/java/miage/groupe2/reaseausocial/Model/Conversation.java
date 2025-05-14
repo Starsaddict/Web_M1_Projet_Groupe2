@@ -1,5 +1,9 @@
 package miage.groupe2.reaseausocial.Model;
 
+import jakarta.persistence.*;
+
+import java.util.List;
+
 @Entity
 public class Conversation {
     @Id

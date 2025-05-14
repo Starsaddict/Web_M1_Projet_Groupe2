@@ -1,5 +1,7 @@
 package miage.groupe2.reaseausocial.Model;
 
+import jakarta.persistence.*;
+
 @Entity
 public class Reaction {
     @Id
