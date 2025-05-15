@@ -23,6 +23,12 @@
     <tr>
         <td colspan="2" th:text="${post.textePost}"></td>
     </tr>
+
+    <tr th:if="${post.createur.idUti != session.user.idUti}">
+        <td colspan="2">
+            <a th:href="@{/post/repost(id=${post.idPost})}">Reposter</a>
+        </td>
+    </tr>
     </tbody>
 </table>
 
@@ -30,5 +36,26 @@
     <a th:href="@{/post/modifier(id=${post.idPost})}" th:text="'Modifier le post'"></a>
     <a th:href="@{/post/supprimer(id=${post.idPost})}" th:text="'Supprimer le post'"></a>
 </div>
+
+<h3>Commentaires</h3>
+<div th:if="${#lists.isEmpty(commentaires)}">
+    <p>Aucun commentaire pour le moment.</p>
+</div>
+<div th:each="comment : ${commentaires}">
+    <p>
+        <strong th:text="${comment.utilisateur.prenomU + ' ' + comment.utilisateur.nomU}">Auteur</strong> :
+        <span th:text="${comment.textCom}">Contenu</span>
+        <br/>
+        <small th:text="${@dateUtil.formatTimestamp(comment.dateC)}">Date</small>
+    </p>
+    <hr/>
+</div>
+
+<h3>Ajouter un commentaire</h3>
+<form th:action="@{/post/commenter(postId=${post.idPost})}" th:object="${nouveauCommentaire}" method="post">
+    <textarea th:field="*{textCom}" rows="3" cols="50" placeholder="Votre commentaire..."></textarea><br/>
+    <button type="submit">Envoyer</button>
+</form>
+
 </body>
 </html>
