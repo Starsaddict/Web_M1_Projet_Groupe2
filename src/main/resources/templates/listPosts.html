@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List De Posts</title>
+</head>
+<body>
+
+<div th:each="post : ${posts}">
+    <table>
+        <thead>
+        <tr>
+            <th colspan="2" th:text="${post.createur.prenomU + ' ' + post.createur.nomU}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td th:text="'date : '"></td>
+            <td th:text="${@dateUtil.formatTimestamp(post.datePost)}"></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <a th:href="@{/post(id=${post.idPost})}" th:text="${post.titrePost}"></a>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" th:text="${post.textePost}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

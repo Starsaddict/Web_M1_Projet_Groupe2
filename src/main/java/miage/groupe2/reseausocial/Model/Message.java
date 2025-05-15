@@ -1,7 +1,6 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 /**
  * Représente un message envoyé dans une conversation.
@@ -25,7 +24,7 @@ public class Message {
     /**
      * Date et heure d'envoi du message.
      */
-    private LocalDateTime dateM;
+    private long dateM;
 
     /**
      * Conversation à laquelle appartient le message.
@@ -50,7 +49,7 @@ public class Message {
      * @param dateM date et heure d'envoi du message
      * @param textM contenu textuel du message
      */
-    public Message(Integer idMsg, Utilisateur expediteur, Conversation conversation, LocalDateTime dateM, String textM) {
+    public Message(Integer idMsg, Utilisateur expediteur, Conversation conversation, long dateM, String textM) {
         this.idMsg = idMsg;
         this.expediteur = expediteur;
         this.conversation = conversation;
@@ -96,14 +95,14 @@ public class Message {
     /**
      * @return la date et l’heure d’envoi du message
      */
-    public LocalDateTime getDateM() {
+    public long getDateM() {
         return dateM;
     }
 
     /**
      * @param dateM date et heure d’envoi du message à définir
      */
-    public void setDateM(LocalDateTime dateM) {
+    public void setDateM(long dateM) {
         this.dateM = dateM;
     }
 

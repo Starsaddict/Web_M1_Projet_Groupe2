@@ -1,7 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+
 import java.util.List;
 
 /**
@@ -18,15 +18,25 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idPost;
 
+    public String getTitrePost() {
+        return titrePost;
+    }
+
+    public void setTitrePost(String titrePost) {
+        this.titrePost = titrePost;
+    }
+
     /**
      * Texte du post.
      */
+    private String titrePost;
+
     private String textePost;
 
     /**
      * Date de publication du post.
      */
-    private LocalDate datePost;
+    private long datePost;
 
     /**
      * Utilisateur ayant créé le post.
@@ -64,7 +74,7 @@ public class Post {
      * @param datePost date de publication du post
      * @param textePost texte du post
      */
-    public Post(Integer idPost, List<Utilisateur> utilisateursRepost, List<Reaction> reactions, Utilisateur createur, List<Commentaire> commentaires, LocalDate datePost, String textePost) {
+    public Post(Integer idPost, List<Utilisateur> utilisateursRepost, List<Reaction> reactions, Utilisateur createur, List<Commentaire> commentaires, long datePost, String textePost) {
         this.idPost = idPost;
         this.utilisateursRepost = utilisateursRepost;
         this.reactions = reactions;
@@ -140,14 +150,14 @@ public class Post {
     /**
      * @return la date de publication du post
      */
-    public LocalDate getDatePost() {
+    public long getDatePost() {
         return datePost;
     }
 
     /**
      * @param datePost date de publication du post à définir
      */
-    public void setDatePost(LocalDate datePost) {
+    public void setDatePost(long datePost) {
         this.datePost = datePost;
     }
 

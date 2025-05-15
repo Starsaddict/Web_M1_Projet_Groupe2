@@ -1,7 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+
 import java.util.List;
 
 /**
@@ -26,12 +26,12 @@ public class Evenement {
     /**
      * Date de début de l’événement.
      */
-    private LocalDate dateDebutE;
+    private long dateDebutE;
 
     /**
      * Date de fin de l’événement.
      */
-    private LocalDate dateFinE;
+    private long dateFinE;
 
     /**
      * Adresse où se déroule l’événement.
@@ -62,7 +62,7 @@ public class Evenement {
      * @param dateDebutE date de début
      * @param nomE nom de l’événement
      */
-    public Evenement(Integer idEve, List<Utilisateur> participants, Utilisateur createur, String adresseE, LocalDate dateFinE, LocalDate dateDebutE, String nomE) {
+    public Evenement(Integer idEve, List<Utilisateur> participants, Utilisateur createur, String adresseE, long dateFinE, long dateDebutE, String nomE) {
         this.idEve = idEve;
         this.participants = participants;
         this.createur = createur;
@@ -137,28 +137,28 @@ public class Evenement {
     /**
      * @return la date de fin de l’événement
      */
-    public LocalDate getDateFinE() {
+    public long getDateFinE() {
         return dateFinE;
     }
 
     /**
      * @param dateFinE date de fin à définir
      */
-    public void setDateFinE(LocalDate dateFinE) {
+    public void setDateFinE(long dateFinE) {
         this.dateFinE = dateFinE;
     }
 
     /**
      * @return la date de début de l’événement
      */
-    public LocalDate getDateDebutE() {
+    public long getDateDebutE() {
         return dateDebutE;
     }
 
     /**
      * @param dateDebutE date de début à définir
      */
-    public void setDateDebutE(LocalDate dateDebutE) {
+    public void setDateDebutE(long dateDebutE) {
         this.dateDebutE = dateDebutE;
     }
 
