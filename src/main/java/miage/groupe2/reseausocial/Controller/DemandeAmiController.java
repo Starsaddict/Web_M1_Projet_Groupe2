@@ -109,7 +109,8 @@ public class DemandeAmiController {
         demande.setDemandeur(userConnecte);
         demande.setRecepteur(recepteur);
         demande.setStatut("en attente");
-        demande.setDateDA(LocalDateTime.now());
+        long timestamp = System.currentTimeMillis();
+        demande.setDateDA(timestamp);
 
         demandeAmiRepository.save(demande);
 
