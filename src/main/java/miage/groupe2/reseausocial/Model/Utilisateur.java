@@ -44,6 +44,9 @@ public class Utilisateur {
      */
     private String mdpU;
 
+    @Column(name = "avatar")
+    private byte[] avatar;
+
     /**
      * Liste des posts créés par l'utilisateur.
      */
@@ -318,6 +321,14 @@ public class Utilisateur {
 
     public void setConversationsParticipees(List<Conversation> conversationsParticipees) {
         this.conversationsParticipees = conversationsParticipees;
+    }
+
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
     }
 
 
