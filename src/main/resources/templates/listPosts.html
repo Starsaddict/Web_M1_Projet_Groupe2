@@ -6,6 +6,7 @@
 </head>
 <body>
 
+<!-- 遍历所有post -->
 <div th:each="post : ${posts}">
     <table>
         <thead>
@@ -23,12 +24,22 @@
                 <a th:href="@{/post(id=${post.idPost})}" th:text="${post.titrePost}"></a>
             </td>
         </tr>
-
         <tr>
             <td colspan="2" th:text="${post.textePost}"></td>
         </tr>
+        <!-- repost si c'est pas mon post -->
+        <tr th:if="${post.createur.idUti != session.user.idUti}">
+            <td colspan="2">
+                <a th:href="@{/post/repost(id=${post.idPost})}">Reposter</a>
+            </td>
+        </tr>
         </tbody>
     </table>
+</div>
+
+<!-- retour a mon page de profil -->
+<div>
+    <a th:href="@{/user(id=${session.user.idUti})}">Retour à mon profil</a>
 </div>
 
 </body>
