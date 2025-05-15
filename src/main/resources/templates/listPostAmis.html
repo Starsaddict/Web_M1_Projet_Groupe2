@@ -25,8 +25,13 @@
             <td colspan="2" th:text="${post.textePost}"></td>
         </tr>
         </tbody>
+        <!-- repost le post -->
+        <a th:href="@{/post/repost(id=${post.idPost})}">Reposter</a>
     </table>
 </div>
+<!-- retour à mon profil page -->
+<a th:href="@{'/user/' + ${session.user.idUti}}">Retour à mon profil</a>
+
 
 </body>
 </html>

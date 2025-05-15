@@ -25,7 +25,7 @@ public class UtilisateurController {
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("utilisateur", new Utilisateur());
-        return "register";
+        return "form-register";
     }
 
     /**
@@ -44,7 +44,7 @@ public class UtilisateurController {
         List<String> emails = utilisateurRepository.findAllEmailU();
         if (emails.contains(utilisateur.getEmailU())) {
             model.addAttribute("error", "email exist");
-            return "register";
+            return "form-register";
         }
 
         String hashedPassword = BCrypt.hashpw(utilisateur.getMdpU(), BCrypt.gensalt());
