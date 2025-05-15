@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mes amis</title>
+</head>
+<body>
+<h2>Liste de mes amis</h2>
+
+<ul>
+    <li th:each="ami : ${amis}">
+        <span th:text="${ami.nomU + ' ' + ami.prenomU}">Nom Prénom</span>
+
+        <form th:action="@{/user/supprimer-ami}" method="post" style="display:inline;">
+            <input type="hidden" name="idAmi" th:value="${ami.idUti}" />
+            <button type="submit">Supprimer</button>
+        </form>
+    </li>
+</ul>
+
+<!-- Affichage du message de succès ou d'erreur -->
+<div th:if="${succes}" th:text="${succes}" style="color: green;"></div>
+<div th:if="${error}" th:text="${error}" style="color: red;"></div>
+
+</body>
+</html>

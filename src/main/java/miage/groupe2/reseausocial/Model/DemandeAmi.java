@@ -2,6 +2,8 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 /**
  * Représente une demande d’amitié entre deux utilisateurs du réseau social.
  * Une demande est composée d’un demandeur, d’un récepteur, d’un statut et d’une date.
@@ -24,7 +26,7 @@ public class DemandeAmi {
     /**
      * Date à laquelle la demande a été envoyée.
      */
-    private long dateDA;
+    private LocalDateTime dateDA;
 
     /**
      * Utilisateur ayant envoyé la demande.
@@ -49,7 +51,7 @@ public class DemandeAmi {
      * @param dateDA date d’envoi
      * @param statut statut de la demande
      */
-    public DemandeAmi(Integer idDA, Utilisateur recepteur, Utilisateur demandeur, long dateDA, String statut) {
+    public DemandeAmi(Integer idDA, Utilisateur recepteur, Utilisateur demandeur, LocalDateTime dateDA, String statut) {
         this.idDA = idDA;
         this.recepteur = recepteur;
         this.demandeur = demandeur;
@@ -108,14 +110,14 @@ public class DemandeAmi {
     /**
      * @return la date d’envoi de la demande
      */
-    public long getDateDA() {
+    public LocalDateTime getDateDA() {
         return dateDA;
     }
 
     /**
      * @param dateDA date d’envoi à définir
      */
-    public void setDateDA(long dateDA) {
+    public void setDateDA(LocalDateTime dateDA) {
         this.dateDA = dateDA;
     }
 
