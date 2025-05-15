@@ -33,7 +33,7 @@ public class AuthController {
      */
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login";
+        return "form-login";
     }
 
     /**
@@ -61,15 +61,15 @@ public class AuthController {
     ) {
         Utilisateur utilisateur = utilisateurRepository.findByEmailU(email);
         if (utilisateur == null) {
-            model.addAttribute("error", "email exist pas");
-            return "login";
+            model.addAttribute("error", "email n'exist pas");
+            return "form-login";
         }else if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
             // Auth successful, redirect to home or profile
             session.setAttribute("user", utilisateur);
             return "redirect:/user/" + utilisateur.getIdUti();
         } else {
             model.addAttribute("error", "wrong password");
-            return "login";
+            return "form-login";
         }
     }
 

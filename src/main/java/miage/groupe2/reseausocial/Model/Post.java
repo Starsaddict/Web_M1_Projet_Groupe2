@@ -33,6 +33,10 @@ public class Post {
 
     private String textePost;
 
+
+    @Column(name = "imagePost")
+    private byte[] imagePost;
+
     /**
      * Date de publication du post.
      */
@@ -63,26 +67,26 @@ public class Post {
     @ManyToMany(mappedBy = "postsRepostes")
     private List<Utilisateur> utilisateursRepost;
 
-    /**
-     * Constructeur avec paramètres.
-     *
-     * @param idPost identifiant du post
-     * @param utilisateursRepost liste des utilisateurs ayant reposté le post
-     * @param reactions liste des réactions associées au post
-     * @param createur utilisateur ayant créé le post
-     * @param commentaires liste des commentaires associés au post
-     * @param datePost date de publication du post
-     * @param textePost texte du post
-     */
-    public Post(Integer idPost, List<Utilisateur> utilisateursRepost, List<Reaction> reactions, Utilisateur createur, List<Commentaire> commentaires, long datePost, String textePost) {
-        this.idPost = idPost;
-        this.utilisateursRepost = utilisateursRepost;
-        this.reactions = reactions;
-        this.createur = createur;
-        this.commentaires = commentaires;
-        this.datePost = datePost;
-        this.textePost = textePost;
-    }
+//    /**
+//     * Constructeur avec paramètres.
+//     *
+//     * @param idPost identifiant du post
+//     * @param utilisateursRepost liste des utilisateurs ayant reposté le post
+//     * @param reactions liste des réactions associées au post
+//     * @param createur utilisateur ayant créé le post
+//     * @param commentaires liste des commentaires associés au post
+//     * @param datePost date de publication du post
+//     * @param textePost texte du post
+//     */
+//    public Post(Integer idPost, List<Utilisateur> utilisateursRepost, List<Reaction> reactions, Utilisateur createur, List<Commentaire> commentaires, long datePost, String textePost) {
+//        this.idPost = idPost;
+//        this.utilisateursRepost = utilisateursRepost;
+//        this.reactions = reactions;
+//        this.createur = createur;
+//        this.commentaires = commentaires;
+//        this.datePost = datePost;
+//        this.textePost = textePost;
+//    }
 
     /**
      * Constructeur par défaut requis par JPA.
@@ -187,5 +191,13 @@ public class Post {
      */
     public void setIdPost(Integer idPost) {
         this.idPost = idPost;
+    }
+
+    public byte[] getImagePost() {
+        return imagePost;
+    }
+
+    public void setImagePost(byte[] imagePost) {
+        this.imagePost = imagePost;
     }
 }
