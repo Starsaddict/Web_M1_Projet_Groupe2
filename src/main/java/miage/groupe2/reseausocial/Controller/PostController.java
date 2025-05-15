@@ -2,8 +2,10 @@ package miage.groupe2.reseausocial.Controller;
 
 
 import jakarta.servlet.http.HttpSession;
+import miage.groupe2.reseausocial.Model.Commentaire;
 import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
+import miage.groupe2.reseausocial.Repository.CommentaireRepository;
 import miage.groupe2.reseausocial.Repository.PostRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,10 @@ public class PostController {
 
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    CommentaireRepository commentaireRepository;
+
 
     @GetMapping("/{id}")
     public String postPersonne(
@@ -93,14 +99,18 @@ public class PostController {
     @GetMapping("")
     public String afficherPostParId(@RequestParam("id") Integer id, Model model) {
         Post post = postRepository.findById(id).orElse(null);
-
         if (post == null) {
             return "redirect:/home";
         }
 
+        List<Commentaire> commentaires = commentaireRepository.findByPost(post);
         model.addAttribute("post", post);
+        model.addAttribute("commentaires", commentaires);
+        model.addAttribute("nouveauCommentaire", new Commentaire());
+
         return "detailPost";
     }
+
 
     @GetMapping("/modifier")
     public String afficherFormulaireModification(@RequestParam("id") Integer id, Model model) {
@@ -160,6 +170,25 @@ public class PostController {
         return "redirect:/user/" + user.getIdUti();
     }
 
+    @PostMapping("/commenter")
+    public String ajouterCommentaire(@ModelAttribute("nouveauCommentaire") Commentaire commentaire,
+                                     @RequestParam("postId") Integer postId,
+                                     HttpSession session) {
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        Post post = postRepository.findById(postId).orElse(null);
+
+        if (user == null || post == null) {
+            return "redirect:/auth/login";
+        }
+
+        commentaire.setUtilisateur(user);
+        commentaire.setPost(post);
+        commentaire.setDateC(System.currentTimeMillis());
+
+        commentaireRepository.save(commentaire);
+
+        return "redirect:/post?id=" + postId;
+    }
 
 
 
