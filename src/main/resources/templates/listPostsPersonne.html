@@ -5,6 +5,9 @@
     <title>list de mon Post</title>
 </head>
 <body>
+<div th:if="${#lists.isEmpty((Posts))}">
+    <p>Il n'y pas aucum post</p>
+</div>
 <div th:if="${not #lists.isEmpty(Posts)}">
     <div th:each="post : ${Posts}">
         <table>
@@ -32,5 +35,5 @@
 </div>
 
 </body>
-<a th:href="@{'/user/' + ${Posts[0].createur.idUti}}">Retour à profil page</a>
+<a th:if="${userId != null}" th:href="@{'/user/' + ${userId}}">Retour à profil page</a>
 </html>

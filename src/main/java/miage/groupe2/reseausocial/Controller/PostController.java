@@ -33,8 +33,10 @@ public class PostController {
         Utilisateur user = utilisateurRepository.findByidUti(id);
         List<Post> posts = postRepository.findByCreateur(user);
         model.addAttribute("Posts", posts);
+        model.addAttribute("userId", id);
         return "listPostsPersonne";
     }
+
 
     @GetMapping("/creer")
     public String CreerPost(Model model) {
