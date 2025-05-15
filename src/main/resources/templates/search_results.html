@@ -1,32 +1,32 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
     <title>Résultats de recherche</title>
 </head>
 <body>
+
 <h1>Résultats de recherche</h1>
 
-<!-- Messages globaux -->
-<div th:if="${success}" class="alert alert-success">
-    <p th:text="${success}" style="color: green"></p>
+<!-- Affichage des messages succès / erreur -->
+<div th:if="${success}" style="color:green;">
+    <p th:text="${success}"></p>
 </div>
-<div th:if="${error}" class="alert alert-danger">
-    <p th:text="${error}" style="color: red"></p>
+<div th:if="${error}" style="color:red;">
+    <p th:text="${error}"></p>
 </div>
 
-<!-- Liste des utilisateurs -->
 <ul>
-    <th:block th:each="user : ${utilisateurs}">
-        <li>
-            <span th:text="${user.nomU}"></span>
-            <form th:action="@{/demande/ajouterAmi}" method="post" style="display:inline;">
-                <input type="hidden" th:name="idAmi" th:value="${user.idUti}" />
-                <button type="submit">Ajouter en ami</button>
-            </form>
-        </li>
-    </th:block>
+    <li th:each="user : ${utilisateurs}">
+        <span th:text="${user.nomU + ' ' + user.prenomU}"></span>
+
+        <form th:action="@{/demande/ajouterAmi}" method="post" style="display:inline;">
+            <input type="hidden" name="idAmi" th:value="${user.idUti}" />
+            <!-- IMPORTANT : transmet le paramètre nom pour garder la recherche -->
+            <input type="hidden" name="nom" th:value="${param.nom}" />
+            <button type="submit">Ajouter en ami</button>
+        </form>
+    </li>
 </ul>
 
 </body>

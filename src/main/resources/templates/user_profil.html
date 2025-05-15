@@ -12,14 +12,14 @@
   <span th:text="${user.prenomU}"></span>
 </p>
 
-<!-- 🔍 Formulaire de recherche d’amis -->
 <div th:if="${session.user != null}">
   <h3>Rechercher un ami :</h3>
   <form action="/user/rechercher" method="get">
-    <input type="text" name="nom" placeholder="Nom de l'utilisateur" required>
+    <input type="text" name="nom" placeholder="Nom de l'utilisateur" th:value="${param.nom}" required>
     <button type="submit">Rechercher</button>
   </form>
 </div>
+
 
 <br>
 

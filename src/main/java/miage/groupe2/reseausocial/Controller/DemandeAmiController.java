@@ -78,32 +78,31 @@ public class DemandeAmiController {
 
     @PostMapping("/ajouterAmi")
     public String envoyerDemandeAmi(@RequestParam("idAmi") Integer idAmi,
+                                    @RequestParam(value = "nom", required = false) String nomRecherche,
                                     HttpSession session,
-                                    Model model,
                                     RedirectAttributes redirectAttributes) {
         Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
         if (userConnecte == null) {
             return "redirect:/auth/login";
         }
-
         if (idAmi.equals(userConnecte.getIdUti())) {
             redirectAttributes.addFlashAttribute("error", "Vous ne pouvez pas vous ajouter vous-même.");
-            return "redirect:/user/rechercher?nom=";
+            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
         }
 
         Utilisateur recepteur = utilisateurRepository.findByidUti(idAmi);
         if (recepteur == null) {
             redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
-            return "redirect:/user/rechercher?nom=";
+            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
         }
 
         boolean demandeExistante = demandeAmiRepository.existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(
                 userConnecte.getIdUti(), idAmi, List.of("en attente"));
 
-        boolean dejaAmis =  demandeAmiRepository.sontDejaAmis(userConnecte.getIdUti(), idAmi);
-        if (demandeExistante || dejaAmis ) {
+        boolean dejaAmis = demandeAmiRepository.sontDejaAmis(userConnecte.getIdUti(), idAmi);
+        if (demandeExistante || dejaAmis) {
             redirectAttributes.addFlashAttribute("error", "Une demande d'ami existe déjà.");
-            return "redirect:/user/rechercher?nom=";
+            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
         }
 
         DemandeAmi demande = new DemandeAmi();
@@ -115,6 +114,7 @@ public class DemandeAmiController {
         demandeAmiRepository.save(demande);
 
         redirectAttributes.addFlashAttribute("success", "Demande d'ami envoyée à " + recepteur.getNomU() + ".");
-        return "redirect:/user/rechercher?nom=";
+        return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
     }
+
 }
