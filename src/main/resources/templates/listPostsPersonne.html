@@ -6,7 +6,7 @@
 </head>
 <body>
 <div th:if="${#lists.isEmpty((Posts))}">
-    <p>Il n'y pas aucum post</p>
+    <p>Il n'y pas aucun post</p>
 </div>
 <div th:if="${not #lists.isEmpty(Posts)}">
     <div th:each="post : ${Posts}">
