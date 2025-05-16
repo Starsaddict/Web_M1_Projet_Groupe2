@@ -5,6 +5,9 @@
 </head>
 <body>
     <h1>Créer un Événement</h1>
+
+    <a th:href="@{/evenement/maListEvenement}">list de mes événements</a>
+    <a th:href="@{/evenement/tous}">list de tous les événements</a>
     
     <form th:action="@{/evenement/creer}" th:object="${evenement}" method="post">
 
@@ -31,6 +34,5 @@
         <button type="submit">Créer l'événement</button>
     </form>
 
-    <a th:href="@{/evenement/maListEvenement}">Retour à mes événements</a>
 </body>
 </html>

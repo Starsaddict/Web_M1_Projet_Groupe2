@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpSession;
 import miage.groupe2.reseausocial.Model.Evenement;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.EvenementRepository;
+import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -23,6 +25,9 @@ public class EventController {
 
     @Autowired
     private EvenementRepository evenementRepository;
+
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
     /**
      * Affiche le formulaire de création d’un nouvel événement.
@@ -154,6 +159,80 @@ public String modifierEvenement(@ModelAttribute Evenement evenementModifie, Http
     return "redirect:/evenement/maListEvenement";
 }
 
+/**
+ * Affiche tous les événements existants, qu’ils soient créés par l’utilisateur ou par d’autres.
+ * Permet à l’utilisateur de voir ceux auxquels il peut participer ou qu’il a déjà rejoints.
+ *
+ * @param model   le modèle utilisé pour passer la liste des événements à la vue
+ * @param session la session HTTP contenant l’utilisateur connecté
+ * @return la vue affichant tous les événements, ou redirection vers la page de login si non connecté
+ */
+@GetMapping("/tous")
+public String afficherTousLesEvenements(Model model, HttpSession session) {
+    Utilisateur user = (Utilisateur) session.getAttribute("user");
+    if (user == null) return "redirect:/auth/login";
+
+    model.addAttribute("evenements", evenementRepository.findAll());
+    model.addAttribute("user", user);
+    return "tousLesEvenements";
+}
+
+/**
+ * Permet à un utilisateur connecté de rejoindre un événement donné.
+ *
+ * @param id      identifiant de l'événement à rejoindre
+ * @param session session HTTP pour récupérer et mettre à jour l'utilisateur
+ * @return redirection vers la liste des événements
+ */
+@PostMapping("/rejoindre")
+public String rejoindreEvenement(@RequestParam("id") Integer id, HttpSession session) {
+    Utilisateur sessionUser = (Utilisateur) session.getAttribute("user");
+    if (sessionUser == null) return "redirect:/auth/login";
+
+    Utilisateur user = utilisateurRepository.findById(sessionUser.getIdUti()).orElse(null);
+    Evenement event = evenementRepository.findById(id).orElse(null);
+
+    if (user != null && event != null && !user.getEvenementsAssistes().contains(event)) {
+        user.getEvenementsAssistes().add(event);
+        event.getParticipants().add(user);
+        utilisateurRepository.save(user);
+        session.setAttribute("user", user); 
+    }
+
+    return "redirect:/evenement/tous";
+}
+
+
+
+/**
+ * Permet à un utilisateur connecté de quitter un événement donné.
+ *
+ * @param id      identifiant de l'événement à quitter
+ * @param session session HTTP pour récupérer et mettre à jour l'utilisateur
+ * @return redirection vers la liste des événements
+ */
+@PostMapping("/quitter")
+public String quitterEvenement(@RequestParam("id") Integer id, HttpSession session) {
+    Utilisateur sessionUser = (Utilisateur) session.getAttribute("user");
+    if (sessionUser == null) return "redirect:/auth/login";
+
+    Utilisateur user = utilisateurRepository.findById(sessionUser.getIdUti()).orElse(null);
+    Evenement event = evenementRepository.findById(id).orElse(null);
+
+    if (user != null && event != null && user.getEvenementsAssistes().contains(event)) {
+        user.getEvenementsAssistes().remove(event);
+        event.getParticipants().remove(user);
+        utilisateurRepository.save(user);
+        session.setAttribute("user", user); 
+    }
+
+    return "redirect:/evenement/tous";
+}
+
+@GetMapping("")
+public String redirectToTous() {
+    return "redirect:/evenement/tous";
+}
 
 
 
