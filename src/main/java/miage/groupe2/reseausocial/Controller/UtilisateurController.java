@@ -110,21 +110,24 @@ public class UtilisateurController {
         return "redirect:/user/mes-amis";
     }
 
-    @RequestMapping("/{id:[0-9]+}")
-    public String userProfil(
-            @PathVariable long id,
-            Model model
-    ){
-        Utilisateur user = utilisateurRepository.findByidUti(id);
-        model.addAttribute("user", user);
-        List<Post> posts = user.getPosts().stream()
-                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost())) // 降序
-                .limit(3)
-                .toList();
-
-        model.addAttribute("posts", posts);
-        return "user_profil";
+@RequestMapping("/{id:[0-9]+}")
+public String userProfil(
+        @PathVariable long id,
+        Model model
+){
+    Utilisateur user = utilisateurRepository.findByidUti(id);
+    if (user == null) {                // Ajout de cette vérification
+        return "redirect:/error404";  // Ou une autre page d’erreur/accueil, selon ton app
     }
+    model.addAttribute("user", user);
+    List<Post> posts = user.getPosts().stream()
+            .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
+            .limit(3)
+            .toList();
+
+    model.addAttribute("posts", posts);
+    return "user_profil";
+}
 
     @GetMapping("/{id}/modifierProfil")
     public String modifierProfil(@PathVariable long id, Model model) {
