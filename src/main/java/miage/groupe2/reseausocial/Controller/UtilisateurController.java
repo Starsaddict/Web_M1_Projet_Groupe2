@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 
@@ -52,9 +53,64 @@ public class UtilisateurController {
         return "redirect:/auth/login";
     }
 
-    //profil page de chaque utilisateur
+    @GetMapping("/rechercher")
+    public String rechercherUtilisateurs(@RequestParam("nom") String nom, Model model, HttpSession session) {
+        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
+        if (userConnecte == null) {
+            return "redirect:/auth/login";
+        }
 
-    @RequestMapping("/{id}")
+        List<Utilisateur> utilisateurs = utilisateurRepository.findByNomUContainingIgnoreCase(nom);
+
+        // Supprimer l'utilisateur connecté des résultats
+        utilisateurs.removeIf(u -> u.getIdUti().equals(userConnecte.getIdUti()));
+
+        model.addAttribute("utilisateurs", utilisateurs);
+        return "search_results";
+    }
+
+    @GetMapping("/mes-amis")
+    public String voirMesAmis(HttpSession session, Model model) {
+        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
+        if (userConnecte == null) {
+            return "redirect:/auth/login";
+        }
+
+        // Rafraîchir l’utilisateur depuis la BDD pour charger les relations (lazy loading)
+        Utilisateur utilisateurAvecAmis = utilisateurRepository.findById(userConnecte.getIdUti()).orElse(null);
+        if (utilisateurAvecAmis == null) {
+            return "redirect:/auth/login";
+        }
+
+        model.addAttribute("amis", utilisateurAvecAmis.getAmis());
+        return "listeamis"; // correspond à amis.html
+    }
+
+    @PostMapping("/supprimer-ami")
+    public String supprimerAmi(@RequestParam("idAmi") Integer idAmi, HttpSession session, RedirectAttributes redirectAttributes) {
+        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
+        if (userConnecte == null) {
+            return "redirect:/auth/login";
+        }
+
+        Utilisateur utilisateur = utilisateurRepository.findById(userConnecte.getIdUti()).orElse(null);
+        Utilisateur ami = utilisateurRepository.findById(idAmi).orElse(null);
+
+        if (utilisateur != null && ami != null) {
+            utilisateur.getAmis().remove(ami);
+            ami.getAmis().remove(utilisateur); // pour supprimer dans les deux sens
+            utilisateurRepository.save(utilisateur);
+            utilisateurRepository.save(ami);
+
+            redirectAttributes.addFlashAttribute("succes", "Ami supprimé avec succès.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Impossible de supprimer cet ami.");
+        }
+
+        return "redirect:/user/mes-amis";
+    }
+
+    @RequestMapping("/{id:[0-9]+}")
     public String userProfil(
             @PathVariable long id,
             Model model
@@ -117,5 +173,8 @@ public class UtilisateurController {
         session.setAttribute("user", user);
         return "redirect:/user/"+id;
     }
+
+
+
 
 }

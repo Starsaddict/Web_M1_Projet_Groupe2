@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demandes d'amis reçues</title>
+</head>
+<body>
+
+<h2>Demandes d'amis reçues</h2>
+
+<!-- Message de confirmation -->
+<div th:if="${succes}" style="color: green; margin-bottom: 10px;">
+    <p th:text="${succes}"></p>
+</div>
+
+<ul>
+    <li th:each="demande : ${demandesRecues}">
+        <span th:text="${demande.demandeur.nomU + ' ' + demande.demandeur.prenomU}">Nom Prénom</span>
+
+        <form th:action="@{/demande/accepter}" method="post" style="display:inline;">
+            <input type="hidden" name="idDemande" th:value="${demande.idDA}" />
+            <button type="submit">Accepter</button>
+        </form>
+
+        <form th:action="@{/demande/refuser}" method="post" style="display:inline;">
+            <input type="hidden" name="idDemande" th:value="${demande.idDA}" />
+            <button type="submit">Refuser</button>
+        </form>
+    </li>
+</ul>
+
+</body>
+</html>

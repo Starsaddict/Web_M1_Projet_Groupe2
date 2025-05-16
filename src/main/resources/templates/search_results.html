@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Résultats de recherche</title>
+</head>
+<body>
+
+<h1>Résultats de recherche</h1>
+
+<!-- Affichage des messages succès / erreur -->
+<div th:if="${success}" style="color:green;">
+    <p th:text="${success}"></p>
+</div>
+<div th:if="${error}" style="color:red;">
+    <p th:text="${error}"></p>
+</div>
+
+<ul>
+    <li th:each="user : ${utilisateurs}">
+        <span th:text="${user.nomU + ' ' + user.prenomU}"></span>
+
+        <form th:action="@{/demande/ajouterAmi}" method="post" style="display:inline;">
+            <input type="hidden" name="idAmi" th:value="${user.idUti}" />
+            <!-- IMPORTANT : transmet le paramètre nom pour garder la recherche -->
+            <input type="hidden" name="nom" th:value="${param.nom}" />
+            <button type="submit">Ajouter en ami</button>
+        </form>
+    </li>
+</ul>
+
+</body>
+</html>

@@ -2,6 +2,8 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 /**
  * Représente une demande d’amitié entre deux utilisateurs du réseau social.
  * Une demande est composée d’un demandeur, d’un récepteur, d’un statut et d’une date.
