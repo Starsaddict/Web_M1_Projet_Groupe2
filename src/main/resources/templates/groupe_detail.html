@@ -43,6 +43,21 @@
     <button type="submit">Join le groupe</button>
 </form>
 
+<h3>Membres du groupe</h3>
+<ul>
+    <li th:each="membre : ${membres}">
+        <a th:href="@{'/user/' + ${membre.idUti}}"
+           th:text="${membre.prenomU + ' ' + membre.nomU}">Nom du membre</a>
+
+        <form th:if="${session.user.idUti == groupe.createur.idUti and session.user.idUti != membre.idUti}"
+              th:action="@{'/groupe/' + ${groupe.idGrp} + '/supprimerMembre'}"
+              method="post"
+              style="display:inline">
+            <input type="hidden" name="idMembre" th:value="${membre.idUti}">
+            <button type="submit">Supprimer</button>
+        </form>
+    </li>
+</ul>
 
 </body>
 </html>

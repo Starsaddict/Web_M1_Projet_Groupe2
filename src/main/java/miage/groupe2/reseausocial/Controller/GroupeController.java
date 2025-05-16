@@ -7,6 +7,7 @@ import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.GroupeRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import miage.groupe2.reseausocial.service.GroupeService;
+import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,8 @@ public class GroupeController {
 
     @Autowired
     GroupeService groupeService;
+    @Autowired
+    private UtilisateurService utilisateurService;
 
     @RequestMapping("/list")
     public String GroupeList(
@@ -120,6 +123,25 @@ public class GroupeController {
         groupe.getPosts().add(post);
 
         groupeRepository.save(groupe); // 级联保存 Post（或用 postRepository.save(post)）
+
+        return "redirect:/groupe/" + id;
+    }
+
+    @PostMapping("/{id}/supprimerMembre")
+    public String supprimerMembreDuGroupe(
+            @PathVariable("id") int id,
+            @RequestParam("idMembre") int idMembre,
+            HttpSession session
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Groupe groupe = groupeRepository.findGroupeByidGrp(id);
+
+        if (groupe != null && user != null && user.equals(groupe.getCreateur())) {
+            Utilisateur membre = utilisateurRepository.findByidUti(idMembre);
+            if (membre != null) {
+                groupeService.quitterGroupe(membre, groupe);
+            }
+        }
 
         return "redirect:/groupe/" + id;
     }
