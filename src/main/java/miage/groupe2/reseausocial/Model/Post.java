@@ -40,6 +40,7 @@ public class Post {
     /**
      * Date de publication du post.
      */
+    @Column(name = "datePost")
     private long datePost;
 
     /**
@@ -52,13 +53,14 @@ public class Post {
     /**
      * Liste des commentaires associés au post.
      */
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Commentaire> commentaires;
 
     /**
      * Liste des réactions associées au post.
      */
-    @OneToMany(mappedBy = "post")
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reaction> reactions;
 
     /**
@@ -66,6 +68,11 @@ public class Post {
      */
     @ManyToMany(mappedBy = "postsRepostes")
     private List<Utilisateur> utilisateursRepost;
+
+    @ManyToOne
+    @JoinColumn(name = "id_grp")
+    private Groupe groupe;
+
 
 //    /**
 //     * Constructeur avec paramètres.
@@ -199,5 +206,13 @@ public class Post {
 
     public void setImagePost(byte[] imagePost) {
         this.imagePost = imagePost;
+    }
+
+    public Groupe getGroupe() {
+        return groupe;
+    }
+
+    public void setGroupe(Groupe groupe) {
+        this.groupe = groupe;
     }
 }

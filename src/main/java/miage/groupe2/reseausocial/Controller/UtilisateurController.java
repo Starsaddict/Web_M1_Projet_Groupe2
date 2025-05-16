@@ -1,10 +1,14 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
+import miage.groupe2.reseausocial.Model.Groupe;
 import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
+import miage.groupe2.reseausocial.Repository.GroupeRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 
+import miage.groupe2.reseausocial.service.GroupeService;
+import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +24,14 @@ import java.util.*;
 public class UtilisateurController {
 
     @Autowired
-    private UtilisateurRepository utilisateurRepository;
+    UtilisateurRepository utilisateurRepository;
+
+    @Autowired
+    GroupeRepository groupeRepository;
+    @Autowired
+    private GroupeService groupeService;
+    @Autowired
+    private UtilisateurService utilisateurService;
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -174,7 +185,59 @@ public class UtilisateurController {
         return "redirect:/user/"+id;
     }
 
+    @RequestMapping("/joinGroupe")
+    public String joinGroupe(
+            HttpSession session,
+            @RequestParam int idGrp
+    ){
+        Utilisateur userSession = (Utilisateur)session.getAttribute("user");
+        Utilisateur user = utilisateurRepository.findByidUti(userSession.getIdUti());
 
+        Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
+        groupeService.joinGroupe(user,groupe);
+
+        session.setAttribute("user", user);
+
+        return "redirect:/user/mes-groupes";
+
+    }
+
+    @PostMapping("/quitterGroupe")
+    public String quitterGroupe(
+            HttpSession session,
+            @RequestParam int idGrp
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
+        groupeService.quitterGroupe(user,groupe);
+
+        if (user.equals(groupe.getCreateur())) {
+            groupeService.supprimerGroupe(user, groupe);
+        }
+
+        session.setAttribute("user", user);
+
+        return "redirect:/user/mes-groupes";
+        }
+
+    @RequestMapping("/supprimerGroupe")
+    public String supprimerGroupe(
+            HttpSession session,
+            @RequestParam int idGrp
+    ){
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        groupeService.supprimerGroupe(user,idGrp);
+
+        return "redirect:/user/mes-groupes";
+    }
+
+    @GetMapping("/mes-groupes")
+    public String voirMesGroupes(HttpSession session, Model model) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        model.addAttribute("groupesCrees", user.getGroupes()); // createur
+        model.addAttribute("groupesMembre", user.getGroupesAppartenance()); // membre
+        return "mes_groupes";
+    }
 
 
 }
