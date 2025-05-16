@@ -85,7 +85,8 @@ public class PostController {
     public String listPosts(Model model) {
         List<Post> posts = postRepository.findAll();
         posts = posts.stream()
-                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost())) // 降序
+                .filter(post -> post.getGroupe() == null)
+                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
                 .limit(10)
                 .toList();
         model.addAttribute("posts", posts);
@@ -104,6 +105,11 @@ public class PostController {
             List<Post> postsAmis = postRepository.findByCreateur(u);
             posts.addAll(postsAmis);
         }
+        posts = posts.stream()
+                .filter(post -> post.getGroupe() == null)
+                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
+                .limit(10)
+                .toList();
         model.addAttribute("posts", posts);
         return "listPostAmis";
     }
