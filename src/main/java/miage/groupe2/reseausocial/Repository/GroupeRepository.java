@@ -10,7 +10,9 @@ import java.util.List;
 public interface GroupeRepository extends JpaRepository<Groupe, Integer> {
     List<Post> findPostsByidGrp(int groupeId);
 
-    List<Groupe> findAllGroupes();
+//    List<Groupe> findAllGroupes();
 
     Groupe findGroupeByidGrp(int id);
+
+
 }

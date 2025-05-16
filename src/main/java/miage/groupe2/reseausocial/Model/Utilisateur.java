@@ -296,13 +296,13 @@ public class Utilisateur {
         this.amis = amis;
     }
 
-    public List<Utilisateur> getAmisDe() {
-        return amisDe;
-    }
-
-    public void setAmisDe(List<Utilisateur> amisDe) {
-        this.amisDe = amisDe;
-    }
+//    public List<Utilisateur> getAmisDe() {
+//        return amisDe;
+//    }
+//
+//    public void setAmisDe(List<Utilisateur> amisDe) {
+//        this.amisDe = amisDe;
+//    }
 
     public List<Post> getPostsRepostes() {
         return postsRepostes;

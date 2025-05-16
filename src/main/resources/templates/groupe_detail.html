@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails du groupe</title>
+</head>
+<body>
+
+<h2 th:text="${groupe.nomG}">Nom du groupe</h2>
+<p th:text="${groupe.description}"></p>
+<p>Créé par : <span th:text="${groupe.createur.prenomU + ' ' + groupe.createur.nomU}"></span></p>
+<p>Date de création : <span th:text="${@dateUtil.formatTimestamp(groupe.dateCreation)}"></span></p>
+
+<h3>Poster dans le groupe</h3>
+<form th:action="@{'/post/creer'(idgrp=${groupe.idGrp})}" th:object="${post}" method="post">
+    <label>Titre :</label><br>
+    <input type="text" th:field="*{titrePost}"><br>
+    <label>Contenu :</label><br>
+    <textarea th:field="*{textePost}"></textarea><br>
+    <button type="submit">Poster</button>
+</form>
+
+
+
+<h3>Posts</h3>
+<div th:each="post : ${groupe.posts}">
+    <hr>
+    <p>
+        <b th:text="${post.titrePost}"></b> par
+        <span th:text="${post.createur.prenomU + ' ' + post.createur.nomU}"></span>
+        <i th:text="${@dateUtil.formatTimestamp(post.datePost)}"></i>
+    </p>
+    <p th:text="${post.textePost}"></p>
+</div>
+
+<form th:if="${estMembre}" th:action="@{'/user/quitterGroupe'}" method="post">
+    <input type="hidden" name="idGrp" th:value="${groupe.idGrp}">
+    <button type="submit">Quitter le groupe</button>
+</form>
+
+<form th:if="${!estMembre}" th:action="@{'/user/joinGroupe'(idGrp=${groupe.idGrp})}" method="post">
+    <input type="hidden" name="idGrp" th:value="${groupe.idGrp}">
+    <button type="submit">Join le groupe</button>
+</form>
+
+
+</body>
+</html>

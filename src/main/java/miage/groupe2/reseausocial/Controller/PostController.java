@@ -3,11 +3,15 @@ package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
 import miage.groupe2.reseausocial.Model.Commentaire;
+import miage.groupe2.reseausocial.Model.Groupe;
 import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.CommentaireRepository;
 import miage.groupe2.reseausocial.Repository.PostRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import miage.groupe2.reseausocial.service.GroupeService;
+import miage.groupe2.reseausocial.service.PostService;
+import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +35,12 @@ public class PostController {
 
     @Autowired
     CommentaireRepository commentaireRepository;
+    @Autowired
+    private UtilisateurService utilisateurService;
+    @Autowired
+    private GroupeService groupeService;
+    @Autowired
+    private PostService postService;
 
 
     @GetMapping("/{id}")
@@ -54,18 +64,20 @@ public class PostController {
     }
 
     @PostMapping("/creer")
-    public String CreerPost(
+    public String creerPost(
             @ModelAttribute("post") Post post,
+            @RequestParam(value = "idgrp", required = false) Integer idGrp,
             HttpSession session
     ) {
-        long timestamp = System.currentTimeMillis();
-        post.setDatePost(timestamp);
-
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        post.setCreateur(user);
-        postRepository.save(post);
-
-        return "redirect:/user/" + user.getIdUti();
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        if (idGrp != null) {
+            Groupe groupe = groupeService.getGroupeByidGrp(idGrp);
+            postService.publierPostDansGroupe(post, user, groupe);
+            return "redirect:/groupe/" + idGrp;
+        } else {
+            postService.publierPostSansGroupe(post, user);
+            return "redirect:/user/" + user.getIdUti();
+        }
     }
 
     @GetMapping("/list")

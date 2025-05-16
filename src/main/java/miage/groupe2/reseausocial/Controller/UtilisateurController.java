@@ -198,25 +198,27 @@ public class UtilisateurController {
 
         session.setAttribute("user", user);
 
-        return "redirect:/user/" + user.getIdUti() + "/listGroupe";
+        return "redirect:/user/mes-groupes";
 
     }
 
-    @RequestMapping("/quitterGroupe")
+    @PostMapping("/quitterGroupe")
     public String quitterGroupe(
             HttpSession session,
             @RequestParam int idGrp
-    ){
-        Utilisateur userSession = (Utilisateur)session.getAttribute("user");
-        Utilisateur user = utilisateurRepository.findByidUti(userSession.getIdUti());
-
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
         groupeService.quitterGroupe(user,groupe);
 
+        if (user.equals(groupe.getCreateur())) {
+            groupeService.supprimerGroupe(user, groupe);
+        }
+
         session.setAttribute("user", user);
 
-        return "redirect:/user/" + user.getIdUti() + "/listGroupe";
-    }
+        return "redirect:/user/mes-groupes";
+        }
 
     @RequestMapping("/supprimerGroupe")
     public String supprimerGroupe(
@@ -226,7 +228,15 @@ public class UtilisateurController {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         groupeService.supprimerGroupe(user,idGrp);
 
-        return "redirect:/user/" + user.getIdUti() + "/listGroupe";
+        return "redirect:/user/mes-groupes";
+    }
+
+    @GetMapping("/mes-groupes")
+    public String voirMesGroupes(HttpSession session, Model model) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        model.addAttribute("groupesCrees", user.getGroupes()); // createur
+        model.addAttribute("groupesMembre", user.getGroupesAppartenance()); // membre
+        return "mes_groupes";
     }
 
 

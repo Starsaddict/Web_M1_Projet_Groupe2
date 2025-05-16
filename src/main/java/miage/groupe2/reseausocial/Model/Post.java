@@ -1,7 +1,6 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
-import org.springframework.context.annotation.EnableMBeanExport;
 
 import java.util.List;
 
@@ -70,7 +69,7 @@ public class Post {
     private List<Utilisateur> utilisateursRepost;
 
     @ManyToOne
-    @JoinColumn(name = "idGrp")
+    @JoinColumn(name = "id_grp")
     private Groupe groupe;
 
 
@@ -206,5 +205,13 @@ public class Post {
 
     public void setImagePost(byte[] imagePost) {
         this.imagePost = imagePost;
+    }
+
+    public Groupe getGroupe() {
+        return groupe;
+    }
+
+    public void setGroupe(Groupe groupe) {
+        this.groupe = groupe;
     }
 }

@@ -20,10 +20,16 @@ public class GroupeService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    public Groupe getGroupeByidGrp(int id) {
+        return groupeRepository.findGroupeByidGrp(id);
+    }
+
     public void createGroupe(Utilisateur user, Groupe groupe) {
         long timestamp = System.currentTimeMillis();
         groupe.setDateCreation(timestamp);
         groupe.setCreateur(user);
+
+        groupe = groupeRepository.save(groupe);
 
         if (user.getGroupes() == null) {
             user.setGroupes(new ArrayList<>());
@@ -32,9 +38,16 @@ public class GroupeService {
             user.getGroupes().add(groupe);
         }
 
+        if (user.getGroupesAppartenance() == null) {
+            user.setGroupesAppartenance(new ArrayList<>());
+        }
+        if (!user.getGroupesAppartenance().contains(groupe)) {
+            user.getGroupesAppartenance().add(groupe);
+        }
+
         utilisateurRepository.save(user);
-        groupeRepository.save(groupe);
     }
+
 
     public void joinGroupe(Utilisateur user, Groupe groupe) {
         if(user.getGroupesAppartenance() == null){
@@ -55,6 +68,7 @@ public class GroupeService {
     }
 
     public void quitterGroupe(Utilisateur user, Groupe groupe) {
+
         if( user.getGroupesAppartenance() != null && user.getGroupesAppartenance().contains(groupe)){
             user.getGroupesAppartenance().remove(groupe);
         }
@@ -63,6 +77,7 @@ public class GroupeService {
         }
         groupeRepository.save(groupe);
         utilisateurRepository.save(user);
+
     }
 
 
@@ -82,16 +97,14 @@ public class GroupeService {
     }
 
     public boolean supprimerGroupe(Utilisateur user, Groupe groupe) {
-        if(groupe.getMembres()==user){
-            groupeRepository.delete(groupe);
-            return true;
-        }
-        return false;
+        Boolean iftrue = supprimerGroupe(user, groupe.getIdGrp());
+        return iftrue;
     }
 
     public boolean supprimerGroupe(Utilisateur user, int groupeId) {
         Groupe groupe = groupeRepository.findGroupeByidGrp(groupeId);
-        if(groupe.getMembres()==user){
+        if (user.equals(groupe.getCreateur()))
+        {
             groupeRepository.delete(groupe);
             return true;
         }
