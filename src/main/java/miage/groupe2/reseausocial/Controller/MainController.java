@@ -24,6 +24,9 @@ public class MainController {
             HttpSession session
     ) {
         Utilisateur userSession = (Utilisateur) session.getAttribute("user");
+        if (userSession == null) {
+            return "redirect:/auth/login";
+        }
         Utilisateur user = utilisateurRepository.findByidUti(userSession.getIdUti());
         List<Utilisateur> friends = user.getAmis().stream()
                 .limit(5)

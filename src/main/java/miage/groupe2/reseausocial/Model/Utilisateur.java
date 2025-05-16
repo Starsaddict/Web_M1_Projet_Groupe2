@@ -35,6 +35,11 @@ public class Utilisateur {
     private String prenomU;
 
     /**
+     * Pseudo de l'utilisateur.
+     */
+    private String pseudoU;
+
+    /**
      * Adresse email de l'utilisateur.
      */
     private String emailU;
@@ -331,6 +336,13 @@ public class Utilisateur {
         this.avatar = avatar;
     }
 
+    public String getPseudoU() {
+        return pseudoU;
+    }
+
+    public void setPseudoU(String pseudoU) {
+        this.pseudoU = pseudoU;
+    }
 
     @Override
     public boolean equals(Object o) {
