@@ -110,7 +110,7 @@ public class Utilisateur {
     private List<Groupe> groupesAppartenance;
 
     /**
-     * Liste des événements auxquels l'utilisateur a assisté.
+     * Liste des événements auxquels l'utilisateur a assiste.
      */
     @ManyToMany
     @JoinTable(
