@@ -131,11 +131,11 @@ public class Utilisateur {
     )
     private List<Utilisateur> amis;
 
-    /**
-     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
-     */
-    @ManyToMany(mappedBy = "amis")
-    private List<Utilisateur> amisDe;
+//    /**
+//     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
+//     */
+//    @ManyToMany(mappedBy = "amis")
+//    private List<Utilisateur> amisDe;
 
     /**
      * Liste des posts que l'utilisateur a repostés.

@@ -1,6 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
+import org.springframework.context.annotation.EnableMBeanExport;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class Post {
     /**
      * Date de publication du post.
      */
+    @Column(name = "datePost")
     private long datePost;
 
     /**
@@ -66,6 +68,11 @@ public class Post {
      */
     @ManyToMany(mappedBy = "postsRepostes")
     private List<Utilisateur> utilisateursRepost;
+
+    @ManyToOne
+    @JoinColumn(name = "idGrp")
+    private Groupe groupe;
+
 
 //    /**
 //     * Constructeur avec paramètres.
