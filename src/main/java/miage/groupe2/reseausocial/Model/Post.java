@@ -53,13 +53,14 @@ public class Post {
     /**
      * Liste des commentaires associés au post.
      */
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Commentaire> commentaires;
 
     /**
      * Liste des réactions associées au post.
      */
-    @OneToMany(mappedBy = "post")
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reaction> reactions;
 
     /**

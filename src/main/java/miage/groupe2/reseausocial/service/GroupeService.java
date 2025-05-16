@@ -1,8 +1,11 @@
 package miage.groupe2.reseausocial.service;
 
+import jakarta.transaction.Transactional;
 import miage.groupe2.reseausocial.Model.Groupe;
+import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.GroupeRepository;
+import miage.groupe2.reseausocial.Repository.PostRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ public class GroupeService {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+    @Autowired
+    private PostRepository postRepository;
 
     public Groupe getGroupeByidGrp(int id) {
         return groupeRepository.findGroupeByidGrp(id);
@@ -92,9 +97,16 @@ public class GroupeService {
         return null;
     }
 
+    @Transactional
     public void deleteGroupe(Integer id) {
-        groupeRepository.deleteById(id);
+        Groupe groupe = groupeRepository.findGroupeByidGrp(id);
+        if (groupe == null) return;
+
+        groupe.getMembres().clear();
+
+        groupeRepository.delete(groupe);
     }
+
 
     public boolean supprimerGroupe(Utilisateur user, Groupe groupe) {
         Boolean iftrue = supprimerGroupe(user, groupe.getIdGrp());
@@ -105,7 +117,7 @@ public class GroupeService {
         Groupe groupe = groupeRepository.findGroupeByidGrp(groupeId);
         if (user.equals(groupe.getCreateur()))
         {
-            groupeRepository.delete(groupe);
+            deleteGroupe(groupeId);
             return true;
         }
         return false;

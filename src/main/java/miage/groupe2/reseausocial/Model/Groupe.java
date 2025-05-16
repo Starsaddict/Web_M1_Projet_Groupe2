@@ -46,7 +46,7 @@ public class Groupe {
     @ManyToMany(mappedBy = "groupesAppartenance")
     private List<Utilisateur> membres;
 
-    @OneToMany(mappedBy = "groupe")
+    @OneToMany(mappedBy = "groupe" ,cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Post> posts;
 
     /**
