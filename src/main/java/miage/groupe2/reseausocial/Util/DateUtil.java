@@ -12,4 +12,12 @@ public class DateUtil {
                 .atZone(ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
+
+    public String formatTimestampIso(Long timestamp) {
+        if (timestamp == null) 
+            return "";
+        return Instant.ofEpochMilli(timestamp)
+                .atZone(ZoneId.systemDefault())
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+    }
 }

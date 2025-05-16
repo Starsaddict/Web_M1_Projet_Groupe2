@@ -118,7 +118,7 @@ public class Utilisateur {
     private List<Groupe> groupesAppartenance;
 
     /**
-     * Liste des événements auxquels l'utilisateur a assisté.
+     * Liste des événements auxquels l'utilisateur a assiste.
      */
     @ManyToMany
     @JoinTable(
@@ -139,11 +139,11 @@ public class Utilisateur {
     )
     private List<Utilisateur> amis;
 
-    /**
-     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
-     */
-    @ManyToMany(mappedBy = "amis")
-    private List<Utilisateur> amisDe;
+//    /**
+//     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
+//     */
+//    @ManyToMany(mappedBy = "amis")
+//    private List<Utilisateur> amisDe;
 
     /**
      * Liste des posts que l'utilisateur a repostés.
@@ -304,13 +304,13 @@ public class Utilisateur {
         this.amis = amis;
     }
 
-    public List<Utilisateur> getAmisDe() {
-        return amisDe;
-    }
-
-    public void setAmisDe(List<Utilisateur> amisDe) {
-        this.amisDe = amisDe;
-    }
+//    public List<Utilisateur> getAmisDe() {
+//        return amisDe;
+//    }
+//
+//    public void setAmisDe(List<Utilisateur> amisDe) {
+//        this.amisDe = amisDe;
+//    }
 
     public List<Post> getPostsRepostes() {
         return postsRepostes;
