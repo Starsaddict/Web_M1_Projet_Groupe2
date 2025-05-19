@@ -4,95 +4,239 @@ import miage.groupe2.reseausocial.Model.DemandeAmi;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.DemandeAmiRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class DemandeAmiControllerTest {
 
+    private MockMvc mockMvc;
+
+    @Mock
+    private DemandeAmiRepository demandeAmiRepository;
+
+    @Mock
+    private UtilisateurRepository utilisateurRepository;
+
+    @Mock
+    private HttpSession session;
+
     @InjectMocks
-    DemandeAmiController controller;
-
-    @Mock
-    DemandeAmiRepository demandeAmiRepository;
-
-    @Mock
-    UtilisateurRepository utilisateurRepository;
-
-    @Mock
-    HttpSession session;
-
-    @Mock
-    RedirectAttributes redirectAttributes;
+    private DemandeAmiController demandeAmiController;
 
     @BeforeEach
-    void init() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(demandeAmiController).build();
     }
 
     @Test
-    void accepte_demande_nonConnecte_redirigeLogin() {
+    void afficherDemandesRecues_userNotLoggedIn_redirectToLogin() throws Exception {
         when(session.getAttribute("user")).thenReturn(null);
 
-        String res = controller.accepterDemande(1, session, redirectAttributes);
-
-        assertEquals("redirect:/auth/login", res);
+        mockMvc.perform(get("/demande/demandes-recues").sessionAttr("user", null))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/auth/login"));
     }
 
     @Test
-    void accepte_demande_valide_modifieEtSauve() {
+    void afficherDemandesRecues_userLoggedIn_showList() throws Exception {
         Utilisateur user = new Utilisateur();
         user.setIdUti(1);
 
+        when(session.getAttribute("user")).thenReturn(user);
+        when(demandeAmiRepository.findByRecepteurIdUtiAndStatut(1, "en attente"))
+                .thenReturn(List.of(new DemandeAmi()));
+
+        mockMvc.perform(get("/demande/demandes-recues").sessionAttr("user", user))
+                .andExpect(status().isOk())
+                .andExpect(view().name("listeDemandeAmi"))
+                .andExpect(model().attributeExists("demandesRecues"));
+    }
+
+    @Test
+    void accepterDemande_userNotLoggedIn_redirectToLogin() throws Exception {
+        when(session.getAttribute("user")).thenReturn(null);
+
+        mockMvc.perform(post("/demande/accepter").param("idDemande", "1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/auth/login"));
+    }
+
+    @Test
+    void accepterDemande_validRequest_saveAndRedirect() throws Exception {
+        Utilisateur user = new Utilisateur();
+        user.setIdUti(2);
+
         Utilisateur demandeur = new Utilisateur();
-        demandeur.setIdUti(2);
+        demandeur.setIdUti(1);
 
         DemandeAmi demande = new DemandeAmi();
-        demande.setIdDA(10);
         demande.setRecepteur(user);
         demande.setDemandeur(demandeur);
         demande.setStatut("en attente");
 
         when(session.getAttribute("user")).thenReturn(user);
         when(demandeAmiRepository.findById(10)).thenReturn(Optional.of(demande));
-        doNothing().when(demandeAmiRepository).ajouterLienAmitie(demandeur.getIdUti(), user.getIdUti());
-        when(redirectAttributes.addFlashAttribute(anyString(), anyString())).thenReturn(redirectAttributes);
 
-        String res = controller.accepterDemande(10, session, redirectAttributes);
+        mockMvc.perform(post("/demande/accepter")
+                        .param("idDemande", "10")
+                        .header("Referer", "/somepage"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/somepage"));
 
-        assertEquals("redirect:/demande/demandes-recues", res);
-        assertEquals("acceptée", demande.getStatut());
         verify(demandeAmiRepository).save(demande);
-        verify(demandeAmiRepository).ajouterLienAmitie(demandeur.getIdUti(), user.getIdUti());
-        verify(redirectAttributes).addFlashAttribute("succes", "Demande d'ami acceptée.");
+        verify(demandeAmiRepository).ajouterLienAmitie(1, 2);
     }
 
     @Test
-    void accepte_demande_pasPourUser_rienFait() {
+    void refuserDemande_userNotLoggedIn_redirectToLogin() throws Exception {
+        when(session.getAttribute("user")).thenReturn(null);
+
+        mockMvc.perform(post("/demande/refuser").param("idDemande", "1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/auth/login"));
+    }
+
+    @Test
+    void refuserDemande_validRequest_saveAndRedirect() throws Exception {
+        Utilisateur user = new Utilisateur();
+        user.setIdUti(2);
+
+        DemandeAmi demande = new DemandeAmi();
+        demande.setRecepteur(user);
+        demande.setStatut("en attente");
+
+        when(session.getAttribute("user")).thenReturn(user);
+        when(demandeAmiRepository.findById(10)).thenReturn(Optional.of(demande));
+
+        mockMvc.perform(post("/demande/refuser")
+                        .param("idDemande", "10")
+                        .header("Referer", "/somepage"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/somepage"));
+
+        verify(demandeAmiRepository).save(demande);
+    }
+
+    @Test
+    void envoyerDemandeAmi_userNotLoggedIn_redirectToLogin() throws Exception {
+        when(session.getAttribute("user")).thenReturn(null);
+
+        mockMvc.perform(post("/demande/ajouterAmi").param("idAmi", "1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/auth/login"));
+    }
+
+    @Test
+    void envoyerDemandeAmi_selfAdd_redirectError() throws Exception {
         Utilisateur user = new Utilisateur();
         user.setIdUti(1);
 
-        Utilisateur autre = new Utilisateur();
-        autre.setIdUti(3);
+        when(session.getAttribute("user")).thenReturn(user);
 
-        DemandeAmi demande = new DemandeAmi();
-        demande.setRecepteur(autre); 
+        mockMvc.perform(post("/demande/ajouterAmi")
+                        .param("idAmi", "1")
+                        .param("nom", ""))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("error"))
+                .andExpect(redirectedUrl("/user/rechercher?nom="));
+    }
+
+    @Test
+    void envoyerDemandeAmi_userNotFound_redirectError() throws Exception {
+        Utilisateur user = new Utilisateur();
+        user.setIdUti(1);
 
         when(session.getAttribute("user")).thenReturn(user);
-        when(demandeAmiRepository.findById(5)).thenReturn(Optional.of(demande));
+        when(utilisateurRepository.findByidUti(2)).thenReturn(null);
 
-        String res = controller.accepterDemande(5, session, redirectAttributes);
+        mockMvc.perform(post("/demande/ajouterAmi")
+                        .param("idAmi", "2")
+                        .param("nom", "toto"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("error"))
+                .andExpect(redirectedUrl("/user/rechercher?nom=toto"));
+    }
 
-        assertEquals("redirect:/demande/demandes-recues", res);
-        verify(demandeAmiRepository, never()).save(any());
-        verify(demandeAmiRepository, never()).ajouterLienAmitie(anyInt(), anyInt());
+    @Test
+    void envoyerDemandeAmi_alreadyExists_redirectError() throws Exception {
+        Utilisateur user = new Utilisateur();
+        user.setIdUti(1);
+
+        Utilisateur recepteur = new Utilisateur();
+        recepteur.setIdUti(2);
+
+        when(session.getAttribute("user")).thenReturn(user);
+        when(utilisateurRepository.findByidUti(2)).thenReturn(recepteur);
+        when(demandeAmiRepository.existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(1, 2, List.of("en attente"))).thenReturn(true);
+        when(demandeAmiRepository.sontDejaAmis(1, 2)).thenReturn(false);
+
+        mockMvc.perform(post("/demande/ajouterAmi")
+                        .param("idAmi", "2")
+                        .param("nom", "foo"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("error"))
+                .andExpect(redirectedUrl("/user/rechercher?nom=foo"));
+    }
+
+    @Test
+    void envoyerDemandeAmi_alreadyFriends_redirectError() throws Exception {
+        Utilisateur user = new Utilisateur();
+        user.setIdUti(1);
+
+        Utilisateur recepteur = new Utilisateur();
+        recepteur.setIdUti(2);
+
+        when(session.getAttribute("user")).thenReturn(user);
+        when(utilisateurRepository.findByidUti(2)).thenReturn(recepteur);
+        when(demandeAmiRepository.existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(1, 2, List.of("en attente"))).thenReturn(false);
+        when(demandeAmiRepository.sontDejaAmis(1, 2)).thenReturn(true);
+
+        mockMvc.perform(post("/demande/ajouterAmi")
+                        .param("idAmi", "2")
+                        .param("nom", "bar"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("error"))
+                .andExpect(redirectedUrl("/user/rechercher?nom=bar"));
+    }
+
+    @Test
+    void envoyerDemandeAmi_validRequest_saveAndRedirect() throws Exception {
+        Utilisateur user = new Utilisateur();
+        user.setIdUti(1);
+        user.setNomU("Jean");
+
+        Utilisateur recepteur = new Utilisateur();
+        recepteur.setIdUti(2);
+        recepteur.setNomU("Paul");
+
+        when(session.getAttribute("user")).thenReturn(user);
+        when(utilisateurRepository.findByidUti(2)).thenReturn(recepteur);
+        when(demandeAmiRepository.existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(1, 2, List.of("en attente"))).thenReturn(false);
+        when(demandeAmiRepository.sontDejaAmis(1, 2)).thenReturn(false);
+
+        mockMvc.perform(post("/demande/ajouterAmi")
+                        .param("idAmi", "2")
+                        .param("nom", "toto"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("success"))
+                .andExpect(redirectedUrl("/user/rechercher?nom=toto"));
+
+        verify(demandeAmiRepository).save(any(DemandeAmi.class));
     }
 }

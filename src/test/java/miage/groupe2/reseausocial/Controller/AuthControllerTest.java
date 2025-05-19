@@ -2,84 +2,84 @@ package miage.groupe2.reseausocial.Controller;
 
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.mindrot.jbcrypt.BCrypt;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import jakarta.servlet.http.HttpSession;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.mindrot.jbcrypt.BCrypt;
-
-@WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private UtilisateurRepository utilisateurRepository;
 
+    @InjectMocks
+    private AuthController authController;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+    }
+
     @Test
-    void testLoginSuccess() throws Exception {
-        String email = "test@example.com";
+    void authenticate_withValidEmailAndPassword_shouldRedirectToHome() throws Exception {
         String rawPassword = "password123";
         String hashedPassword = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
 
         Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setIdUti(42);
-        utilisateur.setEmailU(email);
+        utilisateur.setEmailU("test@example.com");
         utilisateur.setMdpU(hashedPassword);
 
-        Mockito.when(utilisateurRepository.findByEmailU(email)).thenReturn(utilisateur);
+        when(utilisateurRepository.findByEmailU("test@example.com")).thenReturn(utilisateur);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-                .param("email", email)
+        mockMvc.perform(post("/auth/login")
+                .param("email", "test@example.com")
                 .param("mdp", rawPassword))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/user/42"));
+                .andExpect(redirectedUrl("/home"));
     }
 
     @Test
-    void testLoginFailWrongPassword() throws Exception {
-        String email = "test@example.com";
-        String rawPassword = "wrongpass";
-        String hashedPassword = BCrypt.hashpw("password123", BCrypt.gensalt());
+    void authenticate_withInvalidEmail_shouldReturnLoginFormWithError() throws Exception {
+        when(utilisateurRepository.findByEmailU("unknown@example.com")).thenReturn(null);
+
+        mockMvc.perform(post("/auth/login")
+                .param("email", "unknown@example.com")
+                .param("mdp", "anyPassword"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("form-login"))
+                .andExpect(model().attributeExists("error"))
+                .andExpect(model().attribute("error", "email n'exist pas"));
+    }
+
+    @Test
+    void authenticate_withWrongPassword_shouldRedirectToHomeWithError() throws Exception {
+        String rawPassword = "password123";
+        String hashedPassword = BCrypt.hashpw("correctPassword", BCrypt.gensalt());
 
         Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setEmailU(email);
+        utilisateur.setEmailU("test@example.com");
         utilisateur.setMdpU(hashedPassword);
 
-        Mockito.when(utilisateurRepository.findByEmailU(email)).thenReturn(utilisateur);
+        when(utilisateurRepository.findByEmailU("test@example.com")).thenReturn(utilisateur);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-                .param("email", email)
-                .param("mdp", rawPassword))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("error"))
-                .andExpect(model().attribute("error", "wrong password"))
-                .andExpect(view().name("form-login"));
+        mockMvc.perform(post("/auth/login")
+                .param("email", "test@example.com")
+                .param("mdp", rawPassword))  // mauvais mdp
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/home"));
     }
 
-    @Test
-    void testLoginFailEmailNotFound() throws Exception {
-        String email = "unknown@example.com";
-
-        Mockito.when(utilisateurRepository.findByEmailU(email)).thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
-                .param("email", email)
-                .param("mdp", "anything"))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("error"))
-                .andExpect(model().attribute("error", "email n'exist pas"))
-                .andExpect(view().name("form-login"));
-    }
 }

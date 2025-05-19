@@ -60,29 +60,16 @@ public class Groupe implements Serializable {
      * @param nomG nom du groupe
      * @param description description du groupe
      */
-//    public Groupe(Integer idGrp, List<Utilisateur> membres, Utilisateur createur, long dateCreation, String nomG, String description) {
-//        this.idGrp = idGrp;
-//        this.membres = membres;
-//        this.createur = createur;
-//        this.dateCreation = dateCreation;
-//        this.nomG = nomG;
-//        this.description = description;
-//    }
-
-    /**
-     * Constructeur par défaut requis par JPA.
-     * @param string2 
-     * @param string 
-     * @param l 
-     * @param createur2 
-     * @param list 
-     * @param i 
-     */
-    public Groupe(int i, List<Utilisateur> list, Utilisateur createur2, long l, String string, String string2) {
+    public Groupe(Integer idGrp, List<Utilisateur> membres, Utilisateur createur, long dateCreation, String nomG, String description) {
+        this.idGrp = idGrp;
+        this.membres = membres;
+        this.createur = createur;
+        this.dateCreation = dateCreation;
+        this.nomG = nomG;
+        this.description = description;
     }
 
     public Groupe() {
-        //TODO Auto-generated constructor stub
     }
 
     /**
