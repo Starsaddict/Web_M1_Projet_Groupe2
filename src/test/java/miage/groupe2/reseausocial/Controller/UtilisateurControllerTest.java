@@ -2,65 +2,65 @@ package miage.groupe2.reseausocial.Controller;
 
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.http.MediaType;
+import org.mockito.*;
+import org.springframework.ui.Model;
 
-import java.util.List;
+import java.util.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@WebMvcTest(UtilisateurController.class)
-@ContextConfiguration(classes = UtilisateurController.class)
-public class UtilisateurControllerTest {
+class UtilisateurControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    UtilisateurController utilisateurController;
 
-    @MockitoBean
-    private UtilisateurRepository utilisateurRepository;
+    @Mock
+    UtilisateurRepository utilisateurRepository;
 
-    @Test
-    public void testShowRegisterForm() throws Exception {
-        mockMvc.perform(get("/user/register"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("form-register"))
-                .andExpect(model().attributeExists("utilisateur"));
+    @Mock
+    Model model;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testRegisterUser_EmailAlreadyExists() throws Exception {
-        Mockito.when(utilisateurRepository.findAllEmailU())
-                .thenReturn(List.of("test@example.com"));
+    void testRegisterUser_EmailAlreadyExists() {
+        // Setup utilisateur avec email existant
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setEmailU("existant@email.com");
+        utilisateur.setMdpU("password");
 
-        mockMvc.perform(post("/user/register")
-                        .param("emailU", "test@example.com")
-                        .param("mdpU", "password123")
-                        .param("nomU", "Test")
-                        .param("prenomU", "User"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("form-register"))
-                .andExpect(model().attributeExists("error"));
+        when(utilisateurRepository.findAllEmailU()).thenReturn(Arrays.asList("existant@email.com"));
+
+        String view = utilisateurController.registerUser(utilisateur, model);
+
+        assertEquals("form-register", view);
+        verify(model).addAttribute(eq("error"), eq("email exist"));
+        verify(utilisateurRepository, never()).save(any());
     }
 
     @Test
-    public void testRegisterUser_NewUser() throws Exception {
-        Mockito.when(utilisateurRepository.findAllEmailU())
-                .thenReturn(List.of());
+    void testRegisterUser_SuccessfulRegistration() {
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setEmailU("nouveau@email.com");
+        utilisateur.setMdpU("password");
 
-        mockMvc.perform(post("/user/register")
-                        .param("emailU", "newuser@example.com")
-                        .param("mdpU", "password123")
-                        .param("nomU", "New")
-                        .param("prenomU", "User")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/auth/login"));
+        when(utilisateurRepository.findAllEmailU()).thenReturn(Collections.emptyList());
+
+        String view = utilisateurController.registerUser(utilisateur, model);
+
+        assertEquals("redirect:/auth/login", view);
+
+        ArgumentCaptor<Utilisateur> captor = ArgumentCaptor.forClass(Utilisateur.class);
+        verify(utilisateurRepository).save(captor.capture());
+
+        Utilisateur savedUser = captor.getValue();
+        assertNotEquals("password", savedUser.getMdpU());
+        assertTrue(savedUser.getMdpU().startsWith("$2a$")); // Format BCrypt hash
     }
 }

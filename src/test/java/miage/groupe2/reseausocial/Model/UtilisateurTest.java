@@ -4,9 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UtilisateurTest {
 
@@ -15,96 +15,84 @@ class UtilisateurTest {
     @BeforeEach
     void setUp() {
         utilisateur = new Utilisateur();
-    }
-
-    @Test
-    void testSetAndGetBasicAttributes() {
         utilisateur.setIdUti(1);
         utilisateur.setNomU("Dupont");
         utilisateur.setPrenomU("Jean");
         utilisateur.setEmailU("jean.dupont@example.com");
         utilisateur.setMdpU("password123");
-
-        assertEquals(1, utilisateur.getIdUti());
-        assertEquals("Dupont", utilisateur.getNomU());
-        assertEquals("Jean", utilisateur.getPrenomU());
-        assertEquals("jean.dupont@example.com", utilisateur.getEmailU());
-        assertEquals("password123", utilisateur.getMdpU());
+        utilisateur.setPseudoU("jeanjean");
+        utilisateur.setAvatar(new byte[]{1, 2, 3});
     }
 
     @Test
-    void testManipulateAmis() {
-        Utilisateur ami1 = new Utilisateur();
-        ami1.setIdUti(2);
-        ami1.setNomU("Martin");
-
-        Utilisateur ami2 = new Utilisateur();
-        ami2.setIdUti(3);
-        ami2.setNomU("Bernard");
-
-        List<Utilisateur> amis = new ArrayList<>();
-        amis.add(ami1);
-        amis.add(ami2);
-
-        utilisateur.setAmis(amis);
-
-        assertEquals(2, utilisateur.getAmis().size());
-        assertTrue(utilisateur.getAmis().contains(ami1));
-        assertTrue(utilisateur.getAmis().contains(ami2));
-
-        utilisateur.getAmis().remove(ami1);
-        assertEquals(1, utilisateur.getAmis().size());
-        assertFalse(utilisateur.getAmis().contains(ami1));
+    void testAttributsSimples() {
+        assertThat(utilisateur.getIdUti()).isEqualTo(1);
+        assertThat(utilisateur.getNomU()).isEqualTo("Dupont");
+        assertThat(utilisateur.getPrenomU()).isEqualTo("Jean");
+        assertThat(utilisateur.getEmailU()).isEqualTo("jean.dupont@example.com");
+        assertThat(utilisateur.getMdpU()).isEqualTo("password123");
+        assertThat(utilisateur.getPseudoU()).isEqualTo("jeanjean");
+        assertThat(utilisateur.getAvatar()).isEqualTo(new byte[]{1, 2, 3});
     }
 
     @Test
-    void testManipulatePosts() {
-        Post post1 = new Post();
-        post1.setIdPost(10);
-        Post post2 = new Post();
-        post2.setIdPost(20);
+    void testCollectionsInitialisationEtAssignation() {
+        Post post = new Post();
+        Evenement evenement = new Evenement();
+        Groupe groupe = new Groupe();
+        Conversation conv = new Conversation();
+        Commentaire commentaire = new Commentaire();
+        Reaction reaction = new Reaction();
+        Message message = new Message();
+        DemandeAmi demande = new DemandeAmi();
 
-        List<Post> posts = new ArrayList<>();
-        posts.add(post1);
-        posts.add(post2);
+        utilisateur.setPosts(new ArrayList<>(Arrays.asList(post)));
+        utilisateur.setEvenements(new ArrayList<>(Arrays.asList(evenement)));
+        utilisateur.setGroupes(new ArrayList<>(Arrays.asList(groupe)));
+        utilisateur.setConversations(new ArrayList<>(Arrays.asList(conv)));
+        utilisateur.setCommentaires(new ArrayList<>(Arrays.asList(commentaire)));
+        utilisateur.setReactions(new ArrayList<>(Arrays.asList(reaction)));
+        utilisateur.setMessages(new ArrayList<>(Arrays.asList(message)));
+        utilisateur.setDemandesEnvoyees(new ArrayList<>(Arrays.asList(demande)));
+        utilisateur.setDemandesRecues(new ArrayList<>(Arrays.asList(demande)));
+        utilisateur.setGroupesAppartenance(new ArrayList<>(Arrays.asList(groupe)));
+        utilisateur.setEvenementsAssistes(new ArrayList<>(Arrays.asList(evenement)));
+        utilisateur.setAmis(new ArrayList<>());
+        utilisateur.setPostsRepostes(new ArrayList<>(Arrays.asList(post)));
+        utilisateur.setConversationsParticipees(new ArrayList<>(Arrays.asList(conv)));
 
-        utilisateur.setPosts(posts);
-
-        assertEquals(2, utilisateur.getPosts().size());
-        assertTrue(utilisateur.getPosts().contains(post1));
-        assertTrue(utilisateur.getPosts().contains(post2));
-    }
-
-    @Test
-    void testManipulateGroupes() {
-        Groupe grp1 = new Groupe();
-        grp1.setIdGrp(100);
-        Groupe grp2 = new Groupe();
-        grp2.setIdGrp(200);
-
-        List<Groupe> groupes = new ArrayList<>();
-        groupes.add(grp1);
-        groupes.add(grp2);
-
-        utilisateur.setGroupesAppartenance(groupes);
-
-        assertEquals(2, utilisateur.getGroupesAppartenance().size());
-        assertTrue(utilisateur.getGroupesAppartenance().contains(grp1));
-        assertTrue(utilisateur.getGroupesAppartenance().contains(grp2));
+        assertThat(utilisateur.getPosts()).containsExactly(post);
+        assertThat(utilisateur.getEvenements()).containsExactly(evenement);
+        assertThat(utilisateur.getGroupes()).containsExactly(groupe);
+        assertThat(utilisateur.getConversations()).containsExactly(conv);
+        assertThat(utilisateur.getCommentaires()).containsExactly(commentaire);
+        assertThat(utilisateur.getReactions()).containsExactly(reaction);
+        assertThat(utilisateur.getMessages()).containsExactly(message);
+        assertThat(utilisateur.getDemandesEnvoyees()).containsExactly(demande);
+        assertThat(utilisateur.getDemandesRecues()).containsExactly(demande);
+        assertThat(utilisateur.getGroupesAppartenance()).containsExactly(groupe);
+        assertThat(utilisateur.getEvenementsAssistes()).containsExactly(evenement);
+        assertThat(utilisateur.getAmis()).isEmpty();
+        assertThat(utilisateur.getPostsRepostes()).containsExactly(post);
+        assertThat(utilisateur.getConversationsParticipees()).containsExactly(conv);
     }
 
     @Test
     void testEqualsAndHashCode() {
-        Utilisateur u1 = new Utilisateur();
-        u1.setIdUti(10);
-        Utilisateur u2 = new Utilisateur();
-        u2.setIdUti(10);
-        Utilisateur u3 = new Utilisateur();
-        u3.setIdUti(20);
+        Utilisateur autre = new Utilisateur();
+        autre.setIdUti(1);
 
-        assertEquals(u1, u2);
-        assertNotEquals(u1, u3);
-        assertEquals(u1.hashCode(), u2.hashCode());
-        assertNotEquals(u1.hashCode(), u3.hashCode());
+        Utilisateur different = new Utilisateur();
+        different.setIdUti(2);
+
+        assertThat(utilisateur).isEqualTo(autre);
+        assertThat(utilisateur).hasSameHashCodeAs(autre);
+        assertThat(utilisateur).isNotEqualTo(different);
+    }
+
+    @Test
+    void testEqualsAvecNullEtAutreClasse() {
+        assertThat(utilisateur.equals(null)).isFalse();
+        assertThat(utilisateur.equals("string")).isFalse();
     }
 }

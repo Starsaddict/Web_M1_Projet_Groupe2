@@ -1,6 +1,8 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +10,8 @@ import java.util.List;
  * Une conversation peut contenir plusieurs messages et plusieurs participants.
  */
 @Entity
-public class Conversation {
+public class Conversation implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Identifiant unique de la conversation.

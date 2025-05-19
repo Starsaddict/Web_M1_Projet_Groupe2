@@ -1,18 +1,25 @@
 package miage.groupe2.reseausocial.Model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GroupeTest {
 
-    @Test
-    void testConstructeurAvecParametres() {
-        Utilisateur createur = new Utilisateur();
+    private Groupe groupe;
+    private Utilisateur createur;
+    private List<Utilisateur> membres;
+    private List<Post> posts;
+
+    @BeforeEach
+    void setUp() {
+        createur = new Utilisateur();
         createur.setIdUti(1);
-        createur.setNomU("Alice");
+        createur.setNomU("Doe");
 
         Utilisateur membre1 = new Utilisateur();
         membre1.setIdUti(2);
@@ -20,48 +27,50 @@ class GroupeTest {
         Utilisateur membre2 = new Utilisateur();
         membre2.setIdUti(3);
 
-        Groupe groupe = new Groupe(
-                100,
-                List.of(membre1, membre2),
-                createur,
-                1716220800000L,
-                "Groupe MIAGE",
-                "Groupe pour les étudiants en MIAGE"
-        );
+        membres = new ArrayList<>();
+        membres.add(membre1);
+        membres.add(membre2);
 
-        assertEquals(100, groupe.getIdGrp());
-        assertEquals("Groupe MIAGE", groupe.getNomG());
-        assertEquals("Groupe pour les étudiants en MIAGE", groupe.getDescription());
-        assertEquals(1716220800000L, groupe.getDateCreation());
-        assertEquals(createur, groupe.getCreateur());
-        assertEquals(2, groupe.getMembres().size());
-        assertTrue(groupe.getMembres().contains(membre1));
-        assertTrue(groupe.getMembres().contains(membre2));
+        Post post = new Post();
+        post.setIdPost(10);
+
+        posts = new ArrayList<>();
+        posts.add(post);
+
+        groupe = new Groupe(100, membres, createur, 1716076782L, "MIAGE Group", "Groupe de discussion");
+        groupe.setPosts(posts);
     }
 
     @Test
-    void testConstructeurParDefautEtSetters() {
-        Groupe groupe = new Groupe();
+    void testConstructorAndGetters() {
+        assertEquals(100, groupe.getIdGrp());
+        assertEquals("MIAGE Group", groupe.getNomG());
+        assertEquals("Groupe de discussion", groupe.getDescription());
+        assertEquals(1716076782L, groupe.getDateCreation());
 
-        Utilisateur createur = new Utilisateur();
-        createur.setIdUti(10);
-
-        Utilisateur membre = new Utilisateur();
-        membre.setIdUti(11);
-
-        groupe.setIdGrp(200);
-        groupe.setNomG("Test Groupe");
-        groupe.setDescription("Description test");
-        groupe.setDateCreation(1716229999000L);
-        groupe.setCreateur(createur);
-        groupe.setMembres(List.of(membre));
-
-        assertEquals(200, groupe.getIdGrp());
-        assertEquals("Test Groupe", groupe.getNomG());
-        assertEquals("Description test", groupe.getDescription());
-        assertEquals(1716229999000L, groupe.getDateCreation());
         assertEquals(createur, groupe.getCreateur());
-        assertEquals(1, groupe.getMembres().size());
-        assertEquals(membre, groupe.getMembres().get(0));
+        assertEquals(2, groupe.getMembres().size());
+        assertEquals(posts, groupe.getPosts());
+    }
+
+    @Test
+    void testSetters() {
+        Groupe g = new Groupe();
+
+        g.setIdGrp(200);
+        g.setNomG("Test Group");
+        g.setDescription("Description test");
+        g.setDateCreation(123456789L);
+        g.setCreateur(createur);
+        g.setMembres(membres);
+        g.setPosts(posts);
+
+        assertEquals(200, g.getIdGrp());
+        assertEquals("Test Group", g.getNomG());
+        assertEquals("Description test", g.getDescription());
+        assertEquals(123456789L, g.getDateCreation());
+        assertEquals(createur, g.getCreateur());
+        assertEquals(membres, g.getMembres());
+        assertEquals(posts, g.getPosts());
     }
 }
