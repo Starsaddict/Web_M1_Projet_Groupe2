@@ -1,6 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DemandeAmiTest {
@@ -53,4 +54,15 @@ public class DemandeAmiTest {
         assertEquals(123456789L, demande.getDateDA());
         assertEquals("acceptée", demande.getStatut());
     }
+
+    @Test
+    void testStatutPeutEtreNull() {
+    DemandeAmi demande = new DemandeAmi();
+    demande.setStatut(null);
+    assertNull(demande.getStatut());
+}
+
+
+
+
 }
