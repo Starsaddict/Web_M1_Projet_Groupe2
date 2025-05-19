@@ -7,19 +7,15 @@ import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.GroupeRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 
-import miage.groupe2.reseausocial.Util.ImageUtil;
 import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.util.*;
 
 
@@ -125,39 +121,28 @@ public class UtilisateurController {
         return "redirect:/user/mes-amis";
     }
 
-@GetMapping("/{id}/profil")
+@RequestMapping("/{id:[0-9]+}")
 public String userProfil(
-        @RequestParam(value = "type", defaultValue = "post") String type,
-        @PathVariable Integer id,
+        @PathVariable long id,
         Model model
 ){
-    Utilisateur user = utilisateurRepository.findByIdUti(id);
-
+    Utilisateur user = utilisateurRepository.findByidUti(id);
+    if (user == null) {                // Ajout de cette vérification
+        return "redirect:/error404";  // Ou une autre page d’erreur/accueil, selon ton app
+    }
     model.addAttribute("user", user);
     List<Post> posts = user.getPosts().stream()
             .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
-            .limit(10)
+            .limit(3)
             .toList();
 
-    List<Post> reposts = user.getPostsRepostes().stream()
-            .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
-            .limit(10)
-            .toList();
-
-    List<Utilisateur> Amis = user.getAmis().stream()
-                    .limit(6)
-                            .toList();
-
-    model.addAttribute("Friends", Amis);
-    model.addAttribute("posts", "repost".equals(type) ? reposts : posts);
-    model.addAttribute("type", type);
-    model.addAttribute("reposts", reposts);
-    return "profil_user";
+    model.addAttribute("posts", posts);
+    return "user_profil";
 }
 
     @GetMapping("/{id}/modifierProfil")
     public String modifierProfil(@PathVariable long id, Model model) {
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
+        Utilisateur user = utilisateurRepository.findByidUti(id);
         model.addAttribute("user", user);
         return "modifier_profil";
     }
@@ -170,7 +155,7 @@ public String userProfil(
             @RequestParam String email,
             HttpSession session
             ) {
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
+        Utilisateur user = utilisateurRepository.findByidUti(id);
         user.setNomU(nom);
         user.setPrenomU(prenom);
         user.setEmailU(email);
@@ -184,7 +169,7 @@ public String userProfil(
             @PathVariable long id,
             Model model
     ){
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
+        Utilisateur user = utilisateurRepository.findByidUti(id);
         model.addAttribute("user", user);
         return "modifier_password";
     }
@@ -195,7 +180,7 @@ public String userProfil(
             @RequestParam String password,
             HttpSession session
     ){
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
+        Utilisateur user = utilisateurRepository.findByidUti(id);
         password = BCrypt.hashpw(password, BCrypt.gensalt());
         user.setMdpU(password);
         utilisateurRepository.save(user);
@@ -209,7 +194,7 @@ public String userProfil(
             @RequestParam int idGrp
     ){
         Utilisateur userSession = (Utilisateur)session.getAttribute("user");
-        Utilisateur user = utilisateurRepository.findByIdUti(userSession.getIdUti());
+        Utilisateur user = utilisateurRepository.findByidUti(userSession.getIdUti());
 
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
         groupeService.joinGroupe(user,groupe);
@@ -256,26 +241,6 @@ public String userProfil(
         model.addAttribute("groupesMembre", user.getGroupesAppartenance()); // membre
         return "mes_groupes";
     }
-
-
-    @PostMapping("/uploadAvatar")
-    public String uploadAvatar(@RequestParam("avatar") MultipartFile file,
-                               HttpSession session,
-                               @RequestHeader(value = "Referer", required = false) String referer
-    ) throws IOException {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-
-        if (user != null && !file.isEmpty()) {
-            byte[] originalBytes = file.getBytes();
-            byte[] croppedBytes = ImageUtil.cropCenterSquare(originalBytes);
-            user.setAvatar(croppedBytes);
-            utilisateurRepository.save(user);
-        }
-
-        session.setAttribute("user", user);
-        return "redirect:" + (referer != null ? referer : "/user/" + user.getIdUti());
-    }
-
 
 
 }

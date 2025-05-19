@@ -60,7 +60,7 @@ public class GroupeController {
             Model model
     ){
         Utilisateur userSession = (Utilisateur) session.getAttribute("user");
-        Utilisateur user = utilisateurRepository.findByIdUti(userSession.getIdUti());
+        Utilisateur user = utilisateurRepository.findByidUti(userSession.getIdUti());
 
         groupeService.createGroupe(user, groupe);
 
@@ -77,7 +77,7 @@ public class GroupeController {
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
         if (groupe == null) return "redirect:/groupe/list";
 
-        Utilisateur user = utilisateurRepository.findByIdUti(
+        Utilisateur user = utilisateurRepository.findByidUti(
                 ((Utilisateur) session.getAttribute("user")).getIdUti()
         );
 
@@ -142,7 +142,7 @@ public class GroupeController {
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
 
         if (groupe != null && user != null && user.equals(groupe.getCreateur())) {
-            Utilisateur membre = utilisateurRepository.findByIdUti(idMembre);
+            Utilisateur membre = utilisateurRepository.findByidUti(idMembre);
             if (membre != null) {
                 groupeService.quitterGroupe(membre, groupe);
             }
