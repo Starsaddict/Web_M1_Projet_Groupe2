@@ -156,7 +156,7 @@ public class Utilisateur {
     /**
      * Liste des posts que l'utilisateur a repostés.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "reposterPost",
             joinColumns = @JoinColumn(name = "idUti"),

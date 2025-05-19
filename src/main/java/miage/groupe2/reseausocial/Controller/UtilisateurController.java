@@ -155,52 +155,55 @@ public String userProfil(
     return "profil_user";
 }
 
-    @GetMapping("/{id}/modifierProfil")
-    public String modifierProfil(@PathVariable long id, Model model) {
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
-        model.addAttribute("user", user);
+    @GetMapping("/modifierProfil")
+    public String modifierProfil( ) {
+
         return "setting";
     }
 
-    @PostMapping("/{id}/modifierProfil")
+    @PostMapping("/modifierProfil")
     public String modifierProfil(
-            @PathVariable long id,
             @RequestParam String pseudoU,
             @RequestParam String emailU,
             @RequestParam String introductionU,
             HttpSession session
             ) {
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         user.setPseudoU(pseudoU);
         user.setEmailU(emailU);
         user.setIntroductionU(introductionU);
         utilisateurRepository.save(user);
         session.setAttribute("user", user);
-        return "redirect:/user/"+id + "/profil";
+        return "redirect:/user/"+user.getIdUti() + "/profil";
     }
 
-    @GetMapping("/{id}/modifierPassword")
+    @GetMapping("/modifierPassword")
     public String modifierPassword(
-            @PathVariable long id,
-            Model model
     ){
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
-        model.addAttribute("user", user);
         return "modifier_password";
     }
 
-    @PostMapping("/{id}/modifierPassword")
+    @PostMapping("/modifierPassword")
     public String modifierPassword(
-            @PathVariable long id,
-            @RequestParam String password,
-            HttpSession session
+            @RequestParam String currentP,
+            @RequestParam String newP,
+            HttpSession session,
+            @RequestHeader(value = "Referer", required = false) String referer
     ){
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
-        password = BCrypt.hashpw(password, BCrypt.gensalt());
-        user.setMdpU(password);
-        utilisateurRepository.save(user);
-        session.setAttribute("user", user);
-        return "redirect:/user/"+id;
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+//        currentP = BCrypt.hashpw(currentP, BCrypt.gensalt());
+
+        if(BCrypt.checkpw(currentP, user.getMdpU())){
+            newP = BCrypt.hashpw(newP, BCrypt.gensalt());
+            user.setMdpU(newP);
+            utilisateurRepository.save(user);
+            session.setAttribute("user", user);
+            System.out.println("修改成功");
+            return "redirect:" + (referer != null ? referer : "/user/modifierProfil");
+        }
+        System.out.println("修改失败");
+        return "redirect:" + (referer != null ? referer : "/user/modifierProfil");
+
     }
 
     @RequestMapping("/joinGroupe")
