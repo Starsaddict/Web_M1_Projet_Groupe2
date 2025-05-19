@@ -10,12 +10,21 @@
     <li th:each="ami : ${amis}">
         <span th:text="${ami.nomU + ' ' + ami.prenomU}">Nom Prénom</span>
 
+        <!-- Supprimer ami -->
         <form th:action="@{/user/supprimer-ami}" method="post" style="display:inline;">
             <input type="hidden" name="idAmi" th:value="${ami.idUti}" />
             <button type="submit">Supprimer</button>
         </form>
+
+        <!-- Envoyer message -->
+        <form th:action="@{/message/vers-conversation}" method="post" style="display:inline;">
+            <input type="hidden" name="idAmi" th:value="${ami.idUti}" />
+            <button type="submit">Envoyer un message</button>
+        </form>
+
     </li>
 </ul>
+
 
 <!-- Affichage du message de succès ou d'erreur -->
 <div th:if="${succes}" th:text="${succes}" style="color: green;"></div>

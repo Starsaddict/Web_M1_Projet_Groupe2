@@ -38,8 +38,14 @@ public class Conversation {
     /**
      * Liste des participants à la conversation.
      */
-    @ManyToMany(mappedBy = "conversationsParticipees")
+    @ManyToMany
+    @JoinTable(
+            name = "participer_conv",
+            joinColumns = @JoinColumn(name = "id_conv"),
+            inverseJoinColumns = @JoinColumn(name = "id_uti")
+    )
     private List<Utilisateur> participants;
+
 
     /**
      * @return l'identifiant de la conversation
@@ -80,5 +86,21 @@ public class Conversation {
      * @param messages liste des messages à associer
      */
     public void setMessages(List<Message> messages) {
+    }
+
+    public String getNomConv() {
+        return nomConv;
+    }
+
+    public void setNomConv(String nomConv) {
+        this.nomConv = nomConv;
+    }
+
+    public Utilisateur getCreateur() {
+        return createur;
+    }
+
+    public void setCreateur(Utilisateur createur) {
+        this.createur = createur;
     }
 }

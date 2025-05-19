@@ -151,13 +151,9 @@ public class Utilisateur {
     /**
      * Liste des conversations auxquelles l'utilisateur participe.
      */
-    @ManyToMany
-    @JoinTable(
-            name = "participerConv",
-            joinColumns = @JoinColumn(name = "idUti"),
-            inverseJoinColumns = @JoinColumn(name = "idConv")
-    )
+    @ManyToMany(mappedBy = "participants")
     private List<Conversation> conversationsParticipees;
+
 
 
     public Integer getIdUti() {

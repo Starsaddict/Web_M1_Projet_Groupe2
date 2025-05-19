@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Conversation</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h2 th:text="'Conversation avec ' + ${nomAmi}">Conversation</h2>
+
+<!-- Affichage des messages -->
+<div>
+    <ul>
+        <li th:each="message : ${messages}">
+            <strong th:text="${message.expediteur.nomU + ' ' + message.expediteur.prenomU}">Auteur</strong> :
+            <span th:text="${message.textM}">Texte</span>
+            <small th:text="${message.dateM}">Date</small>
+
+        </li>
+    </ul>
+</div>
+
+<!-- Formulaire pour envoyer un message -->
+<form th:action="@{'/message/envoyer/' + ${conversation.idConv}}" method="post">
+    <textarea name="texte" rows="3" required></textarea><br/>
+    <button type="submit">Envoyer</button>
+</form>
+
+<!-- Lien retour -->
+<p><a th:href="@{/user/mes-amis}">Retour à mes amis</a></p>
+
+</body>
+
+
+</html>
