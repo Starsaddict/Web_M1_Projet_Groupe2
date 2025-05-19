@@ -66,17 +66,17 @@ public class AuthController {
         }else if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
             // Auth successful, redirect to home or profile
             session.setAttribute("user", utilisateur);
-            return "redirect:/user/" + utilisateur.getIdUti();
+            return "redirect:/home";
         } else {
             model.addAttribute("error", "wrong password");
-            return "form-login";
+            return "redirect:/home";
         }
     }
 
     @RequestMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/home";
+        return "form-login";
     }
 
 

@@ -31,6 +31,11 @@ public class GroupeController {
     @Autowired
     private UtilisateurService utilisateurService;
 
+    @RequestMapping("")
+    public String index(Model model) {
+        return "redirect:/groupe/list";
+    }
+
     @RequestMapping("/list")
     public String GroupeList(
             Model model
