@@ -15,6 +15,7 @@ import jakarta.persistence.*;
 public class Reaction implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
+   
      * Identifiant unique de la réaction.
      */
     @Id
