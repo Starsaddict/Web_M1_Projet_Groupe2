@@ -2,6 +2,7 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -24,14 +25,19 @@ public class Evenement {
     private String nomE;
 
     /**
+     * Description de l’événement.
+     */
+    private String description;
+
+    /**
      * Date de début de l’événement.
      */
-    private long dateDebutE;
+    private Long dateDebutE;
 
     /**
      * Date de fin de l’événement.
      */
-    private long dateFinE;
+    private Long dateFinE;
 
     /**
      * Adresse où se déroule l’événement.
@@ -61,10 +67,12 @@ public class Evenement {
      * @param dateFinE date de fin
      * @param dateDebutE date de début
      * @param nomE nom de l’événement
+     * @param description
      */
-    public Evenement(Integer idEve, List<Utilisateur> participants, Utilisateur createur, String adresseE, long dateFinE, long dateDebutE, String nomE) {
+    public Evenement(Integer idEve, List<Utilisateur> participants, Utilisateur createur,String description, String adresseE, Long dateFinE, Long dateDebutE, String nomE) {
         this.idEve = idEve;
         this.participants = participants;
+        this.description = description;
         this.createur = createur;
         this.adresseE = adresseE;
         this.dateFinE = dateFinE;
@@ -113,6 +121,21 @@ public class Evenement {
         return createur;
     }
 
+
+    /**
+     * @return description de l'evenement
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description description de l'evenement
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     /**
      * @param createur utilisateur créateur à définir
      */
@@ -137,28 +160,28 @@ public class Evenement {
     /**
      * @return la date de fin de l’événement
      */
-    public long getDateFinE() {
+    public Long getDateFinE() {
         return dateFinE;
     }
 
     /**
      * @param dateFinE date de fin à définir
      */
-    public void setDateFinE(long dateFinE) {
+    public void setDateFinE(Long dateFinE) {
         this.dateFinE = dateFinE;
     }
 
     /**
      * @return la date de début de l’événement
      */
-    public long getDateDebutE() {
+    public Long getDateDebutE() {
         return dateDebutE;
     }
 
     /**
      * @param dateDebutE date de début à définir
      */
-    public void setDateDebutE(long dateDebutE) {
+    public void setDateDebutE(Long dateDebutE) {
         this.dateDebutE = dateDebutE;
     }
 
@@ -175,4 +198,27 @@ public class Evenement {
     public void setNomE(String nomE) {
         this.nomE = nomE;
     }
+
+@Transient
+private String dateDebutEString;
+
+@Transient
+private String dateFinEString;
+
+public String getDateDebutEString() {
+    return dateDebutEString;
+}
+
+public void setDateDebutEString(String dateDebutEString) {
+    this.dateDebutEString = dateDebutEString;
+}
+
+public String getDateFinEString() {
+    return dateFinEString;
+}
+
+public void setDateFinEString(String dateFinEString) {
+    this.dateFinEString = dateFinEString;
+}
+
 }

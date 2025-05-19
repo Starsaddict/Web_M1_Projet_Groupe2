@@ -2,17 +2,21 @@ package miage.groupe2.reseausocial.Controller;
 
 
 import jakarta.servlet.http.HttpSession;
-import miage.groupe2.reseausocial.Model.Commentaire;
-import miage.groupe2.reseausocial.Model.Post;
-import miage.groupe2.reseausocial.Model.Utilisateur;
+import jakarta.transaction.Transactional;
+import miage.groupe2.reseausocial.Model.*;
 import miage.groupe2.reseausocial.Repository.CommentaireRepository;
 import miage.groupe2.reseausocial.Repository.PostRepository;
+import miage.groupe2.reseausocial.Repository.ReactionRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import miage.groupe2.reseausocial.service.GroupeService;
+import miage.groupe2.reseausocial.service.PostService;
+import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 
 import java.util.ArrayList;
@@ -31,6 +35,14 @@ public class PostController {
 
     @Autowired
     CommentaireRepository commentaireRepository;
+    @Autowired
+    private UtilisateurService utilisateurService;
+    @Autowired
+    private GroupeService groupeService;
+    @Autowired
+    private PostService postService;
+    @Autowired
+    ReactionRepository reactionRepository;
 
 
     @GetMapping("/{id}")
@@ -54,26 +66,28 @@ public class PostController {
     }
 
     @PostMapping("/creer")
-    public String CreerPost(
+    public String creerPost(
             @ModelAttribute("post") Post post,
+            @RequestParam(value = "idgrp", required = false) Integer idGrp,
             HttpSession session
     ) {
-        long timestamp = System.currentTimeMillis();
-        post.setDatePost(timestamp);
-
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        post.setCreateur(user);
-        postRepository.save(post);
-
-        return "redirect:/user/" + user.getIdUti();
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        if (idGrp != null) {
+            Groupe groupe = groupeService.getGroupeByidGrp(idGrp);
+            postService.publierPostDansGroupe(post, user, groupe);
+            return "redirect:/groupe/" + idGrp;
+        } else {
+            postService.publierPostSansGroupe(post, user);
+            return "redirect:/user/" + user.getIdUti();
+        }
     }
 
     @GetMapping("/list")
-    // Algorithmes later
     public String listPosts(Model model) {
         List<Post> posts = postRepository.findAll();
         posts = posts.stream()
-                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost())) // 降序
+                .filter(post -> post.getGroupe() == null)
+                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
                 .limit(10)
                 .toList();
         model.addAttribute("posts", posts);
@@ -84,14 +98,10 @@ public class PostController {
     public String listAmis(
             Model model,
             HttpSession session) {
-        List<Post> posts = new ArrayList<>();
 
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        List<Utilisateur> amis = user.getAmis();
-        for (Utilisateur u : amis) {
-            List<Post> postsAmis = postRepository.findByCreateur(u);
-            posts.addAll(postsAmis);
-        }
+        List<Post> posts = postService.listPostFriends(session);
+
+        posts = posts.stream().limit(10).toList();
         model.addAttribute("posts", posts);
         return "listPostAmis";
     }
@@ -143,22 +153,16 @@ public class PostController {
         return "redirect:/user/" + user.getIdUti();
     }
 
-    @GetMapping("/repost")
-    public String repostPost(@RequestParam("id") Integer postId, HttpSession session, RedirectAttributes redirectAttributes) {
-        Utilisateur userInSession = (Utilisateur) session.getAttribute("user");
-        if (userInSession == null) {
-            return "redirect:/login";
-        }
+    @PostMapping("/repost")
+    public String repostPost(@RequestParam("id") Integer postId,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes,
+                             @RequestHeader(value = "Referer", required = false) String referer
+    ) {
 
-        Utilisateur user = utilisateurRepository.findByidUti(userInSession.getIdUti());
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-        Optional<Post> optionalPost = postRepository.findById(postId);
-        if (optionalPost.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Post introuvable");
-            return "redirect:/post/list";
-        }
-
-        Post post = optionalPost.get();
+        Post post = postService.findPostById(postId);
 
         List<Post> repostList = user.getPostsRepostes();
         if (!repostList.contains(post)) {
@@ -167,13 +171,14 @@ public class PostController {
             utilisateurRepository.save(user);
         }
 
-        return "redirect:/user/" + user.getIdUti();
+        return "redirect:" + (referer != null ? referer : "/home");
     }
 
     @PostMapping("/commenter")
     public String ajouterCommentaire(@ModelAttribute("nouveauCommentaire") Commentaire commentaire,
                                      @RequestParam("postId") Integer postId,
-                                     HttpSession session) {
+                                     HttpSession session,
+                                     @RequestHeader(value = "Referer", required = false) String referer) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
         Post post = postRepository.findById(postId).orElse(null);
 
@@ -187,8 +192,30 @@ public class PostController {
 
         commentaireRepository.save(commentaire);
 
-        return "redirect:/post?id=" + postId;
+        return "redirect:" + (referer != null ? referer : "/home");
     }
+
+    @PostMapping("/react")
+    @Transactional
+    public String ajouterReaction(@RequestParam("id") Integer postId,
+                                  @RequestParam("type") String emoji,
+                                  HttpSession session,
+                                  @RequestHeader(value = "Referer", required = false) String referer) {
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        Post post = postRepository.findById(postId).orElseThrow();
+
+        reactionRepository.deleteByPostAndUtilisateur(post, user);
+
+        Reaction reaction = new Reaction();
+        reaction.setPost(post);
+        reaction.setUtilisateur(user);
+        reaction.setType(emoji);
+        reactionRepository.save(reaction);
+
+        return "redirect:" + (referer != null ? referer : "/home");
+    }
+
+
 
 
 
