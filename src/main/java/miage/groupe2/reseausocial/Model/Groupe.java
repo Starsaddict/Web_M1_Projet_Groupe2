@@ -71,8 +71,18 @@ public class Groupe implements Serializable {
 
     /**
      * Constructeur par défaut requis par JPA.
+     * @param string2 
+     * @param string 
+     * @param l 
+     * @param createur2 
+     * @param list 
+     * @param i 
      */
+    public Groupe(int i, List<Utilisateur> list, Utilisateur createur2, long l, String string, String string2) {
+    }
+
     public Groupe() {
+        //TODO Auto-generated constructor stub
     }
 
     /**
