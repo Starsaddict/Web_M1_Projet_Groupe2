@@ -81,5 +81,4 @@ class AuthControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/home"));
     }
-
 }
