@@ -30,6 +30,7 @@
         <java.version>17</java.version>
         <sonar.organization>starsaddict</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.sources>src/main/java,src/main/resources</sonar.sources>
     </properties>
 
     <dependencies>
