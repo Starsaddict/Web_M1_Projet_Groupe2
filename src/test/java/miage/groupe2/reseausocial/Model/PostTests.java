@@ -1,51 +1,83 @@
 package miage.groupe2.reseausocial.Model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PostTests {
+class PostTests {
+
+    private Post post;
+
+    @BeforeEach
+    void setUp() {
+        post = new Post();
+    }
 
     @Test
-    void testConstructeurParDefautEtSetters() {
-        Post post = new Post();
+    void testSetAndGetIdPost() {
+        post.setIdPost(1);
+        assertEquals(1, post.getIdPost());
+    }
 
-        Utilisateur createur = new Utilisateur();
-        createur.setIdUti(1);
-        createur.setNomU("Alice");
+    @Test
+    void testSetAndGetTitrePost() {
+        post.setTitrePost("Mon Titre");
+        assertEquals("Mon Titre", post.getTitrePost());
+    }
 
-        Commentaire commentaire = new Commentaire();
-        commentaire.setIdCommentaire(10);
-
-        Reaction reaction = new Reaction();
-        reaction.setIdReaction(20);
-
-        Utilisateur reposteur = new Utilisateur();
-        reposteur.setIdUti(2);
-
-        post.setIdPost(100);
-        post.setTitrePost("Titre exemple");
+    @Test
+    void testSetAndGetTextePost() {
         post.setTextePost("Contenu du post");
-        post.setDatePost(1716221234567L);
-        post.setCreateur(createur);
-        post.setCommentaires(List.of(commentaire));
-        post.setReactions(List.of(reaction));
-        post.setUtilisateursRepost(List.of(reposteur));
-        post.setImagePost("image".getBytes());
-
-        assertEquals(100, post.getIdPost());
-        assertEquals("Titre exemple", post.getTitrePost());
         assertEquals("Contenu du post", post.getTextePost());
-        assertEquals(1716221234567L, post.getDatePost());
-        assertEquals(createur, post.getCreateur());
-        assertEquals(1, post.getCommentaires().size());
-        assertEquals(commentaire, post.getCommentaires().get(0));
-        assertEquals(1, post.getReactions().size());
-        assertEquals(reaction, post.getReactions().get(0));
-        assertEquals(1, post.getUtilisateursRepost().size());
-        assertEquals(reposteur, post.getUtilisateursRepost().get(0));
-        assertArrayEquals("image".getBytes(), post.getImagePost());
+    }
+
+    @Test
+    void testSetAndGetDatePost() {
+        post.setDatePost(123456789L);
+        assertEquals(123456789L, post.getDatePost());
+    }
+
+    @Test
+    void testSetAndGetImagePost() {
+        byte[] image = {1, 2, 3};
+        post.setImagePost(image);
+        assertArrayEquals(image, post.getImagePost());
+    }
+
+    @Test
+    void testSetAndGetCreateur() {
+        Utilisateur utilisateur = new Utilisateur();
+        post.setCreateur(utilisateur);
+        assertEquals(utilisateur, post.getCreateur());
+    }
+
+    @Test
+    void testSetAndGetCommentaires() {
+        Commentaire c1 = new Commentaire();
+        Commentaire c2 = new Commentaire();
+        List<Commentaire> commentaires = List.of(c1, c2);
+        post.setCommentaires(commentaires);
+        assertEquals(commentaires, post.getCommentaires());
+    }
+
+    @Test
+    void testSetAndGetReactions() {
+        Reaction r1 = new Reaction();
+        Reaction r2 = new Reaction();
+        List<Reaction> reactions = List.of(r1, r2);
+        post.setReactions(reactions);
+        assertEquals(reactions, post.getReactions());
+    }
+
+    @Test
+    void testSetAndGetUtilisateursRepost() {
+        Utilisateur u1 = new Utilisateur();
+        Utilisateur u2 = new Utilisateur();
+        List<Utilisateur> utilisateurs = List.of(u1, u2);
+        post.setUtilisateursRepost(utilisateurs);
+        assertEquals(utilisateurs, post.getUtilisateursRepost());
     }
 }

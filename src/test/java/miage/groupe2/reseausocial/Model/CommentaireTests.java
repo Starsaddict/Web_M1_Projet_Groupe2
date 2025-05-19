@@ -3,7 +3,7 @@ package miage.groupe2.reseausocial.Model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CommentaireTests {
+ class CommentaireTests {
 
     @Test
     void testConstructeurVide() {
