@@ -736,13 +736,36 @@
                                         <div class="w-[245px]"
                                              uk-dropdown="pos: bottom-right; animation: uk-animation-scale-up uk-transform-origin-top-right; animate-out: true; mode: click">
                                             <nav>
-                                                <form th:action="@{/post/repost}" method="post" style="display: flex; align-items: center; gap: 5px;">
-                                                    <input type="hidden" name="id" th:value="${post.idPost}"/>
-                                                    <button type="submit" class="flex items-center gap-2 text-black dark:text-white bg-transparent border-none p-0 m-0 cursor-pointer">
-                                                        <ion-icon class="text-xl shrink-0" name="share-outline"></ion-icon>
-                                                        Repost
-                                                    </button>
-                                                </form>
+
+                                                <a th:if="${post.createur.idUti != session.user.idUti and !session.user.postsRepostes.contains(post)}"
+                                                   th:href="@{/post/repost(id=${post.idPost})}"
+                                                   class="text-black dark:text-white hover:!bg-gray-100 dark:hover:!bg-slate-800 flex items-center gap-2">
+                                                    <ion-icon class="text-xl shrink-0" name="share-outline"></ion-icon>
+                                                    Repost
+                                                </a>
+
+                                                <a th:if="${post.createur.idUti != session.user.idUti and session.user.postsRepostes.contains(post)}"
+                                                   th:href="@{/post/repost/annuler(id=${post.idPost})}"
+                                                   class="text-red-500 dark:text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/50 flex items-center gap-2">
+                                                    <ion-icon class="text-xl shrink-0" name="close-outline"></ion-icon>
+                                                    Annuler le repost
+                                                </a>
+
+                                                <a th:if="${post.createur.idUti == session.user.idUti}"
+                                                   th:href="@{/post/modifier(id=${post.idPost})}"
+                                                   class="text-black dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 px-2 py-1 rounded flex items-center gap-2">
+                                                    <ion-icon class="text-xl shrink-0" name="create-outline"></ion-icon>
+                                                    Modifier
+                                                </a>
+
+                                                <hr  th:if = "${session.user.idUti == post.createur.idUti}">
+
+                                                <a th:if="${session.user.idUti == post.createur.idUti}" th:href="@{/supprimer(id=${post.idPost})}"
+                                                   class="text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/50">
+                                                    <ion-icon class="text-xl shrink-0" name="trash-outline"></ion-icon>
+                                                    Supprimer
+                                                </a>
+
                                             </nav>
                                         </div>
 

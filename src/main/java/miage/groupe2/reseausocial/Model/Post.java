@@ -3,6 +3,7 @@ package miage.groupe2.reseausocial.Model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Représente un post créé par un utilisateur dans le réseau social.
@@ -215,5 +216,17 @@ public class Post {
 
     public void setGroupe(Groupe groupe) {
         this.groupe = groupe;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Post post = (Post) o;
+        return Objects.equals(getIdPost(), post.getIdPost());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getIdPost());
     }
 }

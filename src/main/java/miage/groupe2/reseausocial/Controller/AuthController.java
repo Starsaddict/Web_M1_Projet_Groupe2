@@ -1,6 +1,7 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,9 @@ public class AuthController {
             return "form-login";
         }else if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
             // Auth successful, redirect to home or profile
+
+            Hibernate.initialize(utilisateur.getPostsRepostes());
+
             session.setAttribute("user", utilisateur);
             return "redirect:/home";
         } else {

@@ -132,15 +132,21 @@ public class PostController {
     }
 
     @PostMapping("/modifier")
-    public String modifierPost(@ModelAttribute("post") Post post, HttpSession session) {
+    public String modifierPost(@ModelAttribute("post") Post post,
+                               HttpSession session,
+                               @RequestHeader(value = "Referer", required = false) String referer
+    ) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
         post.setCreateur(user);
         postRepository.save(post);
-        return "redirect:/user/" + user.getIdUti();
+        return "redirect:" + (referer != null ? referer : "/user/" + user.getIdUti() + "/profil");
     }
 
     @GetMapping("/supprimer")
-    public String supprimerPost(@RequestParam("id") Integer id, HttpSession session) {
+    public String supprimerPost(@RequestParam("id") Integer id,
+                                HttpSession session,
+                                @RequestHeader(value = "Referer", required = false) String referer
+    ) {
         Post post = postRepository.findById(id).orElse(null);
         Utilisateur user = (Utilisateur) session.getAttribute("user");
 
@@ -148,10 +154,10 @@ public class PostController {
             postRepository.delete(post);
         }
 
-        return "redirect:/user/" + user.getIdUti();
+        return "redirect:" + (referer != null ? referer : "/user/" + user.getIdUti() + "/profil");
     }
 
-    @PostMapping("/repost")
+    @GetMapping("/repost")
     public String repostPost(@RequestParam("id") Integer postId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes,
@@ -168,10 +174,29 @@ public class PostController {
             user.setPostsRepostes(repostList);
             utilisateurRepository.save(user);
         }
-
+        session.setAttribute("user", user);
         return "redirect:" + (referer != null ? referer : "/home");
     }
 
+    @GetMapping("/repost/annuler")
+    public String repostAnnuler(@RequestParam("id") Integer postId,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes,
+                             @RequestHeader(value = "Referer", required = false) String referer
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Post post = postService.findPostById(postId);
+
+        List<Post> repostList = user.getPostsRepostes();
+        if (repostList.contains(post)) {
+            repostList.remove(post);
+            user.setPostsRepostes(repostList);
+            utilisateurRepository.save(user);
+        }
+        session.setAttribute("user", user);
+
+        return "redirect:" + (referer != null ? referer : "/home");
+    }
     @PostMapping("/commenter")
     public String ajouterCommentaire(@ModelAttribute("nouveauCommentaire") Commentaire commentaire,
                                      @RequestParam("postId") Integer postId,
