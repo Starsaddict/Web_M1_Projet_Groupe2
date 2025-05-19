@@ -7,6 +7,9 @@ import jakarta.persistence.*;
  * Une réaction peut être un "like", "dislike", ou tout autre type de réaction.
  */
 @Entity
+@Table(
+        uniqueConstraints = @UniqueConstraint(columnNames = {"id_post", "id_uti"})
+)
 public class Reaction {
 
     /**

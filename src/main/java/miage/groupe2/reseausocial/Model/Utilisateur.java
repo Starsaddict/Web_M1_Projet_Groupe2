@@ -35,6 +35,11 @@ public class Utilisateur {
     private String prenomU;
 
     /**
+     * Pseudo de l'utilisateur.
+     */
+    private String pseudoU;
+
+    /**
      * Adresse email de l'utilisateur.
      */
     private String emailU;
@@ -43,6 +48,9 @@ public class Utilisateur {
      * Mot de passe de l'utilisateur.
      */
     private String mdpU;
+
+    @Column(name = "avatar")
+    private byte[] avatar;
 
     /**
      * Liste des posts créés par l'utilisateur.
@@ -320,6 +328,21 @@ public class Utilisateur {
         this.conversationsParticipees = conversationsParticipees;
     }
 
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getPseudoU() {
+        return pseudoU;
+    }
+
+    public void setPseudoU(String pseudoU) {
+        this.pseudoU = pseudoU;
+    }
 
     @Override
     public boolean equals(Object o) {
