@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/post")
@@ -50,7 +47,7 @@ public class PostController {
             @PathVariable long id,
             Model model
     ) {
-        Utilisateur user = utilisateurRepository.findByidUti(id);
+        Utilisateur user = utilisateurRepository.findByIdUti(id);
         List<Post> posts = postRepository.findByCreateur(user);
         model.addAttribute("Posts", posts);
         model.addAttribute("userId", id);

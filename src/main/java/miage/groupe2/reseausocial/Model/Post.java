@@ -34,6 +34,7 @@ public class Post {
     private String textePost;
 
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "imagePost")
     private byte[] imagePost;
 
