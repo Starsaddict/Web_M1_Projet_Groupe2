@@ -1,5 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
+import java.io.Serializable;
+
 import jakarta.persistence.*;
 
 /**
@@ -10,9 +12,10 @@ import jakarta.persistence.*;
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"id_post", "id_uti"})
 )
-public class Reaction {
-
+public class Reaction implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
+   
      * Identifiant unique de la réaction.
      */
     @Id

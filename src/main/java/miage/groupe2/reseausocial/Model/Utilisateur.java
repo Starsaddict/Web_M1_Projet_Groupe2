@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.io.Serializable;
 
 /**
  * Représente un utilisateur dans le réseau social.
@@ -15,8 +16,8 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Utilisateur {
-
+public class Utilisateur implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique de l'utilisateur.
      */
