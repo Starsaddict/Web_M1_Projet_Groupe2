@@ -6,8 +6,6 @@ import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class UtilisateurService {
     @Autowired
@@ -16,7 +14,7 @@ public class UtilisateurService {
     public Utilisateur getUtilisateurFromSession(HttpSession session) {
         Object obj = session.getAttribute("user");
         if (obj instanceof Utilisateur user) {
-            return repo.findByidUti(user.getIdUti());
+            return repo.findByIdUti(user.getIdUti());
         }
         return null;
     }

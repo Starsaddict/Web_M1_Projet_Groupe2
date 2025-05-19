@@ -41,6 +41,11 @@ public class Utilisateur implements Serializable {
     private String pseudoU;
 
     /**
+     * Introduction de l'utilisateur
+     */
+    private String introductionU;
+
+    /**
      * Adresse email de l'utilisateur.
      */
     private String emailU;
@@ -50,8 +55,11 @@ public class Utilisateur implements Serializable {
      */
     private String mdpU;
 
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "avatar")
     private byte[] avatar;
+
+
 
     /**
      * Liste des posts créés par l'utilisateur.

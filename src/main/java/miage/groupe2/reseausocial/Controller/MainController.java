@@ -9,6 +9,7 @@ import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import miage.groupe2.reseausocial.service.DemandeAmiService;
 import miage.groupe2.reseausocial.service.PostService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,6 +43,7 @@ public class MainController {
             return "redirect:/auth/login";
         }
 
+        Hibernate.initialize(user.getPostsRepostes());
         List<Post> posts = postService.listPostFriends(session);
         posts = posts.stream().limit(10).toList();
         List<DemandeAmi> demandeAmis = demandeAmiService.getDemandeMessages(user);
@@ -54,5 +56,10 @@ public class MainController {
     public String redirectToHome() {
         return "redirect:/home";
     }
+//
+//    @RequestMapping("/profil")
+//    public String profil( ){
+//        return "profil_user";
+//    }
 
 }
