@@ -2,6 +2,7 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,8 +11,8 @@ import java.util.List;
  * Un événement possède un nom, une adresse, des dates de début et de fin, un créateur et une liste de participants.
  */
 @Entity
-public class Evenement {
-
+public class Evenement implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique de l’événement.
      */

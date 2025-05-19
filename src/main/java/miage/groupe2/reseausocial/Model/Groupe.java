@@ -2,6 +2,7 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -9,8 +10,8 @@ import java.util.List;
  * Un groupe possède un nom, une description, une date de création, un créateur et des membres.
  */
 @Entity
-public class Groupe {
-
+public class Groupe implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique du groupe.
      */
