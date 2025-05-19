@@ -69,7 +69,6 @@ public class PostController {
     }
 
     @GetMapping("/list")
-    // Algorithmes later
     public String listPosts(Model model) {
         List<Post> posts = postRepository.findAll();
         posts = posts.stream()

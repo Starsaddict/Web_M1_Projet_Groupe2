@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
- class EvenementTests {
+ class EvenementTest {
 
     @Test
     void testConstructeurEtGettersSetters() {
