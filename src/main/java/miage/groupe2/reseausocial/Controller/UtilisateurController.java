@@ -125,9 +125,10 @@ public class UtilisateurController {
         return "redirect:/user/mes-amis";
     }
 
-@RequestMapping("/{id}/profil")
+@GetMapping("/{id}/profil")
 public String userProfil(
-        @PathVariable long id,
+        @RequestParam(value = "type", defaultValue = "post") String type,
+        @PathVariable Integer id,
         Model model
 ){
     Utilisateur user = utilisateurRepository.findByIdUti(id);
@@ -143,7 +144,13 @@ public String userProfil(
             .limit(10)
             .toList();
 
-    model.addAttribute("posts", posts);
+    List<Utilisateur> Amis = user.getAmis().stream()
+                    .limit(6)
+                            .toList();
+
+    model.addAttribute("Friends", Amis);
+    model.addAttribute("posts", "repost".equals(type) ? reposts : posts);
+    model.addAttribute("type", type);
     model.addAttribute("reposts", reposts);
     return "profil_user";
 }
