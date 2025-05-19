@@ -159,24 +159,24 @@ public String userProfil(
     public String modifierProfil(@PathVariable long id, Model model) {
         Utilisateur user = utilisateurRepository.findByIdUti(id);
         model.addAttribute("user", user);
-        return "modifier_profil";
+        return "setting";
     }
 
     @PostMapping("/{id}/modifierProfil")
     public String modifierProfil(
             @PathVariable long id,
-            @RequestParam String nom,
-            @RequestParam String prenom,
-            @RequestParam String email,
+            @RequestParam String pseudoU,
+            @RequestParam String emailU,
+            @RequestParam String introductionU,
             HttpSession session
             ) {
         Utilisateur user = utilisateurRepository.findByIdUti(id);
-        user.setNomU(nom);
-        user.setPrenomU(prenom);
-        user.setEmailU(email);
+        user.setPseudoU(pseudoU);
+        user.setEmailU(emailU);
+        user.setIntroductionU(introductionU);
         utilisateurRepository.save(user);
         session.setAttribute("user", user);
-        return "redirect:/user/"+id;
+        return "redirect:/user/"+id + "/profil";
     }
 
     @GetMapping("/{id}/modifierPassword")
@@ -263,6 +263,7 @@ public String userProfil(
                                HttpSession session,
                                @RequestHeader(value = "Referer", required = false) String referer
     ) throws IOException {
+        System.out.println("uploadAvatar");
         Utilisateur user = (Utilisateur) session.getAttribute("user");
 
         if (user != null && !file.isEmpty()) {
