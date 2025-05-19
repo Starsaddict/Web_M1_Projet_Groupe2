@@ -47,6 +47,9 @@ public class Groupe implements Serializable {
     @ManyToMany(mappedBy = "groupesAppartenance")
     private List<Utilisateur> membres;
 
+    @OneToMany(mappedBy = "groupe" ,cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<Post> posts;
+
     /**
      * Constructeur avec paramètres.
      *
@@ -57,14 +60,14 @@ public class Groupe implements Serializable {
      * @param nomG nom du groupe
      * @param description description du groupe
      */
-    public Groupe(Integer idGrp, List<Utilisateur> membres, Utilisateur createur, long dateCreation, String nomG, String description) {
-        this.idGrp = idGrp;
-        this.membres = membres;
-        this.createur = createur;
-        this.dateCreation = dateCreation;
-        this.nomG = nomG;
-        this.description = description;
-    }
+//    public Groupe(Integer idGrp, List<Utilisateur> membres, Utilisateur createur, long dateCreation, String nomG, String description) {
+//        this.idGrp = idGrp;
+//        this.membres = membres;
+//        this.createur = createur;
+//        this.dateCreation = dateCreation;
+//        this.nomG = nomG;
+//        this.description = description;
+//    }
 
     /**
      * Constructeur par défaut requis par JPA.
@@ -114,6 +117,7 @@ public class Groupe implements Serializable {
         this.createur = createur;
     }
 
+
     /**
      * @return la date de création du groupe
      */
@@ -154,5 +158,13 @@ public class Groupe implements Serializable {
      */
     public void setNomG(String nomG) {
         this.nomG = nomG;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 }

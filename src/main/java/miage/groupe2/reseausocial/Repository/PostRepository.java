@@ -11,4 +11,6 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
     List<Post> findByCreateur(Utilisateur createur);
+
+    Post findByIdPost(Integer idPost);
 }
