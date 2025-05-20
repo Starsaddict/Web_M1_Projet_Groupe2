@@ -47,6 +47,13 @@ public class Conversation {
     private List<Utilisateur> participants;
 
 
+    private boolean estconversationDeGroupe = false;
+
+    public Conversation() {
+
+    }
+
+
     /**
      * @return l'identifiant de la conversation
      */
@@ -102,5 +109,22 @@ public class Conversation {
 
     public void setCreateur(Utilisateur createur) {
         this.createur = createur;
+    }
+
+    public Conversation(String nomConv, Integer idConv, Utilisateur createur, List<Message> messages, List<Utilisateur> participants, boolean estconversationDeGroupe) {
+        this.nomConv = nomConv;
+        this.idConv = idConv;
+        this.createur = createur;
+        this.messages = messages;
+        this.participants = participants;
+        this.estconversationDeGroupe = estconversationDeGroupe;
+    }
+
+    public boolean isEstconversationDeGroupe() {
+        return estconversationDeGroupe;
+    }
+
+    public void setEstconversationDeGroupe(boolean estconversationDeGroupe) {
+        this.estconversationDeGroupe = estconversationDeGroupe;
     }
 }

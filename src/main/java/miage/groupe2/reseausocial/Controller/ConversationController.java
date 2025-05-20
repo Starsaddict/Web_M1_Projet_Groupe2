@@ -44,19 +44,27 @@ public class ConversationController {
             return "redirect:/auth/login";
         }
 
-        // Recherche d'une conversation existante entre les deux utilisateurs
+        // Recherche d'une conversation privée existante entre les deux utilisateurs
         List<Conversation> conversations = conversationRepository
                 .findConversationBetweenTwoUsers(user.getIdUti(), idAmi);
 
-        Conversation conv;
-        if (!conversations.isEmpty()) {
-            conv = conversations.get(0); // Conversation existante
-        } else {
+        Conversation conv = null;
+
+        for (Conversation c : conversations) {
+            if (!c.isEstconversationDeGroupe()) {
+                conv = c;
+                break;
+            }
+        }
+
+        // Si aucune conversation privée n'existe, en créer une
+        if (conv == null) {
             Utilisateur ami = utilisateurRepository.findByidUti(idAmi);
 
             conv = new Conversation();
             conv.setNomConv("Conversation entre " + user.getNomU() + " et " + ami.getNomU());
             conv.setCreateur(user);
+
 
             List<Utilisateur> participants = new ArrayList<>();
             participants.add(user);
@@ -64,12 +72,12 @@ public class ConversationController {
 
             conv.setParticipants(participants);
 
-            // ✅ Save and persist the conversation and relationship table
             conversationRepository.save(conv);
         }
 
         return "redirect:/message/conversation/" + conv.getIdConv();
     }
+
 
 
     @GetMapping("/message/conversation/{id}")
@@ -161,6 +169,7 @@ public class ConversationController {
         conversation.setNomConv(nomdiscussion);
         conversation.setParticipants(participants);
         conversation.setCreateur(utilisateurConnecte);
+        conversation.setEstconversationDeGroupe(true);
 
         conversationRepository.save(conversation);
 

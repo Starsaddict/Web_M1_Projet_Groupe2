@@ -2,20 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Mes groupes</title>
+    <meta charset="UTF-8">
 </head>
 <body>
 <h2>Mes conversations de groupe</h2>
 
 <ul>
-    <li th:each="groupe : ${groupes}">
+    <li th:each="groupe : ${groupes}" th:if="${groupe.estconversationDeGroupe}">
         <a th:href="@{'/message/conversation/' + ${groupe.idConv}}">
             <span th:text="${groupe.nomConv}">Nom du groupe</span>
         </a>
         <span> - Participants : <span th:text="${groupe.participants.size()}"></span></span>
-        <!-- Formulaire pour supprimer -->
+
+        <!-- Supprimer (si créateur) -->
         <form th:if="${groupe.createur.idUti == userConnecteId}" th:action="@{'/conversation/supprimer/' + ${groupe.idConv}}" method="post" style="display:inline;">
             <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?');">Supprimer</button>
         </form>
+
+        <!-- Quitter (si non créateur) -->
         <form th:if="${groupe.createur.idUti != userConnecteId}" th:action="@{'/conversation/quitter/' + ${groupe.idConv}}" method="post" style="display:inline;">
             <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?');">Quitter</button>
         </form>
