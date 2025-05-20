@@ -43,14 +43,21 @@ public class MainController {
         }
 
         Hibernate.initialize(user.getPostsRepostes());
-        List<Post> posts = user.getPosts()
-                .stream()
+        List<Post> posts = user.getPosts();
+        posts.addAll(user.getPostsRepostes());
+        List<Utilisateur> friends = user.getAmis();
+        for(Utilisateur u : friends) {
+            posts.addAll(u.getPostsRepostes());
+            posts.addAll(u.getPosts());
+        }
+
+        posts = posts.stream()
                 .filter(i -> i.getGroupe()==null)
+                .distinct()
                 .sorted(Comparator.comparing(Post::getDatePost).reversed())
                 .toList();
-        posts = posts.stream().limit(10).toList();
+        posts = posts.stream().limit(20).toList();
         model.addAttribute("posts", posts);
-        model.addAttribute("post", new Post());
         return "feed";
     }
 
@@ -60,9 +67,5 @@ public class MainController {
         return "redirect:/home";
     }
 
-//    @RequestMapping("groupes/details")
-//    public String details(){
-//        return "group_detail";
-//    }
 
 }

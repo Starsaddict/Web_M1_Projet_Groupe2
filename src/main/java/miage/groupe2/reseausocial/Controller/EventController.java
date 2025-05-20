@@ -7,9 +7,11 @@ import miage.groupe2.reseausocial.Repository.EvenementRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import miage.groupe2.reseausocial.Util.DateUtil;
 import miage.groupe2.reseausocial.service.UtilisateurService;
@@ -74,174 +76,214 @@ public class EventController {
 
 
 
-/**
- * Affiche la liste des événements créés par l'utilisateur connecté.
- *
- * @param model le modèle utilisé pour passer la liste des événements à la vue
- * @param session la session HTTP contenant l'utilisateur connecté
- * @return la vue affichant les événements de l'utilisateur, ou redirection vers la page de login si non connecté
- */
-@GetMapping("/maListEvenement")
-public String afficherMesEvenements(Model model, HttpSession session) {
-    Utilisateur user = (Utilisateur) session.getAttribute("user");
-    if (user == null) return "redirect:/auth/login";
+    /**
+     * Affiche la liste des événements créés par l'utilisateur connecté.
+     *
+     * @param model le modèle utilisé pour passer la liste des événements à la vue
+     * @param session la session HTTP contenant l'utilisateur connecté
+     * @return la vue affichant les événements de l'utilisateur, ou redirection vers la page de login si non connecté
+     */
+    @GetMapping("/maListEvenement")
+    public String afficherMesEvenements(Model model, HttpSession session) {
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        if (user == null) return "redirect:/auth/login";
 
-    model.addAttribute("evenements", evenementRepository.findByCreateur(user));
-    return "maListEvenement";
-}
-
-
-/**
- * Supprime un événement si l'utilisateur connecté en est le créateur.
- *
- * @param id l’identifiant de l’événement à supprimer
- * @param session la session HTTP contenant l’utilisateur connecté
- * @return redirection vers la liste des événements de l’utilisateur
- */
-@PostMapping("/supprimer")
-public String supprimerEvenement(@RequestParam("id") Integer id, HttpSession session) {
-    Utilisateur user = (Utilisateur) session.getAttribute("user");
-    if (user == null) return "redirect:/auth/login";
-
-    Evenement evenement = evenementRepository.findById(id).orElse(null);
-    if (evenement != null && evenement.getCreateur().getIdUti().equals(user.getIdUti())) {
-        evenementRepository.delete(evenement);
+        model.addAttribute("evenements", evenementRepository.findByCreateur(user));
+        return "maListEvenement";
     }
 
-    return "redirect:/evenement/maListEvenement";
-}
 
-/**
- * Affiche le formulaire de modification d’un événement existant.
- * Vérifie que l'utilisateur est le créateur de l'événement.
- *
- * @param id identifiant de l’événement à modifier
- * @param session la session HTTP contenant l’utilisateur connecté
- * @param model le modèle pour passer l’événement à modifier à la vue
- * @return la vue du formulaire de modification, ou redirection si accès non autorisé
- */
-@GetMapping("/modifier")
-public String afficherFormulaireModification(@RequestParam("id") Integer id, HttpSession session, Model model) {
-    Utilisateur user = (Utilisateur) session.getAttribute("user");
-    if (user == null) return "redirect:/auth/login";
+    /**
+     * Supprime un événement si l'utilisateur connecté en est le créateur.
+     *
+     * @param id l’identifiant de l’événement à supprimer
+     * @param session la session HTTP contenant l’utilisateur connecté
+     * @return redirection vers la liste des événements de l’utilisateur
+     */
+    @RequestMapping("/supprimer")
+    public String supprimerEvenement(@RequestParam("id") Integer id,
+                                     HttpSession session,
+                                     @RequestHeader(value = "Referer", required = false) String referer
 
-    Evenement evenement = evenementRepository.findById(id).orElse(null);
-    if (evenement == null || !evenement.getCreateur().getIdUti().equals(user.getIdUti())) {
+    ) {
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        if (user == null) return "redirect:/auth/login";
+
+        Evenement evenement = evenementRepository.findById(id).orElse(null);
+        if (evenement != null && evenement.getCreateur().getIdUti().equals(user.getIdUti())) {
+            evenementRepository.delete(evenement);
+        }
+
+        return "redirect:" + (referer != null ? referer : "/evenement/tous");
+    }
+
+    /**
+     * Affiche le formulaire de modification d’un événement existant.
+     * Vérifie que l'utilisateur est le créateur de l'événement.
+     *
+     * @param id identifiant de l’événement à modifier
+     * @param session la session HTTP contenant l’utilisateur connecté
+     * @param model le modèle pour passer l’événement à modifier à la vue
+     * @return la vue du formulaire de modification, ou redirection si accès non autorisé
+     */
+    @GetMapping("/modifier")
+    public String afficherFormulaireModification(@RequestParam("id") Integer id, HttpSession session, Model model) {
+        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        if (user == null) return "redirect:/auth/login";
+
+        Evenement evenement = evenementRepository.findById(id).orElse(null);
+        if (evenement == null || !evenement.getCreateur().getIdUti().equals(user.getIdUti())) {
+            return "redirect:/evenement/maListEvenement";
+        }
+
+        model.addAttribute("evenement", evenement);
+        return "modifierEvenement";
+    }
+
+    /**
+     * Traite la soumission du formulaire de modification d’un événement.
+     *
+     * @ modifierEvenement l’objet contenant les modifications de l’événement
+     * @param session la session HTTP contenant l’utilisateur connecté
+     * @return redirection vers la liste des événements de l’utilisateur
+     */
+    @PostMapping("/modifier")
+    public String modifierEvenement(@RequestParam(name = "id") Integer id,
+                                    @RequestParam(name = "nomE") String nomE,
+                                    @RequestParam(name = "description") String description,
+                                    @RequestParam(name = "adressE") String adressE,
+                                    HttpSession session,
+                                    @RequestParam(name = "start") LocalDateTime start,
+                                    @RequestParam(name = "fin") LocalDateTime fin
+    ) {
+        Evenement evenement = evenementRepository.findByIdEve(id);
+        if(nomE != null){
+            evenement.setNomE(nomE);
+        }
+        if(description != null){
+            evenement.setDescription(description);
+        }
+        if(adressE != null){
+            evenement.setAdresseE(adressE);
+        }
+        long dd = DateUtil.toEpochMilli(start);
+        long df = DateUtil.toEpochMilli(fin);
+        evenement.setDateDebutE(dd);
+        evenement.setDateFinE(df);
+
+        evenementRepository.save(evenement);
+
         return "redirect:/evenement/maListEvenement";
     }
 
-    model.addAttribute("evenement", evenement);
-    return "modifierEvenement";
-}
+    /**
+     * Affiche tous les événements existants, qu’ils soient créés par l’utilisateur ou par d’autres.
+     * Permet à l’utilisateur de voir ceux auxquels il peut participer ou qu’il a déjà rejoints.
+     *
+     * @param model   le modèle utilisé pour passer la liste des événements à la vue
+     * @param session la session HTTP contenant l’utilisateur connecté
+     * @return la vue affichant tous les événements, ou redirection vers la page de login si non connecté
+     */
+    @GetMapping("/tous")
+    public String afficherTousLesEvenements(Model model, HttpSession session) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        long time = System.currentTimeMillis();
+        List<Evenement> monEvenements = user.getEvenementsAssistes().stream()
+                .filter(e -> e.getDateFinE() > time)
+                .sorted(Comparator.comparing(Evenement::getDateDebutE))
+                .collect(Collectors.toList());
 
-/**
- * Traite la soumission du formulaire de modification d’un événement.
- *
- * @param evenementModifie l’objet contenant les modifications de l’événement
- * @param session la session HTTP contenant l’utilisateur connecté
- * @return redirection vers la liste des événements de l’utilisateur
- */
-@PostMapping("/modifier")
-public String modifierEvenement(@RequestParam(name = "id") Integer id,
-                                @RequestParam(name = "nomE") String nomE,
-                                @RequestParam(name = "description") String description,
-                                @RequestParam(name = "adressE") String adressE,
-                                HttpSession session,
-                                @RequestParam(name = "start") LocalDateTime start,
-                                @RequestParam(name = "fin") LocalDateTime fin
-) {
-   Evenement evenement = evenementRepository.findByIdEve(id);
-   if(nomE != null){
-       evenement.setNomE(nomE);
-   }
-   if(description != null){
-       evenement.setDescription(description);
-   }
-   if(adressE != null){
-       evenement.setAdresseE(adressE);
-   }
-   long dd = DateUtil.toEpochMilli(start);
-   long df = DateUtil.toEpochMilli(fin);
-   evenement.setDateDebutE(dd);
-   evenement.setDateFinE(df);
+        List<Evenement> evenementCree = user.getEvenements().stream()
+                .filter(e -> e.getDateFinE() > time)
+                .sorted(Comparator.comparing(Evenement::getDateDebutE))
+                .collect(Collectors.toList());
 
-   evenementRepository.save(evenement);
+        List<Evenement> upcoming = evenementRepository.findAll();
 
-    return "redirect:/evenement/maListEvenement";
-}
+        upcoming = upcoming.stream()
+                        .filter(e -> e.getDateFinE() > time)
+                .filter(e -> !e.getParticipants().contains(user))
+                .limit(4)
+                .collect(Collectors.toList());
 
-/**
- * Affiche tous les événements existants, qu’ils soient créés par l’utilisateur ou par d’autres.
- * Permet à l’utilisateur de voir ceux auxquels il peut participer ou qu’il a déjà rejoints.
- *
- * @param model   le modèle utilisé pour passer la liste des événements à la vue
- * @param session la session HTTP contenant l’utilisateur connecté
- * @return la vue affichant tous les événements, ou redirection vers la page de login si non connecté
- */
-@GetMapping("/tous")
-public String afficherTousLesEvenements(Model model, HttpSession session) {
-    Utilisateur user = (Utilisateur) session.getAttribute("user");
-    if (user == null) return "redirect:/auth/login";
 
-    model.addAttribute("evenements", evenementRepository.findAll());
-    model.addAttribute("user", user);
-    return "tousLesEvenements";
-}
-
-/**
- * Permet à un utilisateur connecté de rejoindre un événement donné.
- *
- * @param id      identifiant de l'événement à rejoindre
- * @param session session HTTP pour récupérer et mettre à jour l'utilisateur
- * @return redirection vers la liste des événements
- */
-@PostMapping("/rejoindre")
-public String rejoindreEvenement(@RequestParam("id") Integer id, HttpSession session) {
-    Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-    Evenement event = evenementRepository.findByIdEve(id);
-
-    if (user != null && event != null && !user.getEvenementsAssistes().contains(event)) {
-        user.getEvenementsAssistes().add(event);
-        event.getParticipants().add(user);
-        utilisateurRepository.save(user);
-        session.setAttribute("user", user); 
+        model.addAttribute("monEvenements", monEvenements);
+        model.addAttribute("evenementCree", evenementCree);
+        model.addAttribute("upcoming", upcoming);
+        model.addAttribute("user", user);
+        return "events";
     }
 
-    return "redirect:/evenement/tous";
-}
+    /**
+     * Permet à un utilisateur connecté de rejoindre un événement donné.
+     *
+     * @param id      identifiant de l'événement à rejoindre
+     * @param session session HTTP pour récupérer et mettre à jour l'utilisateur
+     * @return redirection vers la liste des événements
+     */
+    @RequestMapping("/rejoindre")
+    public String rejoindreEvenement(@RequestParam("id") Integer id,
+                                     HttpSession session,
+                                     @RequestHeader(value = "Referer", required = false) String referer
 
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Evenement event = evenementRepository.findByIdEve(id);
 
-
-/**
- * Permet à un utilisateur connecté de quitter un événement donné.
- *
- * @param id      identifiant de l'événement à quitter
- * @param session session HTTP pour récupérer et mettre à jour l'utilisateur
- * @return redirection vers la liste des événements
- */
-@PostMapping("/quitter")
-public String quitterEvenement(@RequestParam("id") Integer id, HttpSession session) {
-    Utilisateur sessionUser = (Utilisateur) session.getAttribute("user");
-    if (sessionUser == null) return "redirect:/auth/login";
-
-    Utilisateur user = utilisateurRepository.findById(sessionUser.getIdUti()).orElse(null);
-    Evenement event = evenementRepository.findById(id).orElse(null);
-
-    if (user != null && event != null && user.getEvenementsAssistes().contains(event)) {
-        user.getEvenementsAssistes().remove(event);
-        event.getParticipants().remove(user);
-        utilisateurRepository.save(user);
-        session.setAttribute("user", user); 
+        if (user != null && event != null && !user.getEvenementsAssistes().contains(event)) {
+            user.getEvenementsAssistes().add(event);
+            event.getParticipants().add(user);
+            utilisateurRepository.save(user);
+            session.setAttribute("user", user);
+        }
+        return "redirect:" + (referer != null ? referer : "/evenement/tous");
     }
 
-    return "redirect:/evenement/tous";
-}
 
-@GetMapping("")
-public String redirectToTous() {
-    return "redirect:/evenement/tous";
-}
 
+    /**
+     * Permet à un utilisateur connecté de quitter un événement donné.
+     *
+     * @param id      identifiant de l'événement à quitter
+     * @param session session HTTP pour récupérer et mettre à jour l'utilisateur
+     * @return redirection vers la liste des événements
+     */
+    @RequestMapping("/quitter")
+    public String quitterEvenement(@RequestParam("id") Integer id,
+                                   HttpSession session,
+                                   @RequestHeader(value = "Referer", required = false) String referer
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Evenement event = evenementRepository.findByIdEve(id);
+
+        if (user != null && event != null && user.getEvenementsAssistes().contains(event)) {
+            user.getEvenementsAssistes().remove(event);
+            event.getParticipants().remove(user);
+            utilisateurRepository.save(user);
+            session.setAttribute("user", user);
+        }
+        return "redirect:" + (referer != null ? referer : "/evenement/tous");
+    }
+
+
+
+    @GetMapping("")
+    public String redirectToEvenement(
+            @RequestParam(name = "idEve") Integer idEve,
+            Model model,
+            HttpSession session
+    ) {
+
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Evenement eve = evenementRepository.findByIdEve(idEve);
+        Instant instant = Instant.ofEpochMilli(eve.getDateDebutE());
+        ZonedDateTime utcTime = instant.atZone(ZoneOffset.UTC);
+        String isoUtc = utcTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        model.addAttribute("estParticipants", eve.getParticipants().contains(user));
+        model.addAttribute("eventDate", isoUtc);
+        model.addAttribute("event", eve);
+        return "event";
+    }
 
 
 }
