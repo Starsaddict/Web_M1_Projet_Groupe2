@@ -135,16 +135,30 @@ public class PostController {
         }
 
         model.addAttribute("post", post);
-        return "modifierPost";
+        return "modifier_post";
     }
 
     @PostMapping("/modifier")
-    public String modifierPost(@ModelAttribute("post") Post post,
+    public String modifierPost(@RequestParam(name = "titre", required = false ) String titre,
+                               @RequestParam(name = "text", required = false ) String text,
+                               @RequestParam(value = "image", required = false) MultipartFile imageFile,
+                               @RequestParam(value = "idPost") Integer idPost,
                                HttpSession session,
                                @RequestHeader(value = "Referer", required = false) String referer
     ) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
-        post.setCreateur(user);
+        Post post = postRepository.findByIdPost(idPost);
+        if (post == null) {
+            if ( titre != null && !titre.isEmpty()) {
+                post.setTitrePost(titre);
+            }
+            if ( text != null && !text.isEmpty()) {
+                post.setTextePost(text);
+            }
+            if ( imageFile != null && !imageFile.isEmpty()) {
+                post.getImagePost(imageFile);
+            }
+        }
         postRepository.save(post);
         return "redirect:" + (referer != null ? referer : "/user/" + user.getIdUti() + "/profil");
     }
