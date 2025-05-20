@@ -1,6 +1,8 @@
 package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +10,8 @@ import java.util.List;
  * Une conversation peut contenir plusieurs messages et plusieurs participants.
  */
 @Entity
-public class Conversation {
+public class Conversation implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Identifiant unique de la conversation.
@@ -69,17 +72,31 @@ public class Conversation {
     }
 
     /**
-     * @return la liste des participants de la conversation
+     * @return le nom de la conversation
      */
-    public List<Utilisateur> getParticipants() {
-        return participants;
+    public String getNomConv() {
+        return nomConv;
     }
 
     /**
-     * @param participants liste des participants à associer
+     * @param nomConv nom à définir
      */
-    public void setParticipants(List<Utilisateur> participants) {
-        this.participants = participants;
+    public void setNomConv(String nomConv) {
+        this.nomConv = nomConv;
+    }
+
+    /**
+     * @return le créateur de la conversation
+     */
+    public Utilisateur getCreateur() {
+        return createur;
+    }
+
+    /**
+     * @param createur utilisateur ayant créé la conversation
+     */
+    public void setCreateur(Utilisateur createur) {
+        this.createur = createur;
     }
 
     /**
@@ -93,6 +110,21 @@ public class Conversation {
      * @param messages liste des messages à associer
      */
     public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
+    /**
+     * @return la liste des participants de la conversation
+     */
+    public List<Utilisateur> getParticipants() {
+        return participants;
+    }
+
+    /**
+     * @param participants liste des participants à associer
+     */
+    public void setParticipants(List<Utilisateur> participants) {
+        this.participants = participants;
     }
 
     public String getNomConv() {
@@ -127,4 +159,5 @@ public class Conversation {
     public void setEstconversationDeGroupe(boolean estconversationDeGroupe) {
         this.estconversationDeGroupe = estconversationDeGroupe;
     }
+}
 }

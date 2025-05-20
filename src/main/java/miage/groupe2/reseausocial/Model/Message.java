@@ -1,5 +1,7 @@
 package miage.groupe2.reseausocial.Model;
 
+import java.io.Serializable;
+
 import jakarta.persistence.*;
 
 /**
@@ -7,8 +9,8 @@ import jakarta.persistence.*;
  * Un message possède un texte, une date d'envoi, un expéditeur et une conversation associée.
  */
 @Entity
-public class Message {
-
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique du message.
      */

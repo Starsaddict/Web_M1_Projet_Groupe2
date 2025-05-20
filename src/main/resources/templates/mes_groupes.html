@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Mes groupes</title>
+</head>
+<body>
+
+<h2>Groupes que j'ai créés</h2>
+<div th:each="groupe : ${groupesCrees}">
+  <p>
+    <a th:href="@{'/groupe/' + ${groupe.idGrp}}" th:text="${groupe.nomG}"></a>
+    |
+    <a th:href="@{'/user/supprimerGroupe?idGrp=' + ${groupe.idGrp}}">Supprimer</a>
+  </p>
+</div>
+
+<h2>Groupes où je suis membre</h2>
+<div th:each="groupe : ${groupesMembre}">
+  <p>
+    <a th:href="@{'/groupe/' + ${groupe.idGrp}}" th:text="${groupe.nomG}"></a>
+  </p>
+</div>
+
+<p>
+  <a href="/groupe/creer">Créer un nouveau groupe</a>
+</p>
+
+
+</body>
+</html>

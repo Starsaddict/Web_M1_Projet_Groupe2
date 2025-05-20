@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.io.Serializable;
 
 /**
  * Représente un utilisateur dans le réseau social.
@@ -15,8 +16,8 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Utilisateur {
-
+public class Utilisateur implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique de l'utilisateur.
      */
@@ -35,6 +36,11 @@ public class Utilisateur {
     private String prenomU;
 
     /**
+     * Pseudo de l'utilisateur.
+     */
+    private String pseudoU;
+
+    /**
      * Adresse email de l'utilisateur.
      */
     private String emailU;
@@ -43,6 +49,9 @@ public class Utilisateur {
      * Mot de passe de l'utilisateur.
      */
     private String mdpU;
+
+    @Column(name = "avatar")
+    private byte[] avatar;
 
     /**
      * Liste des posts créés par l'utilisateur.
@@ -110,7 +119,7 @@ public class Utilisateur {
     private List<Groupe> groupesAppartenance;
 
     /**
-     * Liste des événements auxquels l'utilisateur a assisté.
+     * Liste des événements auxquels l'utilisateur a assiste.
      */
     @ManyToMany
     @JoinTable(
@@ -131,11 +140,11 @@ public class Utilisateur {
     )
     private List<Utilisateur> amis;
 
-    /**
-     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
-     */
-    @ManyToMany(mappedBy = "amis")
-    private List<Utilisateur> amisDe;
+//    /**
+//     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
+//     */
+//    @ManyToMany(mappedBy = "amis")
+//    private List<Utilisateur> amisDe;
 
     /**
      * Liste des posts que l'utilisateur a repostés.
@@ -292,13 +301,13 @@ public class Utilisateur {
         this.amis = amis;
     }
 
-    public List<Utilisateur> getAmisDe() {
-        return amisDe;
-    }
-
-    public void setAmisDe(List<Utilisateur> amisDe) {
-        this.amisDe = amisDe;
-    }
+//    public List<Utilisateur> getAmisDe() {
+//        return amisDe;
+//    }
+//
+//    public void setAmisDe(List<Utilisateur> amisDe) {
+//        this.amisDe = amisDe;
+//    }
 
     public List<Post> getPostsRepostes() {
         return postsRepostes;
@@ -316,6 +325,21 @@ public class Utilisateur {
         this.conversationsParticipees = conversationsParticipees;
     }
 
+    public byte[] getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getPseudoU() {
+        return pseudoU;
+    }
+
+    public void setPseudoU(String pseudoU) {
+        this.pseudoU = pseudoU;
+    }
 
     @Override
     public boolean equals(Object o) {

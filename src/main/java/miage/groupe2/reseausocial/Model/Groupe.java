@@ -2,6 +2,7 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -9,8 +10,8 @@ import java.util.List;
  * Un groupe possède un nom, une description, une date de création, un créateur et des membres.
  */
 @Entity
-public class Groupe {
-
+public class Groupe implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique du groupe.
      */
@@ -46,6 +47,9 @@ public class Groupe {
     @ManyToMany(mappedBy = "groupesAppartenance")
     private List<Utilisateur> membres;
 
+    @OneToMany(mappedBy = "groupe" ,cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<Post> posts;
+
     /**
      * Constructeur avec paramètres.
      *
@@ -65,9 +69,6 @@ public class Groupe {
         this.description = description;
     }
 
-    /**
-     * Constructeur par défaut requis par JPA.
-     */
     public Groupe() {
     }
 
@@ -113,6 +114,7 @@ public class Groupe {
         this.createur = createur;
     }
 
+
     /**
      * @return la date de création du groupe
      */
@@ -153,5 +155,13 @@ public class Groupe {
      */
     public void setNomG(String nomG) {
         this.nomG = nomG;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 }

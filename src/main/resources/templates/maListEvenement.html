@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mes Événements</title>
+</head>
+<body>
+<h1>Mes Événements</h1>
+
+<a th:href="@{/evenement/creer}">Créer un nouvel événement</a>
+<a th:href="@{/evenement/tous}">list des tous les evenement</a>
+
+
+<ul>
+    <li th:each="event : ${evenements}">
+        <span th:text="${event.nomE}"></span>
+        du <span th:text="${@dateUtil.formatTimestamp(event.dateDebutE)}"></span>
+        au <span th:text="${@dateUtil.formatTimestamp(event.dateFinE)}"></span>
+        à <span th:text="${event.adresseE}"></span>
+
+        <a th:href="@{/evenement/modifier(id=${event.idEve})}">Modifier</a>
+
+        <form th:action="@{/evenement/supprimer}" method="post" style="display:inline;">
+            <input type="hidden" name="id" th:value="${event.idEve}" />
+            <button type="submit" onclick="return confirm('Confirmer la suppression de cet événement ?');">Supprimer</button>
+        </form>
+
+        <div>
+            <strong>Participants :</strong>
+            <ul>
+                <li th:each="part : ${event.participants}" th:text="${part.nomU + ' ' + part.prenomU}"></li>
+                <li th:if="${#lists.isEmpty(event.participants)}">Aucun participant</li>
+            </ul>
+        </div>
+    </li>
+</ul>
+</body>
+</html>

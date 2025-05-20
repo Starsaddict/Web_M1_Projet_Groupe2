@@ -2,6 +2,7 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -9,8 +10,8 @@ import java.time.LocalDateTime;
  * Une demande est composée d’un demandeur, d’un récepteur, d’un statut et d’une date.
  */
 @Entity
-public class DemandeAmi {
-
+public class DemandeAmi implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique de la demande d’amitié.
      */

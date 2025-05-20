@@ -41,7 +41,11 @@ public class DemandeAmiController {
     }
 
     @PostMapping("/accepter")
-    public String accepterDemande(@RequestParam("idDemande") Integer idDemande, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String accepterDemande(@RequestParam("idDemande") Integer idDemande,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes,
+                                  @RequestHeader(value = "Referer", required = false) String referer
+    ) {
         Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
         if (userConnecte == null) {
             return "redirect:/auth/login";
@@ -55,11 +59,15 @@ public class DemandeAmiController {
             redirectAttributes.addFlashAttribute("succes", "Demande d'ami acceptée.");
         }
 
-        return "redirect:/demande/demandes-recues";
+        return "redirect:" + (referer != null ? referer : "/home");
     }
 
     @PostMapping("/refuser")
-    public String refuserDemande(@RequestParam("idDemande") Integer idDemande, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String refuserDemande(@RequestParam("idDemande") Integer idDemande,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes,
+                                 @RequestHeader(value = "Referer", required = false) String referer
+    ) {
         Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
         if (userConnecte == null) {
             return "redirect:/auth/login";
@@ -72,7 +80,7 @@ public class DemandeAmiController {
             redirectAttributes.addFlashAttribute("succes", "Demande d'ami refusée.");
         }
 
-        return "redirect:/demande/demandes-recues";
+        return "redirect:" + (referer != null ? referer : "/home");
     }
 
 
