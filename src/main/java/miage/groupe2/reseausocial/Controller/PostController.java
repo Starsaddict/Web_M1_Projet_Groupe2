@@ -145,7 +145,7 @@ public class PostController {
                                @RequestParam(value = "idPost") Integer idPost,
                                HttpSession session,
                                @RequestHeader(value = "Referer", required = false) String referer
-    ) {
+    ) throws IOException {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
         Post post = postRepository.findByIdPost(idPost);
         if (post == null) {
@@ -156,7 +156,7 @@ public class PostController {
                 post.setTextePost(text);
             }
             if ( imageFile != null && !imageFile.isEmpty()) {
-                post.getImagePost(imageFile);
+                post.setImagePost(imageFile.getBytes());
             }
         }
         postRepository.save(post);

@@ -734,17 +734,10 @@
 
 
                     <div class="flex-1">
-                        <h3 class="md:text-xl text-base font-semibold text-black dark:text-white"> Monroe Parker </h3>
-                        <p class="text-sm text-blue-600 mt-1 font-normal">@Monroe</p>
+                        <h3 class="md:text-xl text-base font-semibold text-black dark:text-white" th:text="${session.user.prenomU} + ' ' + ${session.user.nomU}"> Monroe Parker </h3>
+                        <p class="text-sm text-blue-600 mt-1 font-normal" th:text="'@'+${session.user.pseudoU}">@Monroe</p>
                     </div>
 
-                    <button class="inline-flex items-center gap-1 py-1 pl-2.5 pr-3 rounded-full bg-slate-50 border-2 border-slate-100 dark:text-white dark:bg-slate-700"
-                            type="button" aria-haspopup="true" aria-expanded="false">
-                        <ion-icon name="flash-outline"
-                                  class="text-base duration-500 group-aria-expanded:rotate-180 md hydrated" role="img"
-                                  aria-label="chevron down outline"></ion-icon>
-                        <span class="font-medium text-sm"> Upgrade  </span>
-                    </button>
                 </div>
 
                 <!-- nav tabs -->
