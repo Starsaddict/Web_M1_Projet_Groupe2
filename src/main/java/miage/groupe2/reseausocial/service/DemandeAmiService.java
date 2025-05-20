@@ -20,7 +20,7 @@ public class DemandeAmiService {
 
     public List<DemandeAmi> getDemandeMessages(Utilisateur user) {
         List<DemandeAmi> demandes = demandeAmiRepository.findByRecepteur(user);
-        System.out.println("找到的好友请求数量: " + demandes.size());
+        System.out.println("Nombre de demandes d'ami trouvées: " + demandes.size());
         return demandes.stream()
                 .filter(demandeAmi -> "en attente".equals(demandeAmi.getStatut()))
                 .toList();
