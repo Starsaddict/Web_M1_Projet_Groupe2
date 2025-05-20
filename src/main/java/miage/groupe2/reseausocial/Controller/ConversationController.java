@@ -82,15 +82,15 @@ public class ConversationController {
 
         List<Message> messages = messageRepository.findByConversationOrderByDateMAsc(conv);
 
-        // Trouver l'ami avec qui on discute (l'autre participant)
-        String nomAmi = conv.getParticipants().stream()
+        // Récupérer tous les noms des participants sauf l'utilisateur connecté
+        List<String> nomsParticipants = conv.getParticipants().stream()
                 .filter(u -> !u.getIdUti().equals(user.getIdUti()))
-                .map(u -> u.getNomU() + " " + u.getPrenomU())
-                .findFirst().orElse("Inconnu");
+                .map(u -> u.getPrenomU() + " " + u.getNomU())
+                .toList();
 
         model.addAttribute("conversation", conv);
         model.addAttribute("messages", messages);
-        model.addAttribute("nomAmi", nomAmi);
+        model.addAttribute("nomsParticipants", nomsParticipants);
         return "conversation";
     }
 
@@ -141,7 +141,7 @@ public class ConversationController {
     @PostMapping("/conversation/groupe/creer")
     public String creerConversationGroupe(
             @RequestParam("participantIds") List<Integer> participantIds,
-            HttpSession session,
+            HttpSession session,@RequestParam("nomdiscussion") String nomdiscussion,
             RedirectAttributes redirectAttributes) {
 
         Utilisateur utilisateurConnecte = (Utilisateur) session.getAttribute("user");
@@ -158,7 +158,7 @@ public class ConversationController {
         List<Utilisateur> participants = utilisateurRepository.findAllById(participantIds);
 
         Conversation conversation = new Conversation();
-        conversation.setNomConv("Groupe de discussion");
+        conversation.setNomConv(nomdiscussion);
         conversation.setParticipants(participants);
         conversation.setCreateur(utilisateurConnecte);
 

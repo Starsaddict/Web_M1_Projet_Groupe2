@@ -6,7 +6,8 @@
 </head>
 <body>
 
-<h2 th:text="'Conversation avec ' + ${nomAmi}">Conversation</h2>
+<h2 th:text="'Conversation avec ' + ${#strings.arrayJoin(nomsParticipants, ', ')}">Conversation</h2>
+
 
 <!-- Affichage des messages -->
 <div>
@@ -14,7 +15,8 @@
         <li th:each="message : ${messages}">
             <strong th:text="${message.expediteur.nomU + ' ' + message.expediteur.prenomU}">Auteur</strong> :
             <span th:text="${message.textM}">Texte</span>
-            <small th:text="${message.dateM}">Date</small>
+            <small th:text="${#dates.format(message.dateM, 'dd/MM/yyyy HH:mm')}">Date</small>
+
 
         </li>
     </ul>
