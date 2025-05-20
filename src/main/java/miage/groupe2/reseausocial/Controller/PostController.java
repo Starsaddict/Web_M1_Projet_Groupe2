@@ -141,26 +141,29 @@ public class PostController {
     @PostMapping("/modifier")
     public String modifierPost(@RequestParam(name = "titre", required = false ) String titre,
                                @RequestParam(name = "text", required = false ) String text,
-                               @RequestParam(value = "image", required = false) MultipartFile imageFile,
+                               @RequestParam(value = "imagePost", required = false) MultipartFile imageFile,
                                @RequestParam(value = "idPost") Integer idPost,
-                               HttpSession session,
-                               @RequestHeader(value = "Referer", required = false) String referer
-    ) throws IOException {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
+                               @RequestParam(name = "deleteImage", required = false) Boolean deleteImage) throws IOException {
         Post post = postRepository.findByIdPost(idPost);
-        if (post == null) {
-            if ( titre != null && !titre.isEmpty()) {
-                post.setTitrePost(titre);
-            }
-            if ( text != null && !text.isEmpty()) {
-                post.setTextePost(text);
-            }
-            if ( imageFile != null && !imageFile.isEmpty()) {
-                post.setImagePost(imageFile.getBytes());
-            }
+
+        if ( titre != null && !titre.isEmpty()) {
+            post.setTitrePost(titre);
         }
+        if ( text != null && !text.isEmpty()) {
+            post.setTextePost(text);
+        }
+        if ( imageFile != null && !imageFile.isEmpty()) {
+            post.setImagePost(imageFile.getBytes());
+        }
+        if (imageFile != null && !imageFile.isEmpty()) {
+            post.setImagePost(imageFile.getBytes());
+        }
+        else if (Boolean.TRUE.equals(deleteImage)) {
+            post.setImagePost(null);
+        }
+
         postRepository.save(post);
-        return "redirect:" + (referer != null ? referer : "/user/" + user.getIdUti() + "/profil");
+        return "redirect:/home";
     }
 
     @GetMapping("/supprimer")
