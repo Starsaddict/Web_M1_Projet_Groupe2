@@ -15,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -66,8 +68,12 @@ public class PostController {
     public String creerPost(
             @ModelAttribute("post") Post post,
             @RequestParam(value = "idgrp", required = false) Integer idGrp,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             HttpSession session
-    ) {
+    ) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            post.setImagePost(imageFile.getBytes());
+        }
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         if (idGrp != null) {
             Groupe groupe = groupeService.getGroupeByidGrp(idGrp);

@@ -56,10 +56,10 @@ public class MainController {
     public String redirectToHome() {
         return "redirect:/home";
     }
-//
-//    @RequestMapping("/profil")
-//    public String profil( ){
-//        return "profil_user";
+
+//    @RequestMapping("groupes/details")
+//    public String details(){
+//        return "group_detail";
 //    }
 
 }

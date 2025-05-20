@@ -117,7 +117,7 @@ public class Utilisateur {
     /**
      * Liste des groupes auxquels l'utilisateur appartient.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "appartenirGrp",
             joinColumns = @JoinColumn(name = "idUti"),

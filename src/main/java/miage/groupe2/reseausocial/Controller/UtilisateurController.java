@@ -209,24 +209,25 @@ public String userProfil(
     @RequestMapping("/joinGroupe")
     public String joinGroupe(
             HttpSession session,
-            @RequestParam int idGrp
+            @RequestParam int idGrp,
+            @RequestHeader(value = "Referer", required = false) String referer
     ){
-        Utilisateur userSession = (Utilisateur)session.getAttribute("user");
-        Utilisateur user = utilisateurRepository.findByIdUti(userSession.getIdUti());
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
         groupeService.joinGroupe(user,groupe);
 
+        user.getGroupesAppartenance().size();
         session.setAttribute("user", user);
-
-        return "redirect:/user/mes-groupes";
+        return "redirect:" + (referer != null ? referer : "/user/mes-groupes");
 
     }
 
-    @PostMapping("/quitterGroupe")
+    @RequestMapping("/quitterGroupe")
     public String quitterGroupe(
             HttpSession session,
-            @RequestParam int idGrp
+            @RequestParam int idGrp,
+            @RequestHeader(value = "Referer", required = false) String referer
     ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
@@ -235,10 +236,9 @@ public String userProfil(
         if (user.equals(groupe.getCreateur())) {
             groupeService.supprimerGroupe(user, groupe);
         }
-
+        user.getGroupesAppartenance().size();
         session.setAttribute("user", user);
-
-        return "redirect:/user/mes-groupes";
+        return "redirect:" + (referer != null ? referer : "/user/mes-groupes");
         }
 
     @RequestMapping("/supprimerGroupe")

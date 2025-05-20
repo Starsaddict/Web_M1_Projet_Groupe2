@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -77,22 +78,31 @@ public class GroupeController {
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
         if (groupe == null) return "redirect:/groupe/list";
 
-        Utilisateur user = utilisateurRepository.findByIdUti(
-                ((Utilisateur) session.getAttribute("user")).getIdUti()
-        );
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         user.getGroupesAppartenance().size();
 
         boolean estMembre = user.getGroupesAppartenance().stream()
                 .anyMatch(g -> g.getIdGrp().equals(groupe.getIdGrp()));
 
+        user.getGroupesAppartenance().size();
+
+        List<Post> posts = groupe.getPosts().stream()
+                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
+                .toList();
+
+        List<Groupe> groupes = groupeRepository.findAll();
+        groupes.remove(groupe);
+        groupes.stream().limit(6).toList();
+
         model.addAttribute("groupe", groupe);
         model.addAttribute("membres", groupe.getMembres());
-        model.addAttribute("posts", groupe.getPosts());
+        model.addAttribute("posts", posts);
         model.addAttribute("post", new Post());
         model.addAttribute("estMembre", estMembre);
+        model.addAttribute("groupes", groupes);
 
-        return "groupe_detail";
+        return "group_detail";
     }
 
 
