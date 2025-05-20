@@ -23,5 +23,7 @@ public interface ConversationRepository extends JpaRepository<Conversation, Inte
     void ajouterutilisateuralaconversation(@Param("id1") Integer id1, @Param("id2") Integer id2);
 
 
+    List<Conversation> findByParticipants_IdUti(Integer idUti);
+
 
 }

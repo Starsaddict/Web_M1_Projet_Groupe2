@@ -5,6 +5,12 @@
 </head>
 <body>
 <h2>Liste de mes amis</h2>
+<!-- Bouton pour créer une conversation de groupe -->
+<p>
+    <a th:href="@{/conversation/groupe/nouvelle}" style="display:inline-block; margin-bottom: 15px;">
+        <button type="button">Créer une conversation de groupe</button>
+    </a>
+</p>
 
 <ul>
     <li th:each="ami : ${amis}">
@@ -30,5 +36,6 @@
 <div th:if="${succes}" th:text="${succes}" style="color: green;"></div>
 <div th:if="${error}" th:text="${error}" style="color: red;"></div>
 
+<a th:href="@{/conversation/groupes}">afficher mes conversations de groupe</a>
 </body>
 </html>
