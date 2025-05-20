@@ -76,7 +76,9 @@ public class DemandeAmiController {
     public String envoyerDemandeAmi(@RequestParam("idAmi") Integer idAmi,
                                     @RequestParam(value = "nom", required = false) String nomRecherche,
                                     HttpSession session,
-                                    RedirectAttributes redirectAttributes) {
+                                    RedirectAttributes redirectAttributes,
+                                    @RequestHeader(value = "Referer", required = false) String referer
+    ) {
         Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
         if (userConnecte == null) {
             return "redirect:/auth/login";
@@ -111,7 +113,17 @@ public class DemandeAmiController {
         demandeAmiRepository.save(demande);
 
         redirectAttributes.addFlashAttribute("success", "Demande d'ami envoyée à " + recepteur.getNomU() + ".");
-        return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
+
+        if (referer != null) {
+            return "redirect:" + referer;
+        }
+
+        String redirectUrl = "/home";
+        if (nomRecherche != null && !nomRecherche.isEmpty()) {
+            redirectUrl = "/user/rechercher?nom=" + nomRecherche;
+        }
+
+        return "redirect:" + redirectUrl;
     }
 
 }
