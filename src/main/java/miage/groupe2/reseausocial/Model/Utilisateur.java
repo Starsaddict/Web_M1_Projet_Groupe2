@@ -46,6 +46,11 @@ public class Utilisateur implements Serializable {
     private String emailU;
 
     /**
+     * Introduction de l'utilisateur.
+     */
+    private String introductionU;
+
+    /**
      * Mot de passe de l'utilisateur.
      */
     private String mdpU;
@@ -338,6 +343,14 @@ public class Utilisateur implements Serializable {
 
     public void setPseudoU(String pseudoU) {
         this.pseudoU = pseudoU;
+    }
+
+    public String getIntroductionU() {
+        return introductionU;
+    }
+
+    public void setIntroductionU(String introductionU) {
+        this.introductionU = introductionU;
     }
 
     @Override

@@ -6,28 +6,28 @@
 <body>
 <h1>Modifier l'événement</h1>
 
-<form th:action="@{/evenements/modifier}" th:object="${evenement}" method="post">
+<form th:action="@{/evenement/modifier}"  method="post">
 
-    <input type="hidden" th:field="*{idEve}" />
+    <input type="hidden" name="id" th:value="${evenement.idEve}" />
 
     <label for="nomE">Nom :</label>
-    <input type="text" id="nomE" th:field="*{nomE}" required />
+    <input type="text" id="nomE" name="nomE" th:placeholder="${evenement.nomE}" />
     <br/>
 
     <label for="description">Description :</label>
-    <textarea id="description" th:field="*{description}" rows="4" cols="50"></textarea>
+    <textarea id="description" name="description" th:placeholder="${evenement.description}" rows="4" cols="50"></textarea>
     <br/>
 
     <label for="adresseE">Adresse :</label>
-    <input type="text" id="adresseE" th:field="*{adresseE}" required />
+    <input type="text" id="adresseE" name="adressE" th:placeholder="${evenement.adresseE}" />
     <br/>
 
     <label for="dateDebutE">Date et heure début :</label>
-    <input type="datetime-local" id="dateDebutE" th:field="*{dateDebutE}" required />
+    <input type="datetime-local" id="dateDebutE" name="start" required />
     <br/>
 
     <label for="dateFinE">Date et heure fin :</label>
-    <input type="datetime-local" id="dateFinE" th:field="*{dateFinE}" required />
+    <input type="datetime-local" id="dateFinE" name="fin" required />
     <br/>
 
     <button type="submit">Enregistrer</button>

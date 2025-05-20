@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import miage.groupe2.reseausocial.Util.DateUtil;
+import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +30,8 @@ public class EventController {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+    @Autowired
+    private UtilisateurService utilisateurService;
 
     /**
      * Affiche le formulaire de création d’un nouvel événement.
@@ -50,25 +54,20 @@ public class EventController {
      * @return redirection vers la liste des événements créés par l’utilisateur
      */
     @PostMapping("/creer")
-    public String creerEvenement(@ModelAttribute Evenement evenement, HttpSession session) {
+    public String creerEvenement(@ModelAttribute Evenement evenement,
+                                 HttpSession session,
+                                 @RequestParam(name = "start") LocalDateTime dateStart,
+                                 @RequestParam(name="fin") LocalDateTime dateFin
+    ) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
         if (user == null) return "redirect:/auth/login";
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-
-        if (evenement.getDateDebutEString() != null && !evenement.getDateDebutEString().isEmpty()) {
-            LocalDateTime debut = LocalDateTime.parse(evenement.getDateDebutEString(), formatter);
-            long timestampDebut = debut.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            evenement.setDateDebutE(timestampDebut);
-        }
-
-        if (evenement.getDateFinEString() != null && !evenement.getDateFinEString().isEmpty()) {
-            LocalDateTime fin = LocalDateTime.parse(evenement.getDateFinEString(), formatter);
-            long timestampFin = fin.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            evenement.setDateFinE(timestampFin);
-        }
-
+        long dd = DateUtil.toEpochMilli(dateStart);
+        long df = DateUtil.toEpochMilli(dateFin);
         evenement.setCreateur(user);
+        evenement.setDateDebutE(dd);
+        evenement.setDateFinE(df);
+
         evenementRepository.save(evenement);
         return "redirect:/evenement/maListEvenement";
     }
@@ -143,18 +142,30 @@ public String afficherFormulaireModification(@RequestParam("id") Integer id, Htt
  * @return redirection vers la liste des événements de l’utilisateur
  */
 @PostMapping("/modifier")
-public String modifierEvenement(@ModelAttribute Evenement evenementModifie, HttpSession session) {
-    Utilisateur user = (Utilisateur) session.getAttribute("user");
-    if (user == null) return "redirect:/auth/login";
+public String modifierEvenement(@RequestParam(name = "id") Integer id,
+                                @RequestParam(name = "nomE") String nomE,
+                                @RequestParam(name = "description") String description,
+                                @RequestParam(name = "adressE") String adressE,
+                                HttpSession session,
+                                @RequestParam(name = "start") LocalDateTime start,
+                                @RequestParam(name = "fin") LocalDateTime fin
+) {
+   Evenement evenement = evenementRepository.findByIdEve(id);
+   if(nomE != null){
+       evenement.setNomE(nomE);
+   }
+   if(description != null){
+       evenement.setDescription(description);
+   }
+   if(adressE != null){
+       evenement.setAdresseE(adressE);
+   }
+   long dd = DateUtil.toEpochMilli(start);
+   long df = DateUtil.toEpochMilli(fin);
+   evenement.setDateDebutE(dd);
+   evenement.setDateFinE(df);
 
-    Evenement existant = evenementRepository.findById(evenementModifie.getIdEve()).orElse(null);
-    if (existant != null && existant.getCreateur().getIdUti().equals(user.getIdUti())) {
-        existant.setNomE(evenementModifie.getNomE());
-        existant.setDateDebutE(evenementModifie.getDateDebutE());
-        existant.setDateFinE(evenementModifie.getDateFinE());
-        existant.setAdresseE(evenementModifie.getAdresseE());
-        evenementRepository.save(existant);
-    }
+   evenementRepository.save(evenement);
 
     return "redirect:/evenement/maListEvenement";
 }
@@ -186,11 +197,8 @@ public String afficherTousLesEvenements(Model model, HttpSession session) {
  */
 @PostMapping("/rejoindre")
 public String rejoindreEvenement(@RequestParam("id") Integer id, HttpSession session) {
-    Utilisateur sessionUser = (Utilisateur) session.getAttribute("user");
-    if (sessionUser == null) return "redirect:/auth/login";
-
-    Utilisateur user = utilisateurRepository.findById(sessionUser.getIdUti()).orElse(null);
-    Evenement event = evenementRepository.findById(id).orElse(null);
+    Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+    Evenement event = evenementRepository.findByIdEve(id);
 
     if (user != null && event != null && !user.getEvenementsAssistes().contains(event)) {
         user.getEvenementsAssistes().add(event);

@@ -200,26 +200,5 @@ public class Evenement implements Serializable {
         this.nomE = nomE;
     }
 
-@Transient
-private String dateDebutEString;
-
-@Transient
-private String dateFinEString;
-
-public String getDateDebutEString() {
-    return dateDebutEString;
-}
-
-public void setDateDebutEString(String dateDebutEString) {
-    this.dateDebutEString = dateDebutEString;
-}
-
-public String getDateFinEString() {
-    return dateFinEString;
-}
-
-public void setDateFinEString(String dateFinEString) {
-    this.dateFinEString = dateFinEString;
-}
 
 }

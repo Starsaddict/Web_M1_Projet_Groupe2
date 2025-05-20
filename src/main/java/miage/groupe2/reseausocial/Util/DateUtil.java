@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -46,5 +47,12 @@ public class DateUtil {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             return sdf.format(date);
         }
+    }
+
+    public static long toEpochMilli(LocalDateTime ldt) {
+        return ldt
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
     }
 }

@@ -46,7 +46,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public String postPersonne(
-            @PathVariable long id,
+            @PathVariable Integer id,
             Model model
     ) {
         Utilisateur user = utilisateurRepository.findByIdUti(id);
