@@ -160,4 +160,4 @@ public class Conversation implements Serializable {
         this.estconversationDeGroupe = estconversationDeGroupe;
     }
 }
-}
+
