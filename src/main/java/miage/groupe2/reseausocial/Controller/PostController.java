@@ -57,13 +57,6 @@ public class PostController {
     }
 
 
-    @GetMapping("/creer")
-    public String CreerPost(Model model) {
-        Post post = new Post();
-        model.addAttribute("Post", post);
-        return "creerPost";
-    }
-
     @PostMapping("/creer")
     public String creerPost(
             @ModelAttribute("post") Post post,
@@ -143,8 +136,16 @@ public class PostController {
                                @RequestParam(name = "text", required = false ) String text,
                                @RequestParam(value = "imagePost", required = false) MultipartFile imageFile,
                                @RequestParam(value = "idPost") Integer idPost,
-                               @RequestParam(name = "deleteImage", required = false) Boolean deleteImage) throws IOException {
+                               @RequestParam(name = "deleteImage", required = false) Boolean deleteImage,
+                               @RequestHeader(value = "Referer", required = false) String referer
+    ) throws IOException {
         Post post = postRepository.findByIdPost(idPost);
+
+        System.out.println("=== upload image debug ===");
+        System.out.println("originalFilename=" + (imageFile==null? "null": imageFile.getOriginalFilename()));
+        System.out.println("size=" + (imageFile==null? "null": imageFile.getSize()));
+        System.out.println("isEmpty=" + (imageFile==null? "null": imageFile.isEmpty()));
+
 
         if ( titre != null && !titre.isEmpty()) {
             post.setTitrePost(titre);
@@ -152,18 +153,19 @@ public class PostController {
         if ( text != null && !text.isEmpty()) {
             post.setTextePost(text);
         }
-        if ( imageFile != null && !imageFile.isEmpty()) {
-            post.setImagePost(imageFile.getBytes());
-        }
+
         if (imageFile != null && !imageFile.isEmpty()) {
             post.setImagePost(imageFile.getBytes());
+            System.out.println("已经更换image");
+        }else{
+            System.out.println("没换");
         }
-        else if (Boolean.TRUE.equals(deleteImage)) {
+        if (Boolean.TRUE.equals(deleteImage)) {
             post.setImagePost(null);
         }
 
         postRepository.save(post);
-        return "redirect:/home";
+        return "redirect:" + (referer != null ? referer : "/home");
     }
 
     @GetMapping("/supprimer")

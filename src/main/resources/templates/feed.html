@@ -75,39 +75,6 @@
 
                         </form>
 
-                        <!-- search dropdown-->
-                        <!--                        <div class="hidden uk- open z-10"-->
-                        <!--                                uk-drop="pos: bottom-center ; animation: uk-animation-slide-bottom-small;mode:click ">-->
-                        <!--                            -->
-                        <!--                                <div class="xl:w-[694px] sm:w-96 bg-white dark:bg-dark3 w-screen p-2 rounded-lg shadow-lg -mt-14 pt-14">-->
-                        <!--                                    <div class="flex justify-between px-2 py-2.5 text-sm font-medium"> -->
-                        <!--                                        <div class=" text-black dark:text-white">Recent</div>-->
-                        <!--                                        <button type="button" class="text-blue-500">Clear</button>-->
-                        <!--                                    </div>-->
-                        <!--                                    <nav class="text-sm font-medium text-black dark:text-white" th:if="${utilisateurs != null}">-->
-                        <!--                                        <div th:each="friend : ${utilisateurs}" class="relative px-3 py-1.5 flex items-center gap-4 hover:bg-secondery rounded-lg dark:hover:bg-white/10">-->
-
-                        <!--                                            <img th:if="${friend.avatar != null}"-->
-                        <!--                                                 th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(friend.avatar)}"-->
-                        <!--                                                 class="w-9 h-9 rounded-full" />-->
-
-                        <!--                                            <img th:if="${friend.avatar == null}"-->
-                        <!--                                                 th:src="@{/assets/images/avatars/avatar-0.png}"-->
-                        <!--                                                 class="w-9 h-9 rounded-full" />-->
-
-                        <!--                                            <div>-->
-                        <!--                                                <div th:text="${friend.nomU + ' ' + friend.prenomU}"></div>-->
-                        <!--                                                <div class="text-xs text-blue-500 font-medium mt-0.5">Friend</div>-->
-                        <!--                                            </div>-->
-
-                        <!--                                            &lt;!&ndash; <ion-icon name="close" class="text-base absolute right-3 top-1/2 -translate-y-1/2 "></ion-icon> &ndash;&gt;-->
-
-                        <!--                                        </div>-->
-                        <!--                                    </nav>-->
-
-                        <!--                                </div>-->
-                        <!--                                -->
-                        <!--                        </div>-->
 
                         <!-- header icons -->
                         <div class="flex items-center sm:gap-4 gap-2 absolute right-5 top-1/2 -translate-y-1/2 text-black">
@@ -129,46 +96,17 @@
                                     <div class="uk-slider-container pb-1">
 
                                         <ul class="uk-slider-items grid-small" uk-scrollspy="target: > li; cls: uk-animation-scale-up , uk-animation-slide-right-small; delay: 20 ;repeat: true">
-                                            <li class="w-28">
-                                                <a th:href="@{/post/creer}" class="block p-3 px-4 rounded-lg bg-sky-100/60 text-sky-600 dark:text-white dark:bg-dark4 text-center">
+                                            <li class="w-28" uk-toggle="target: #create-status" >
+                                                <a href = "#" class="block p-3 px-4 rounded-lg bg-sky-100/60 text-sky-600 dark:text-white dark:bg-dark4 text-center">
                                                     <ion-icon name="camera" class="text-2xl drop-shadow-md"></ion-icon>
                                                     <div class="mt-1.5 text-sm font-medium">Post</div>
                                                 </a>
                                             </li>
 
-                                            <!--                                                <li class="w-28">-->
-                                            <!--                                                    <div class="p-3 px-4 rounded-lg bg-purple-100/60 text-purple-600 dark:text-white dark:bg-dark4">-->
-                                            <!--                                                        <ion-icon name="videocam" class="text-2xl drop-shadow-md"></ion-icon>-->
-                                            <!--                                                        <div class="mt-1.5 text-sm font-medium"> Reel </div>-->
-                                            <!--                                                    </div>-->
-                                            <!--                                                </li> -->
-                                            <!--                                                <li class="w-28">-->
-                                            <!--                                                    <div class="p-3 px-4 rounded-lg bg-pink-100/60 text-pink-600 dark:text-white dark:bg-dark4">-->
-                                            <!--                                                        <ion-icon name="location" class="text-2xl drop-shadow-md"></ion-icon>-->
-                                            <!--                                                        <div class="mt-1.5 text-sm font-medium"> location </div>-->
-                                            <!--                                                    </div>-->
-                                            <!--                                                </li> -->
-                                            <!--                                                <li class="w-28">-->
-                                            <!--                                                    <div class="p-3 px-4 rounded-lg bg-sky-100/70 text-sky-600 dark:text-white dark:bg-dark4">-->
-                                            <!--                                                        <ion-icon name="happy" class="text-2xl  drop-shadow-md"></ion-icon>-->
-                                            <!--                                                        <div class="mt-1.5 text-sm font-medium"> Status </div>-->
-                                            <!--                                                    </div> -->
-                                            <!--                                                </li> -->
                                         </ul>
 
                                     </div>
 
-                                    <!--                                        &lt;!&ndash; slide nav icons &ndash;&gt;-->
-                                    <!--                                        <div class="dark:hidden">-->
-                                    <!--                                            <a class="absolute -translate-y-1/2 top-1/2 -left-4 flex items-center w-8 h-full px-1.5 justify-start bg-gradient-to-r from-white via-white dark:from-slate-600 dark:via-slate-500 dark:from-transparent dark:via-transparent" href="#" uk-slider-item="previous"> <ion-icon name="chevron-back" class="text-xl dark:text-white"></ion-icon> </a>-->
-                                    <!--                                            <a class="absolute -translate-y-1/2 top-1/2 -right-4 flex items-center w-8 h-full px-1.5 justify-end bg-gradient-to-l from-white via-white dark:from-transparent dark:via-transparent" href="#" uk-slider-item="next">  <ion-icon name="chevron-forward" class="text-xl dark:text-white"></ion-icon> </a>-->
-                                    <!--                                        </div>-->
-                                    <!--                -->
-
-                                    <!--                                        &lt;!&ndash; slide nav &ndash;&gt;-->
-                                    <!--                                        <div class="justify-center mt-2 -mb-2 hidden dark:flex">-->
-                                    <!--                                            <ul class="inline-flex flex-wrap justify-center gap-1 uk-dotnav uk-slider-nav"> </ul>-->
-                                    <!--                                        </div>-->
 
                                 </div>
 
@@ -181,13 +119,7 @@
                                             <div class="mt-1 text-xs text-gray-500 dark:text-white"> Groupes qui vous intéressent </div>
                                         </div>
                                     </li>
-                                    <!--                                        <li class="flex items-center gap-4 hover:bg-secondery rounded-md p-1.5 cursor-pointer dark:hover:bg-white/10">-->
-                                    <!--                                            <img src="/assets/images/icons/page.png" alt="" class="w-7">-->
-                                    <!--                                            <div class="flex-1">-->
-                                    <!--                                                <a href="timeline.html"><h4 class="font-medium text-sm text-black dark:text-white"> Pages </h4></a>-->
-                                    <!--                                                <div class="mt-1"> Find and connect with businesses.-->
-                                    <!--                                            </div>-->
-                                    <!--                                        </li>-->
+
                                     <li class="flex items-center gap-4 hover:bg-secondery rounded-md p-1.5 cursor-pointer dark:hover:bg-white/10">
                                         <img src="/assets/images/icons/event.png" class="w-7">
                                         <div class="flex-1">
@@ -202,20 +134,7 @@
                                             <div class="mt-1">Parler avec ton amis </div>
                                         </div>
                                     </li>
-                                    <!--                                        <li class="flex items-center gap-4 hover:bg-secondery rounded-md p-1.5 cursor-pointer dark:hover:bg-white/10">-->
-                                    <!--                                            <img src="assets/images/icons/market.png" class="w-8 -ml-1">-->
-                                    <!--                                            <div class="flex-1">-->
-                                    <!--                                                <a href="timeline.html"><h4 class="font-medium text-sm text-black dark:text-white"> Event </h4></a>-->
-                                    <!--                                                <div class="mt-1">Find local buyers and sellers .</div>-->
-                                    <!--                                            </div>-->
-                                    <!--                                        </li>-->
-                                    <!--                                        <li class="flex items-center gap-4 hover:bg-secondery rounded-md p-1.5 cursor-pointer dark:hover:bg-white/10">-->
-                                    <!--                                            <img src="assets/images/icons/game.png" alt="" class="w-7">-->
-                                    <!--                                            <div class="flex-1">-->
-                                    <!--                                                <a href="timeline.html"><h4 class="font-medium text-sm text-black dark:text-white"> Games </h4></a>-->
-                                    <!--                                                <div class="mt-1"> play game with friends have fun. </div>-->
-                                    <!--                                            </div>-->
-                                    <!--                                        </li>-->
+
                                 </ul>
 
 
@@ -301,124 +220,7 @@
                                 <div class="w-3 h-3 absolute -top-1.5 right-3 bg-white border-l border-t rotate-45 max-md:hidden dark:bg-dark3 dark:border-transparent"></div>
                             </div>
 
-                            <!--                            &lt;!&ndash; messages &ndash;&gt;-->
-                            <!--                            <button type="button" class="sm:p-2 p-1 rounded-full relative sm:bg-secondery dark:text-white" uk-tooltip="title: Messages; pos: bottom; offset:6">-->
-                            <!--                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 max-sm:hidden">-->
-                            <!--                                    <path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97zM6.75 8.25a.75.75 0 01.75-.75h9a.75.75 0 010 1.5h-9a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H7.5z" clip-rule="evenodd"></path>-->
-                            <!--                                </svg>-->
-                            <!--                                <ion-icon name="chatbox-ellipses-outline" class="sm:hidden text-2xl"></ion-icon>-->
-                            <!--                            </button>-->
-                            <!--                            <div  class="hidden bg-white pr-1.5 rounded-lg drop-shadow-xl dark:bg-slate-700 md:w-[360px] w-screen border2"-->
-                            <!--                                uk-drop="offset:6;pos: bottom-right; mode: click; animate-out: true; animation: uk-animation-scale-up uk-transform-origin-top-right ">-->
 
-                            <!--                                &lt;!&ndash; heading &ndash;&gt;-->
-                            <!--                                <div class="flex items-center justify-between gap-2 p-4 pb-1">-->
-                            <!--                                    <h3 class="font-bold text-xl"> Chats </h3>-->
-
-                            <!--                                    <div class="flex gap-2.5 text-lg text-slate-900 dark:text-white">-->
-                            <!--                                        <ion-icon name="expand-outline"></ion-icon>-->
-                            <!--                                        <ion-icon name="create-outline"></ion-icon>-->
-                            <!--                                    </div>-->
-                            <!--                                </div>-->
-
-                            <!--                                <div class="relative w-full p-2 px-3 ">-->
-                            <!--                                    <input type="text" class="w-full !pl-10 !rounded-lg dark:!bg-white/10" placeholder="Search">-->
-                            <!--                                    <ion-icon name="search-outline" class="dark:text-white absolute left-7 -translate-y-1/2 top-1/2"></ion-icon>-->
-                            <!--                                </div>-->
-
-                            <!--                                <div class="h-80 overflow-y-auto pr-2">-->
-
-                            <!--                                    <div class="p-2 pt-0 pr-1 dark:text-white/80">-->
-
-                            <!--                                        <a href="#" class="relative flex items-center gap-4 p-2 py-3 duration-200 rounded-lg hover:bg-secondery dark:hover:bg-white/10">-->
-                            <!--                                            <div class="relative w-10 h-10 shrink-0">-->
-                            <!--                                                <img src="assets/images/avatars/avatar-2.jpg" alt="" class="object-cover w-full h-full rounded-full">-->
-                            <!--                                            </div>-->
-                            <!--                                            <div class="flex-1 min-w-0">-->
-                            <!--                                                <div class="flex items-center gap-2 mb-1">-->
-                            <!--                                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">Jesse Steeve</div>-->
-                            <!--                                                    <div class="text-xs text-gray-500 dark:text-white/80"> 09:40AM </div>-->
-                            <!--                                                    <div class="w-2.5 h-2.5 bg-blue-600 rounded-full dark:bg-slate-700"></div>-->
-                            <!--                                                </div>-->
-                            <!--                                                <div class="font-normal overflow-hidden text-ellipsis text-xs whitespace-nowrap">Love your photos 😍</div>-->
-                            <!--                                            </div>-->
-                            <!--                                        </a>-->
-                            <!--                                        <a href="#" class="relative flex items-center gap-4 p-2 py-3 duration-200 rounded-lg hover:bg-secondery dark:hover:bg-white/10">-->
-                            <!--                                            <div class="relative w-10 h-10 shrink-0">-->
-                            <!--                                                <img src="assets/images/avatars/avatar-4.jpg" alt="" class="object-cover w-full h-full rounded-full">-->
-                            <!--                                            </div>-->
-                            <!--                                            <div class="flex-1 min-w-0">-->
-                            <!--                                                <div class="flex items-center gap-2 mb-1">-->
-                            <!--                                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">Martin Gray</div>-->
-                            <!--                                                    <div class="text-xs text-gray-500 dark:text-white/80"> 02:40AM </div>-->
-                            <!--                                                </div>-->
-                            <!--                                                <div class="font-normal overflow-hidden text-ellipsis text-xs whitespace-nowrap">Product photographer wanted? 📷</div>-->
-                            <!--                                            </div>-->
-                            <!--                                        </a>-->
-                            <!--                                        <a href="#" class="relative flex items-center gap-4 p-2 py-3 duration-200 rounded-lg hover:bg-secondery dark:hover:bg-white/10">-->
-                            <!--                                            <div class="relative w-10 h-10 shrink-0">-->
-                            <!--                                                <img src="assets/images/avatars/avatar-5.jpg" alt="" class="object-cover w-full h-full rounded-full">-->
-                            <!--                                            </div>-->
-                            <!--                                            <div class="flex-1 min-w-0">-->
-                            <!--                                                <div class="flex items-center gap-2 mb-1">-->
-                            <!--                                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">Jesse Steeve</div>-->
-                            <!--                                                    <div class="text-xs text-gray-500 dark:text-white/80"> 2 day </div>-->
-                            <!--                                                </div>-->
-                            <!--                                                <div class="font-normal overflow-hidden text-ellipsis text-xs whitespace-nowrap">Want to buy landscape photo? 🌄</div>-->
-                            <!--                                            </div>-->
-                            <!--                                        </a>-->
-                            <!--                                        <a href="#" class="relative flex items-center gap-4 p-2 py-3 duration-200 rounded-lg hover:bg-secondery dark:hover:bg-white/10">-->
-                            <!--                                            <div class="relative w-10 h-10 shrink-0">-->
-                            <!--                                                <img src="assets/images/avatars/avatar-3.jpg" alt="" class="object-cover w-full h-full rounded-full">-->
-                            <!--                                            </div>-->
-                            <!--                                            <div class="flex-1 min-w-0">-->
-                            <!--                                                <div class="flex items-center gap-2 mb-1">-->
-                            <!--                                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">Monroe Parker</div>-->
-                            <!--                                                    <div class="text-xs text-gray-500 dark:text-white/80"> 4 week </div>-->
-                            <!--                                                    <div class="w-2.5 h-2.5 bg-blue-600 rounded-full dark:bg-slate-700"></div>-->
-                            <!--                                                </div>-->
-                            <!--                                                <div class="font-normal overflow-hidden text-ellipsis text-xs whitespace-nowrap">I’m glad you like it.😊</div>-->
-                            <!--                                            </div>-->
-                            <!--                                        </a>-->
-                            <!--                                        <a href="#" class="relative flex items-center gap-4 p-2 py-3 duration-200 rounded-lg hover:bg-secondery dark:hover:bg-white/10">-->
-                            <!--                                            <div class="relative w-10 h-10 shrink-0">-->
-                            <!--                                                <img src="assets/images/avatars/avatar-7.jpg" alt="" class="object-cover w-full h-full rounded-full">-->
-                            <!--                                            </div>-->
-                            <!--                                            <div class="flex-1 min-w-0">-->
-                            <!--                                                <div class="flex items-center gap-2 mb-1">-->
-                            <!--                                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">Alex Dolve</div>-->
-                            <!--                                                    <div class="text-xs text-gray-500 dark:text-white/80"> 2 month </div>-->
-                            <!--                                                </div>-->
-                            <!--                                                <div class="font-normal overflow-hidden text-ellipsis text-xs whitespace-nowrap">Photo editor needed. Fix photos? 🛠️</div>-->
-                            <!--                                            </div>-->
-                            <!--                                        </a>-->
-                            <!--                                        <a href="#" class="relative flex items-center gap-4 p-2 py-3 duration-200 rounded-lg hover:bg-secondery dark:hover:bg-white/10">-->
-                            <!--                                            <div class="relative w-10 h-10 shrink-0">-->
-                            <!--                                                <img src="assets/images/avatars/avatar-4.jpg" alt="" class="object-cover w-full h-full rounded-full">-->
-                            <!--                                            </div>-->
-                            <!--                                            <div class="flex-1 min-w-0">-->
-                            <!--                                                <div class="flex items-center gap-2 mb-1">-->
-                            <!--                                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">Jesse Steeve</div>-->
-                            <!--                                                    <div class="text-xs text-gray-500 dark:text-white/80"> 09:40AM </div>-->
-                            <!--                                                </div>-->
-                            <!--                                                <div class="font-normal overflow-hidden text-ellipsis text-xs whitespace-nowrap">Love your photos 😍</div>-->
-                            <!--                                            </div>-->
-                            <!--                                        </a>-->
-
-                            <!--                                    </div>-->
-
-                            <!--                                </div>-->
-
-
-                            <!--                                &lt;!&ndash; footer &ndash;&gt;-->
-                            <!--                                <a href="#">-->
-                            <!--                                    <div class="text-center py-4 border-t border-slate-100 text-sm font-medium text-blue-600 dark:text-white dark:border-gray-600">   See all Messages  </div>-->
-                            <!--                                </a>-->
-
-                            <!--                                <div class="w-3 h-3 absolute -top-1.5 right-3 bg-white border-l border-t rotate-45 max-md:hidden dark:bg-dark3 dark:border-transparent"></div>-->
-                            <!--                            </div>-->
-
-                            <!-- profile -->
                             <div  class="rounded-full relative bg-secondery cursor-pointer shrink-0">
                                 <img th:if="${session.user.avatar != null}"
                                      th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(session.user.avatar)}"
@@ -455,30 +257,7 @@
                                 <hr class="dark:border-gray-600/60">
 
                                 <nav class="p-2 text-sm text-black font-normal dark:text-white">
-                                    <!--                                    <a href="upgrade.html">-->
-                                    <!--                                        <div class="flex items-center gap-2.5 hover:bg-secondery p-2 px-2.5 rounded-md dark:hover:bg-white/10 text-blue-600">-->
-                                    <!--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">-->
-                                    <!--                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />-->
-                                    <!--                                            </svg>-->
-                                    <!--                                            Upgrade To Premium -->
-                                    <!--                                        </div>-->
-                                    <!--                                    </a>  -->
-                                    <!--                                    <a href="setting.html">-->
-                                    <!--                                        <div class="flex items-center gap-2.5 hover:bg-secondery p-2 px-2.5 rounded-md dark:hover:bg-white/10"> -->
-                                    <!--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">-->
-                                    <!--                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />-->
-                                    <!--                                            </svg>-->
-                                    <!--                                            My Billing -->
-                                    <!--                                        </div>-->
-                                    <!--                                    </a>-->
-                                    <!--                                    <a href="setting.html">-->
-                                    <!--                                        <div class="flex items-center gap-2.5 hover:bg-secondery p-2 px-2.5 rounded-md dark:hover:bg-white/10"> -->
-                                    <!--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">-->
-                                    <!--                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />-->
-                                    <!--                                            </svg>-->
-                                    <!--                                            Advatacing-->
-                                    <!--                                        </div>-->
-                                    <!--                                    </a>-->
+
                                     <a th:href="@{'/user/modifierProfil'}">
                                         <div class="flex items-center gap-2.5 hover:bg-secondery p-2 px-2.5 rounded-md dark:hover:bg-white/10">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -488,17 +267,7 @@
                                             Modifier mon profil
                                         </div>
                                     </a>
-                                    <!--                                    <button type="button" class="w-full">-->
-                                    <!--                                        <div class="flex items-center gap-2.5 hover:bg-secondery p-2 px-2.5 rounded-md dark:hover:bg-white/10"> -->
-                                    <!--                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">-->
-                                    <!--                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />-->
-                                    <!--                                            </svg>-->
-                                    <!--                                            Night mode-->
-                                    <!--                                            <span class="bg-slate-200/40 ml-auto p-0.5 rounded-full w-9 dark:hover:bg-white/20">-->
-                                    <!--                                                <span class="bg-white block h-4 relative rounded-full shadow-md w-2 w-4 dark:bg-blue-600"></span>-->
-                                    <!--                                            </span>-->
-                                    <!--                                        </div>-->
-                                    <!--                                    </button>   -->
+
                                     <hr class="-mx-2 my-2 dark:border-gray-600/60">
                                     <a href="/auth/logout">
                                         <div class="flex items-center gap-2.5 hover:bg-secondery p-2 px-2.5 rounded-md dark:hover:bg-white/10">
@@ -765,8 +534,12 @@
                                                 </a>
 
                                                 <a th:if="${post.createur.idUti == session.user.idUti}"
-                                                   th:href="@{/post/modifier(id=${post.idPost})}"
-                                                   class="text-black dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 px-2 py-1 rounded flex items-center gap-2">
+                                                   href="#"
+                                                   class="text-black dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 px-2 py-1 rounded flex items-center gap-2"
+                                                   uk-toggle="target: #modifier-status"
+                                                >
+
+                                                <!--                                                   th:href="@{/post/modifier(id=${post.idPost})}"-->
                                                     <ion-icon class="text-xl shrink-0" name="create-outline"></ion-icon>
                                                     Modifier
                                                 </a>
@@ -780,6 +553,65 @@
                                                 </a>
 
                                             </nav>
+                                        </div>
+
+                                        <!-- modifier status -->
+                                        <div id="modifier-status" uk-modal>
+                                            <form th:action="@{/post/modifier}"
+                                                  method="post"
+                                                  enctype="multipart/form-data"
+                                                  class="uk-modal-dialog tt relative overflow-hidden mx-auto bg-white shadow-xl rounded-lg md:w-[520px] w-full dark:bg-dark2">
+
+                                                <input name="idPost" th:value="${post.idPost}" class="hidden">
+
+                                                <div class="text-center py-4 border-b mb-0 dark:border-slate-700">
+                                                    <h2 class="text-sm font-medium text-black">Modifier une publication</h2>
+                                                    <button type="button" class="button-icon absolute top-0 right-0 m-2.5 uk-modal-close">
+                                                    </button>
+                                                </div>
+
+                                                <div class="space-y-5 mt-3 p-2">
+                                                      <textarea name="titre"
+                                                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                                                                rows="1"
+                                                                th:placeholder="${post.titrePost}"></textarea>
+                                                </div>
+
+                                                <div class="space-y-5 mt-3 p-2">
+                                                      <textarea name="text"
+                                                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                                                                rows="6"
+                                                                th:placeholder="${post.textePost}"
+                                                      ></textarea>
+                                                </div>
+
+
+
+                                                <div class="flex items-center gap-2 text-sm py-2 px-4 font-medium flex-wrap">
+                                                    <label
+                                                            class="relative flex items-center gap-1.5
+                                                               bg-sky-50 text-sky-600 rounded-full
+                                                               py-1 px-2 border-2 border-sky-100 cursor-pointer"
+                                                    >
+                                                        <ion-icon name="image" class="text-base"></ion-icon>
+                                                        Image
+                                                        <input
+                                                                type="file"
+                                                                name="imagePost"
+                                                                accept="image/*"
+                                                                class="hidden"
+                                                        />
+                                                    </label>
+                                                </div>
+
+
+                                                <div class="p-5 flex justify-between items-center">
+                                                    <button type="submit"
+                                                            class="button bg-blue-500 text-white py-2 px-12 text-[14px]">
+                                                        Modifier
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
 
                                     </div>
@@ -952,7 +784,7 @@
 
     <!-- create status -->
     <div id="create-status" uk-modal>
-        <form th:object="${post}"
+        <form th:object="${newpost}"
               th:action="@{/post/creer}"
               method="post"
               enctype="multipart/form-data"
@@ -966,17 +798,17 @@
             </div>
 
             <div class="space-y-5 mt-3 p-2">
-      <textarea th:field="*{titrePost}"
-                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                rows="1"
-                placeholder="À quoi pensez-vous ?"></textarea>
+                  <textarea th:field="*{titrePost}"
+                            class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                            rows="1"
+                            placeholder="À quoi pensez-vous ?"></textarea>
             </div>
 
             <div class="space-y-5 mt-3 p-2">
-      <textarea th:field="*{textePost}"
-                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                rows="6"
-      ></textarea>
+                  <textarea th:field="*{textePost}"
+                            class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                            rows="6"
+                  ></textarea>
             </div>
 
             <input type="file"
@@ -1000,7 +832,8 @@
             </div>
         </form>
     </div>
- 
+
+
 
     <!-- Javascript  -->
     <script src="assets/js/uikit.min.js"></script>

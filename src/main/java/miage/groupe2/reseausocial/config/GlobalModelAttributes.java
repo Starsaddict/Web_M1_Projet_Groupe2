@@ -2,6 +2,7 @@ package miage.groupe2.reseausocial.config;
 
 import jakarta.servlet.http.HttpSession;
 import miage.groupe2.reseausocial.Model.DemandeAmi;
+import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.DemandeAmiRepository;
 import miage.groupe2.reseausocial.service.DemandeAmiService;
@@ -46,5 +47,15 @@ public class GlobalModelAttributes {
 
         List<Utilisateur> Amis = user.getAmis();
         model.addAttribute("Amis", Amis);
+    }
+
+    @ModelAttribute
+    public void ajouterPost(Model model, HttpSession session) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        if (user == null) {
+            return;
+        }
+
+        model.addAttribute("newpost", new Post());
     }
 }
