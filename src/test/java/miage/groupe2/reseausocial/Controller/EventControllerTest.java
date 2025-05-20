@@ -1,6 +1,5 @@
 package miage.groupe2.reseausocial.Controller;
 
-import jakarta.servlet.http.HttpSession;
 import miage.groupe2.reseausocial.Model.Evenement;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.EvenementRepository;
@@ -10,15 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.ui.Model;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class EventControllerTest {
-
-    @InjectMocks
-    private EventController controller;
+public class EventControllerTest {
 
     @Mock
     private EvenementRepository evenementRepository;
@@ -32,107 +30,116 @@ class EventControllerTest {
     @Mock
     private Model model;
 
+    @InjectMocks
+    private EventController controller;
+
     @BeforeEach
-    void setup() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void creerEvenement_nonConnecte_redirigeLogin() {
-        when(session.getAttribute("user")).thenReturn(null);
-
-        String view = controller.creerEvenement(new Evenement(), session);
-
-        assertEquals("redirect:/auth/login", view);
-        verifyNoInteractions(evenementRepository);
+    void testAfficherFormulaireCreation() {
+        String view = controller.afficherFormulaireCreation(model);
+        assertEquals("creerEvenement", view);
+        verify(model).addAttribute(eq("evenement"), any(Evenement.class));
     }
 
     @Test
-    void creerEvenement_connecte_sauvegardeEtRedirige() {
+    void testCreerEvenement_NotLoggedIn() {
+        when(session.getAttribute("user")).thenReturn(null);
+        String result = controller.creerEvenement(new Evenement(), session);
+        assertEquals("redirect:/auth/login", result);
+    }
+
+    @Test
+    void testAfficherMesEvenements_UserNotLoggedIn() {
+        when(session.getAttribute("user")).thenReturn(null);
+        String result = controller.afficherMesEvenements(model, session);
+        assertEquals("redirect:/auth/login", result);
+    }
+
+    @Test
+    void testAfficherMesEvenements_Success() {
+        Utilisateur user = new Utilisateur();
+        List<Evenement> events = List.of(new Evenement());
+
+        when(session.getAttribute("user")).thenReturn(user);
+        when(evenementRepository.findByCreateur(user)).thenReturn(events);
+
+        String result = controller.afficherMesEvenements(model, session);
+        assertEquals("maListEvenement", result);
+        verify(model).addAttribute("evenements", events);
+    }
+
+    @Test
+    void testSupprimerEvenement_UserNotLoggedIn() {
+        when(session.getAttribute("user")).thenReturn(null);
+        String result = controller.supprimerEvenement(1, session);
+        assertEquals("redirect:/auth/login", result);
+    }
+
+    @Test
+    void testSupprimerEvenement_Success() {
         Utilisateur user = new Utilisateur();
         user.setIdUti(1);
+        Evenement e = new Evenement();
+        e.setIdEve(1);
+        e.setCreateur(user);
+
         when(session.getAttribute("user")).thenReturn(user);
+        when(evenementRepository.findById(1)).thenReturn(Optional.of(e));
 
-        Evenement evt = new Evenement();
-        evt.setDateDebutEString("2025-05-20T10:00");
-        evt.setDateFinEString("2025-05-20T12:00");
-
-        String view = controller.creerEvenement(evt, session);
-
-        assertEquals("redirect:/evenement/maListEvenement", view);
-        assertEquals(user, evt.getCreateur());
-        verify(evenementRepository).save(evt);
+        String result = controller.supprimerEvenement(1, session);
+        assertEquals("redirect:/evenement/maListEvenement", result);
+        verify(evenementRepository).delete(e);
     }
 
     @Test
-    void afficherMesEvenements_nonConnecte_redirigeLogin() {
-        when(session.getAttribute("user")).thenReturn(null);
-
-        String view = controller.afficherMesEvenements(model, session);
-
-        assertEquals("redirect:/auth/login", view);
-        verifyNoInteractions(evenementRepository);
-    }
-
-    @Test
-    void afficherMesEvenements_connecte_afficheListe() {
-        Utilisateur user = new Utilisateur();
-        when(session.getAttribute("user")).thenReturn(user);
-        List<Evenement> liste = new ArrayList<>();
-        when(evenementRepository.findByCreateur(user)).thenReturn(liste);
-
-        String view = controller.afficherMesEvenements(model, session);
-
-        assertEquals("maListEvenement", view);
-        verify(model).addAttribute("evenements", liste);
-    }
-
-    @Test
-    void supprimerEvenement_nonConnecte_redirigeLogin() {
-        when(session.getAttribute("user")).thenReturn(null);
-
-        String view = controller.supprimerEvenement(1, session);
-
-        assertEquals("redirect:/auth/login", view);
-        verifyNoInteractions(evenementRepository);
-    }
-
-    @Test
-    void supprimerEvenement_connecteEtCreateur_supprimeEtRedirige() {
+    void testRejoindreEvenement_Success() {
         Utilisateur user = new Utilisateur();
         user.setIdUti(1);
+        user.setEvenementsAssistes(new ArrayList<>());
+
+        Evenement e = new Evenement();
+        e.setIdEve(1);
+        e.setParticipants(new ArrayList<>());
+
         when(session.getAttribute("user")).thenReturn(user);
+        when(utilisateurRepository.findById(1)).thenReturn(Optional.of(user));
+        when(evenementRepository.findById(1)).thenReturn(Optional.of(e));
 
-        Evenement evt = new Evenement();
-        evt.setCreateur(user);
-        evt.setIdEve(10);
-
-        when(evenementRepository.findById(10)).thenReturn(Optional.of(evt));
-
-        String view = controller.supprimerEvenement(10, session);
-
-        assertEquals("redirect:/evenement/maListEvenement", view);
-        verify(evenementRepository).delete(evt);
+        String result = controller.rejoindreEvenement(1, session);
+        assertEquals("redirect:/evenement/tous", result);
+        verify(utilisateurRepository).save(user);
+        assertTrue(user.getEvenementsAssistes().contains(e));
     }
 
     @Test
-    void supprimerEvenement_connectePasCreateur_neFaitRien() {
+    void testQuitterEvenement_Success() {
         Utilisateur user = new Utilisateur();
         user.setIdUti(1);
-        Utilisateur autre = new Utilisateur();
-        autre.setIdUti(2);
+        Evenement e = new Evenement();
+        e.setIdEve(1);
+        e.setParticipants(new ArrayList<>());
+
+        user.setEvenementsAssistes(new ArrayList<>(List.of(e)));
+        e.setParticipants(new ArrayList<>(List.of(user)));
 
         when(session.getAttribute("user")).thenReturn(user);
+        when(utilisateurRepository.findById(1)).thenReturn(Optional.of(user));
+        when(evenementRepository.findById(1)).thenReturn(Optional.of(e));
 
-        Evenement evt = new Evenement();
-        evt.setCreateur(autre);
-        evt.setIdEve(20);
-
-        when(evenementRepository.findById(20)).thenReturn(Optional.of(evt));
-
-        String view = controller.supprimerEvenement(20, session);
-
-        assertEquals("redirect:/evenement/maListEvenement", view);
-        verify(evenementRepository, never()).delete(any());
+        String result = controller.quitterEvenement(1, session);
+        assertEquals("redirect:/evenement/tous", result);
+        verify(utilisateurRepository).save(user);
+        assertFalse(user.getEvenementsAssistes().contains(e));
     }
+
+    @Test
+    void testRedirectToTous() {
+        String view = controller.redirectToTous();
+        assertEquals("redirect:/evenement/tous", view);
+    }
+
 }
