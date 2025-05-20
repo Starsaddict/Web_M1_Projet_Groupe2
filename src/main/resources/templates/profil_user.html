@@ -465,6 +465,21 @@
                         </div>
 
                         <h3 class="md:text-3xl text-base font-bold text-black dark:text-white" th:text="${user.prenomU} + ' ' + ${user.nomU}"> </h3>
+                        <th:block th:if="${session.user.idUti != user.idUti}">
+                            <th:block th:if="${!etreAmi and demandeEnvoyee}">
+                                <span class="text-gray-400 text-xs italic">Demande envoyée</span>
+                            </th:block>
+                            <th:block th:if="${!etreAmi and !demandeEnvoyee}">
+                                <form th:action="@{/demande/ajouterAmi}" method="post">
+                                    <input type="hidden" name="idAmi" th:value="${user.idUti}" />
+                                    <button type="submit" class="px-4 py-1.5 text-sm font-medium rounded-full bg-blue-500 text-white hover:bg-blue-600">
+                                        Ajouter en ami
+                                    </button>
+                                </form>
+                            </th:block>
+                        </th:block>
+
+
 
                         <p class="mt-2 text-gray-500 dark:text-white/80" th:text="${user.introductionU}"> </p>
 

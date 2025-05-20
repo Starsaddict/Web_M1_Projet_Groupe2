@@ -1,6 +1,7 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
+import miage.groupe2.reseausocial.Model.DemandeAmi;
 import miage.groupe2.reseausocial.Model.Groupe;
 import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
@@ -129,9 +130,11 @@ public class UtilisateurController {
 public String userProfil(
         @RequestParam(value = "type", defaultValue = "post") String type,
         @PathVariable Integer id,
-        Model model
+        Model model,
+        HttpSession session
 ){
     Utilisateur user = utilisateurRepository.findByIdUti(id);
+    Utilisateur sessionUser = utilisateurService.getUtilisateurFromSession(session);
 
     model.addAttribute("user", user);
     List<Post> posts = user.getPosts().stream()
@@ -153,7 +156,15 @@ public String userProfil(
     model.addAttribute("posts", "repost".equals(type) ? reposts : posts);
     model.addAttribute("type", type);
     model.addAttribute("reposts", reposts);
-    model.addAttribute("post",new Post());
+
+    boolean etreAmi = sessionUser.getAmis().stream()
+            .anyMatch(u -> u.getIdUti().equals(user.getIdUti()));
+    model.addAttribute("etreAmi", etreAmi);
+
+    boolean demandeEnvoyee = sessionUser.getDemandesEnvoyees().stream()
+            .anyMatch(d -> d.getRecepteur().getIdUti().equals(user.getIdUti()) && d.getStatut().equals("en attente"));
+    model.addAttribute("demandeEnvoyee", demandeEnvoyee);
+
     return "profil_user";
 }
 
