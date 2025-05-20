@@ -35,17 +35,6 @@ public class EventController {
     @Autowired
     private UtilisateurService utilisateurService;
 
-    /**
-     * Affiche le formulaire de création d’un nouvel événement.
-     *
-     * @param model le modèle utilisé pour passer l’objet Evenement au formulaire
-     * @return la vue du formulaire de création
-     */
-    @GetMapping("/creer")
-    public String afficherFormulaireCreation(Model model) {
-        model.addAttribute("evenement", new Evenement());
-        return "creerEvenement";
-    }
 
     /**
      * Traite la soumission du formulaire de création d’un événement.
@@ -78,21 +67,6 @@ public class EventController {
 
 
 
-    /**
-     * Affiche la liste des événements créés par l'utilisateur connecté.
-     *
-     * @param model le modèle utilisé pour passer la liste des événements à la vue
-     * @param session la session HTTP contenant l'utilisateur connecté
-     * @return la vue affichant les événements de l'utilisateur, ou redirection vers la page de login si non connecté
-     */
-    @GetMapping("/maListEvenement")
-    public String afficherMesEvenements(Model model, HttpSession session) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) return "redirect:/auth/login";
-
-        model.addAttribute("evenements", evenementRepository.findByCreateur(user));
-        return "maListEvenement";
-    }
 
 
     /**
@@ -119,28 +93,6 @@ public class EventController {
         return "redirect:" + (referer != null ? referer : "/evenement/tous");
     }
 
-    /**
-     * Affiche le formulaire de modification d’un événement existant.
-     * Vérifie que l'utilisateur est le créateur de l'événement.
-     *
-     * @param id identifiant de l’événement à modifier
-     * @param session la session HTTP contenant l’utilisateur connecté
-     * @param model le modèle pour passer l’événement à modifier à la vue
-     * @return la vue du formulaire de modification, ou redirection si accès non autorisé
-     */
-    @GetMapping("/modifier")
-    public String afficherFormulaireModification(@RequestParam("id") Integer id, HttpSession session, Model model) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) return "redirect:/auth/login";
-
-        Evenement evenement = evenementRepository.findById(id).orElse(null);
-        if (evenement == null || !evenement.getCreateur().getIdUti().equals(user.getIdUti())) {
-            return "redirect:/evenement/maListEvenement";
-        }
-
-        model.addAttribute("evenement", evenement);
-        return "modifierEvenement";
-    }
 
     /**
      * Traite la soumission du formulaire de modification d’un événement.

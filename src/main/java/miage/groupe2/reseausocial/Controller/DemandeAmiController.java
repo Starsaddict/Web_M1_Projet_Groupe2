@@ -26,19 +26,7 @@ public class DemandeAmiController {
     private UtilisateurRepository utilisateurRepository;
 
 
-    @GetMapping("/demandes-recues")
-    public String afficherDemandesRecues(HttpSession session, Model model) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) {
-            return "redirect:/auth/login";
-        }
 
-        List<DemandeAmi> demandesRecues = demandeAmiRepository
-                .findByRecepteurIdUtiAndStatut(userConnecte.getIdUti(), "en attente");
-
-        model.addAttribute("demandesRecues", demandesRecues);
-        return "listeDemandeAmi";
-    }
 
     @PostMapping("/accepter")
     public String accepterDemande(@RequestParam("idDemande") Integer idDemande,

@@ -58,14 +58,6 @@ public class GroupeController {
         return "groups";
     }
 
-    @GetMapping("/creer")
-    public String creerGroupe(
-            Model model
-    ){
-        model.addAttribute("groupe", new Groupe());
-        return "creer_groupes";
-    }
-
     @PostMapping("/creer")
     public String creerGroupe(
             HttpSession session,

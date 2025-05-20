@@ -179,11 +179,6 @@ public String userProfil(
         return "redirect:/user/"+user.getIdUti() + "/profil";
     }
 
-    @GetMapping("/modifierPassword")
-    public String modifierPassword(
-    ){
-        return "modifier_password";
-    }
 
     @PostMapping("/modifierPassword")
     public String modifierPassword(
@@ -253,13 +248,6 @@ public String userProfil(
         return "redirect:/user/mes-groupes";
     }
 
-    @GetMapping("/mes-groupes")
-    public String voirMesGroupes(HttpSession session, Model model) {
-        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-        model.addAttribute("groupesCrees", user.getGroupes()); // createur
-        model.addAttribute("groupesMembre", user.getGroupesAppartenance()); // membre
-        return "mes_groupes";
-    }
 
 
     @PostMapping("/uploadAvatar")

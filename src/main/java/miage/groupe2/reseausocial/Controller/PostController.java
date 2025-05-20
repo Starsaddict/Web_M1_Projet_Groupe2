@@ -44,19 +44,6 @@ public class PostController {
     ReactionRepository reactionRepository;
 
 
-    @GetMapping("/{id}")
-    public String postPersonne(
-            @PathVariable Integer id,
-            Model model
-    ) {
-        Utilisateur user = utilisateurRepository.findByIdUti(id);
-        List<Post> posts = postRepository.findByCreateur(user);
-        model.addAttribute("Posts", posts);
-        model.addAttribute("userId", id);
-        return "listPostsPersonne";
-    }
-
-
     @PostMapping("/creer")
     public String creerPost(
             @ModelAttribute("post") Post post,
@@ -79,57 +66,7 @@ public class PostController {
         }
     }
 
-    @GetMapping("/list")
-    // Algorithmes later
-    public String listPosts(Model model) {
-        List<Post> posts = postRepository.findAll();
-        posts = posts.stream()
-                .filter(post -> post.getGroupe() == null)
-                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
-                .limit(10)
-                .toList();
-        model.addAttribute("posts", posts);
-        return "listPosts";
-    }
 
-    @GetMapping("/list/amis")
-    public String listAmis(
-            Model model,
-            HttpSession session) {
-
-        List<Post> posts = postService.listPostFriends(session);
-
-        posts = posts.stream().limit(10).toList();
-        model.addAttribute("posts", posts);
-        return "listPostAmis";
-    }
-
-    @GetMapping("")
-    public String afficherPostParId(@RequestParam("id") Integer id, Model model) {
-        Post post = postRepository.findById(id).orElse(null);
-        if (post == null) {
-            return "redirect:/home";
-        }
-
-        List<Commentaire> commentaires = commentaireRepository.findByPost(post);
-        model.addAttribute("post", post);
-        model.addAttribute("commentaires", commentaires);
-        model.addAttribute("nouveauCommentaire", new Commentaire());
-
-        return "detailPost";
-    }
-
-
-    @GetMapping("/modifier")
-    public String afficherFormulaireModification(@RequestParam("id") Integer id, Model model) {
-        Post post = postRepository.findById(id).orElse(null);
-        if (post == null) {
-            return "redirect:/home";
-        }
-
-        model.addAttribute("post", post);
-        return "modifier_post";
-    }
 
     @PostMapping("/modifier")
     public String modifierPost(@RequestParam(name = "titre", required = false ) String titre,
