@@ -69,7 +69,8 @@ public class PostController {
             @ModelAttribute("post") Post post,
             @RequestParam(value = "idgrp", required = false) Integer idGrp,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-            HttpSession session
+            HttpSession session,
+            @RequestHeader(value = "Referer", required = false) String referer
     ) throws IOException {
         if (imageFile != null && !imageFile.isEmpty()) {
             post.setImagePost(imageFile.getBytes());
@@ -78,10 +79,10 @@ public class PostController {
         if (idGrp != null) {
             Groupe groupe = groupeService.getGroupeByidGrp(idGrp);
             postService.publierPostDansGroupe(post, user, groupe);
-            return "redirect:/groupe/" + idGrp;
+            return "redirect:" + (referer != null ? referer : "redirect:/groupe/" + idGrp);
         } else {
             postService.publierPostSansGroupe(post, user);
-            return "redirect:/user/" + user.getIdUti();
+            return "redirect:" + (referer != null ? referer : user.getIdUti() + "/profil");
         }
     }
 

@@ -135,6 +135,7 @@ public String userProfil(
 
     model.addAttribute("user", user);
     List<Post> posts = user.getPosts().stream()
+            .filter(i -> i.getGroupe()==null)
             .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
             .limit(10)
             .toList();
@@ -152,6 +153,7 @@ public String userProfil(
     model.addAttribute("posts", "repost".equals(type) ? reposts : posts);
     model.addAttribute("type", type);
     model.addAttribute("reposts", reposts);
+    model.addAttribute("post",new Post());
     return "profil_user";
 }
 

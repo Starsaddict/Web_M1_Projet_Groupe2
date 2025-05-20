@@ -659,6 +659,18 @@
                     <!-- feed story -->
                     <div class="md:max-w-[580px] mx-auto flex-1 xl:space-y-6 space-y-3">
 
+                        <!-- add story -->
+                        <div class="bg-white rounded-xl shadow-sm p-4 space-y-4 text-sm font-medium border1 dark:bg-dark2">
+
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 bg-slate-100 hover:bg-opacity-80 transition-all rounded-lg cursor-pointer dark:bg-dark3" uk-toggle="target: #create-status">
+                                    <div class="py-2.5 text-center dark:text-white"> À quoi pensez-vous ? </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
                         <!-- post text-->
                         <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1 dark:bg-dark2">
 
@@ -714,7 +726,7 @@
 
                                 <!-- post heading -->
                                 <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
-                                    <a th:href="@{'/user/' + ${post.createur.idUti}}">
+                                    <a th:href="@{'/user/' + ${post.createur.idUti} + '/profil'}">
                                         <img th:if="${post.createur.avatar != null}"
                                              th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(post.createur.avatar)}"
                                              alt="avatar" class="w-9 h-9 rounded-full">
@@ -723,7 +735,7 @@
                                              alt="avatar" class="w-9 h-9 rounded-full">
                                     </a>
                                     <div class="flex-1">
-                                        <a th:href="@{'/user/' + ${post.createur.idUti}}">
+                                        <a th:href="@{'/user/' + ${post.createur.idUti} + '/profil'}">
                                             <h4 class="text-black dark:text-white" th:text="${post.createur.prenomU + ' ' + post.createur.nomU}"></h4>
                                         </a>
                                         <div class="text-xs text-gray-500 dark:text-white/80"
@@ -761,7 +773,7 @@
 
                                                 <hr  th:if = "${session.user.idUti == post.createur.idUti}">
 
-                                                <a th:if="${session.user.idUti == post.createur.idUti}" th:href="@{/supprimer(id=${post.idPost})}"
+                                                <a th:if="${session.user.idUti == post.createur.idUti}" th:href="@{/post/supprimer(id=${post.idPost})}"
                                                    class="text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/50">
                                                     <ion-icon class="text-xl shrink-0" name="trash-outline"></ion-icon>
                                                     Supprimer
@@ -780,11 +792,13 @@
 
                                 <!-- post image -->
                                 <div th:if="${post.imagePost != null}" class="relative w-full lg:h-96 h-full sm:px-4">
-                                    <img th:src="${'data:image/jpeg;base64,' + @picUtil.encodeBase64(post.imagePost)}" class="sm:rounded-lg w-full h-full object-cover">
+                                    <img
+                                            th:src="|data:image/jpeg;base64,${@picUtil.encodeBase64(post.imagePost)}|"
+                                            class="sm:rounded-lg w-full h-full object-cover"
+                                            alt="Post image"/>
                                 </div>
-
                                 <!-- post texte -->
-                                <div class="sm:px-4 p-2.5 pt-0">
+                                <div th:if="${post.textePost != null}" class="sm:px-4 p-2.5 pt-0">
                                     <p class="font-normal" th:text="${post.textePost}"></p>
                                 </div>
 
@@ -935,10 +949,57 @@
 
     <!-- post preview modal --> 
 
+
     <!-- create status -->
+    <div id="create-status" uk-modal>
+        <form th:object="${post}"
+              th:action="@{/post/creer}"
+              method="post"
+              enctype="multipart/form-data"
+              class="uk-modal-dialog tt relative overflow-hidden mx-auto bg-white shadow-xl rounded-lg md:w-[520px] w-full dark:bg-dark2">
 
-    <!-- create story -->
 
+            <div class="text-center py-4 border-b mb-0 dark:border-slate-700">
+                <h2 class="text-sm font-medium text-black">Créer une publication</h2>
+                <button type="button" class="button-icon absolute top-0 right-0 m-2.5 uk-modal-close">
+                </button>
+            </div>
+
+            <div class="space-y-5 mt-3 p-2">
+      <textarea th:field="*{titrePost}"
+                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                rows="1"
+                placeholder="À quoi pensez-vous ?"></textarea>
+            </div>
+
+            <div class="space-y-5 mt-3 p-2">
+      <textarea th:field="*{textePost}"
+                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                rows="6"
+      ></textarea>
+            </div>
+
+            <input type="file"
+                   name="imageFile"
+                   id="imageFile"
+                   class="hidden"/>
+
+            <div class="flex items-center gap-2 text-sm py-2 px-4 font-medium flex-wrap">
+                <label for="imageFile"
+                       class="flex items-center gap-1.5 bg-sky-50 text-sky-600 rounded-full py-1 px-2 border-2 border-sky-100 cursor-pointer">
+                    <ion-icon name="image" class="text-base"></ion-icon>
+                    Image
+                </label>
+            </div>
+
+            <div class="p-5 flex justify-between items-center">
+                <button type="submit"
+                        class="button bg-blue-500 text-white py-2 px-12 text-[14px]">
+                    Créer
+                </button>
+            </div>
+        </form>
+    </div>
  
 
     <!-- Javascript  -->
