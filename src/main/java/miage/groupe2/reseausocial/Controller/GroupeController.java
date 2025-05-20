@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/groupe")
@@ -39,11 +40,22 @@ public class GroupeController {
 
     @RequestMapping("/list")
     public String GroupeList(
-            Model model
+            Model model,
+            HttpSession session
     ) {
-        List<Groupe> groupes = groupeRepository.findAll();
-        model.addAttribute("groupes", groupes);
-        return "listGroupe";
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+
+        List<Groupe> recommandGroupes = groupeRepository.findAll().stream()
+                .filter(groupe -> !groupe.getMembres().contains(user))
+                .collect(Collectors.toList());
+        model.addAttribute("recommandGroupes", recommandGroupes);
+
+        List<Groupe> monGroupes = user.getGroupesAppartenance();
+        model.addAttribute("monGroupes", monGroupes);
+        List<Groupe> monGroupCreer = user.getGroupes();
+        model.addAttribute("monGroupCreer", monGroupCreer);
+
+        return "groups";
     }
 
     @GetMapping("/creer")

@@ -191,7 +191,6 @@ public String userProfil(
             @RequestHeader(value = "Referer", required = false) String referer
     ){
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-//        currentP = BCrypt.hashpw(currentP, BCrypt.gensalt());
 
         if(BCrypt.checkpw(currentP, user.getMdpU())){
             newP = BCrypt.hashpw(newP, BCrypt.gensalt());
