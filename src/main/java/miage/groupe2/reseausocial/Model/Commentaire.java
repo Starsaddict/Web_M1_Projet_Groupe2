@@ -1,13 +1,15 @@
 package miage.groupe2.reseausocial.Model;
 
+import java.io.Serializable;
+
 import jakarta.persistence.*;
 
 /**
  * Représente un commentaire laissé par un utilisateur sur un post.
  */
 @Entity
-public class Commentaire {
-
+public class Commentaire implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique du commentaire.
      */

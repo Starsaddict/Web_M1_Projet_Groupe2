@@ -11,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -96,7 +98,7 @@ public class DemandeAmiController {
             return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
         }
 
-        Utilisateur recepteur = utilisateurRepository.findByIdUti(idAmi);
+        Utilisateur recepteur = utilisateurRepository.findByidUti(idAmi);
         if (recepteur == null) {
             redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
             return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");

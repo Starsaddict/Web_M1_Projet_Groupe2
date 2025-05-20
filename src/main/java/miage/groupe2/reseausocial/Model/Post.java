@@ -2,16 +2,16 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Représente un post créé par un utilisateur dans le réseau social.
  * Un post contient du texte, une date de publication, des commentaires, des réactions et des reposts.
  */
 @Entity
-public class Post {
-
+public class Post implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Identifiant unique du post.
      */
@@ -35,7 +35,6 @@ public class Post {
     private String textePost;
 
 
-    @Basic(fetch = FetchType.LAZY)
     @Column(name = "imagePost")
     private byte[] imagePost;
 
@@ -216,17 +215,5 @@ public class Post {
 
     public void setGroupe(Groupe groupe) {
         this.groupe = groupe;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Post post = (Post) o;
-        return Objects.equals(getIdPost(), post.getIdPost());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getIdPost());
     }
 }
