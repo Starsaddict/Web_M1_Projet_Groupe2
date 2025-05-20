@@ -63,7 +63,7 @@ public class GroupeController {
             Model model
     ){
         model.addAttribute("groupe", new Groupe());
-        return "creerGroupe";
+        return "creer_groupes";
     }
 
     @PostMapping("/creer")
