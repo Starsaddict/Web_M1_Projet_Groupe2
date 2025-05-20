@@ -59,7 +59,8 @@ public class EventController {
     public String creerEvenement(@ModelAttribute Evenement evenement,
                                  HttpSession session,
                                  @RequestParam(name = "start") LocalDateTime dateStart,
-                                 @RequestParam(name="fin") LocalDateTime dateFin
+                                 @RequestParam(name="fin") LocalDateTime dateFin,
+                                 @RequestHeader(value = "Referer", required = false) String referer
     ) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
         if (user == null) return "redirect:/auth/login";
@@ -71,7 +72,8 @@ public class EventController {
         evenement.setDateFinE(df);
 
         evenementRepository.save(evenement);
-        return "redirect:/evenement/maListEvenement";
+        return "redirect:" + (referer != null ? referer : "/evenement/tous");
+
     }
 
 
@@ -149,21 +151,25 @@ public class EventController {
      */
     @PostMapping("/modifier")
     public String modifierEvenement(@RequestParam(name = "id") Integer id,
-                                    @RequestParam(name = "nomE") String nomE,
-                                    @RequestParam(name = "description") String description,
-                                    @RequestParam(name = "adressE") String adressE,
+                                    @RequestParam(name = "nomE",required = false) String nomE,
+                                    @RequestParam(name = "description",required = false) String description,
+                                    @RequestParam(name = "adressE",required = false) String adressE,
                                     HttpSession session,
                                     @RequestParam(name = "start") LocalDateTime start,
-                                    @RequestParam(name = "fin") LocalDateTime fin
+                                    @RequestParam(name = "fin") LocalDateTime fin,
+                                    @RequestHeader(value = "Referer", required = false) String referer
+
+
     ) {
         Evenement evenement = evenementRepository.findByIdEve(id);
-        if(nomE != null){
+        if (nomE != null && !nomE.trim().isEmpty()) {
             evenement.setNomE(nomE);
         }
-        if(description != null){
+        if (description != null && !description.trim().isEmpty()) {
             evenement.setDescription(description);
         }
-        if(adressE != null){
+
+        if (adressE != null && !adressE.trim().isEmpty()) {
             evenement.setAdresseE(adressE);
         }
         long dd = DateUtil.toEpochMilli(start);
@@ -173,7 +179,7 @@ public class EventController {
 
         evenementRepository.save(evenement);
 
-        return "redirect:/evenement/maListEvenement";
+        return "redirect:" + (referer != null ? referer : "/evenement/tous");
     }
 
     /**

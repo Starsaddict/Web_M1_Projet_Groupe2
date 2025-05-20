@@ -70,7 +70,9 @@ public class GroupeController {
     public String creerGroupe(
             HttpSession session,
             @ModelAttribute Groupe groupe,
-            Model model
+            Model model,
+            @RequestHeader(value = "Referer", required = false) String referer
+
     ){
         Utilisateur userSession = (Utilisateur) session.getAttribute("user");
         Utilisateur user = utilisateurRepository.findByIdUti(userSession.getIdUti());
@@ -78,7 +80,7 @@ public class GroupeController {
         groupeService.createGroupe(user, groupe);
 
         session.setAttribute("user", user);
-        return "redirect:/groupe/list";
+        return "redirect:" + (referer != null ? referer : "/groupe/list");
     }
 
     @GetMapping("/{id}")
