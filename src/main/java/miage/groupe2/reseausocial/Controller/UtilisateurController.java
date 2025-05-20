@@ -238,8 +238,8 @@ public String userProfil(
     ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
-        groupeService.quitterGroupe(user,groupe);
 
+        groupeService.quitterGroupe(user,idGrp);
         if (user.equals(groupe.getCreateur())) {
             groupeService.supprimerGroupe(user, groupe);
         }

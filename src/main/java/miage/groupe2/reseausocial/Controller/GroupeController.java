@@ -160,7 +160,7 @@ public class GroupeController {
         if (groupe != null && user != null && user.equals(groupe.getCreateur())) {
             Utilisateur membre = utilisateurRepository.findByIdUti(idMembre);
             if (membre != null) {
-                groupeService.quitterGroupe(membre, groupe);
+                groupeService.quitterGroupe(membre, groupe.getIdGrp());
             }
         }
 

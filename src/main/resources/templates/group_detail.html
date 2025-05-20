@@ -829,29 +829,54 @@
                         <!-- panel 2 -->
                         <div>
                             <div class="flex flex-col space-y-4">
-                                <th:block th:each="user : ${membres}">
-                                    <div class="flex items-center gap-4 bg-white rounded-xl shadow-sm p-4 border1 dark:bg-dark2">
-                                        <a th:href="@{'/user/' + ${user.idUti} + '/profil'}">
-                                            <img th:if="${user.avatar != null}"
-                                                 th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
-                                                 alt="avatar"
-                                                 class="w-10 h-10 rounded-full object-cover"/>
-                                            <img th:if="${user.avatar == null}"
-                                                 th:src="@{/assets/images/avatars/avatar-0.png}"
-                                                 alt="avatar par défaut"
-                                                 class="w-10 h-10 rounded-full object-cover"/>
-                                        </a>
-                                        <div class="flex-1">
-                                            <a th:href="@{'/user/' + ${user.idUti} + '/profil'}"
-                                               class="block text-black dark:text-white font-medium"
-                                               th:text="${user.prenomU + ' ' + user.nomU}">
-                                                Nom Prénom
+                                <th:block th:each="membre : ${membres}">
+                                    <div class="flex items-center justify-between gap-4 bg-white rounded-xl shadow-sm p-4 border1 dark:bg-dark2">
+
+                                        <!-- 左侧：头像 + 信息 -->
+                                        <div class="flex items-center gap-4">
+                                            <a th:href="@{'/user/' + ${membre.idUti} + '/profil'}">
+                                                <img th:if="${membre.avatar != null}"
+                                                     th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(membre.avatar)}"
+                                                     alt="avatar"
+                                                     class="w-10 h-10 rounded-full object-cover"/>
+                                                <img th:if="${membre.avatar == null}"
+                                                     th:src="@{/assets/images/avatars/avatar-0.png}"
+                                                     alt="avatar par défaut"
+                                                     class="w-10 h-10 rounded-full object-cover"/>
                                             </a>
-                                            <div class="text-xs text-gray-500 dark:text-white/80"
-                                                 th:text="${user.emailU}">
-                                                email@example.com
+                                            <div class="flex-1">
+                                                <a th:href="@{'/user/' + ${membre.idUti} + '/profil'}"
+                                                   class="block text-black dark:text-white font-medium"
+                                                   th:text="${membre.prenomU + ' ' + membre.nomU}">
+                                                    Nom Prénom
+                                                </a>
+                                                <div class="text-xs text-gray-500 dark:text-white/80"
+                                                     th:text="${membre.emailU}">
+                                                    email@example.com
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <!-- 右侧：本人标记／删除按钮 -->
+                                        <div class="flex items-center gap-2">
+                                            <!-- 1. 如果是本人，显示 “Moi” 标记 -->
+                                            <span th:if="${membre.idUti == session.user.idUti}"
+                                                  class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
+          Moi
+        </span>
+
+                                            <!-- 2. 如果不是本人，且当前用户是群主，显示删除按钮 -->
+                                            <form th:if="${membre.idUti != session.user.idUti and session.user.idUti == groupe.createur.idUti}"
+                                                  th:action="@{/groupe/{id}/supprimerMembre(id=${groupe.idGrp})}"
+                                                  method="post">
+                                                <input type="hidden" name="idMembre" th:value="${membre.idUti}" />
+                                                <button type="submit"
+                                                        class="button-icon w-8 h-8 text-red-500 hover:bg-red-100 rounded-full">
+                                                    <ion-icon name="trash-outline" class="text-lg"></ion-icon>
+                                                </button>
+                                            </form>
+                                        </div>
+
                                     </div>
                                 </th:block>
                             </div>
