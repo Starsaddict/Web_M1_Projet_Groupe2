@@ -7,6 +7,8 @@ import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.ConversationRepository;
 import miage.groupe2.reseausocial.Repository.MessageRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
+import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,8 @@ public class ConversationController {
     private final MessageRepository messageRepository;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private UtilisateurService utilisateurService;
 
     // ✅ Constructeur avec injection de dépendances
     @Autowired
@@ -149,10 +153,11 @@ public class ConversationController {
     public String creerConversationGroupe(
             @RequestParam("participantIds") List<Integer> participantIds,
             HttpSession session,@RequestParam("nomdiscussion") String nomdiscussion,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = "Referer", required = false) String referer
+    ) {
 
-        Utilisateur utilisateurConnecte = (Utilisateur) session.getAttribute("user");
-        if (utilisateurConnecte == null) return "redirect:/auth/login";
+        Utilisateur utilisateurConnecte = utilisateurService.getUtilisateurFromSession(session);
 
         // On ajoute l'utilisateur lui-même dans la conversation
         participantIds.add(utilisateurConnecte.getIdUti());
@@ -172,7 +177,7 @@ public class ConversationController {
 
         conversationRepository.save(conversation);
 
-        return "redirect:/message/conversation/" + conversation.getIdConv();
+        return RedirectUtil.getSafeRedirectUrl(referer,"/message/conversation/" + conversation.getIdConv());
     }
 
 

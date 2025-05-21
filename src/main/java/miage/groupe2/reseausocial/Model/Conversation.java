@@ -2,7 +2,8 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+import java.util.List;import jakarta.persistence.CascadeType;
+
 
 @Entity
 public class Conversation implements Serializable {
@@ -18,8 +19,13 @@ public class Conversation implements Serializable {
     @JoinColumn(name = "idUtiCreateur")
     private Utilisateur createur;
 
-    @OneToMany(mappedBy = "conversation")
+    @OneToMany(
+            mappedBy = "conversation",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
     private List<Message> messages;
+
 
     @ManyToMany
     @JoinTable(
