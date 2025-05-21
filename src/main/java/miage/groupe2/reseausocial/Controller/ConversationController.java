@@ -8,6 +8,7 @@ import miage.groupe2.reseausocial.Repository.ConversationRepository;
 import miage.groupe2.reseausocial.Repository.MessageRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,8 @@ public class ConversationController {
     private final ConversationRepository conversationRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final MessageRepository messageRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // ✅ Constructeur avec injection de dépendances
     @Autowired
@@ -109,7 +112,6 @@ public class ConversationController {
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes) {
 
-
         Utilisateur user = (Utilisateur) session.getAttribute("user");
         if (user == null) {
             return "redirect:/auth/login";
@@ -125,13 +127,16 @@ public class ConversationController {
         msg.setConversation(conv);
         msg.setExpediteur(user);
         msg.setTextM(texte);
-        // Stocke la date en timestamp Unix millis
         msg.setDateM(Instant.now().toEpochMilli());
 
         messageRepository.save(msg);
 
+        // ✅ WebSocket 推送
+        messagingTemplate.convertAndSend("/topic/conversation/" + idConv, msg);
+
         return "redirect:/message/conversation/" + idConv;
     }
+
 
 
     @GetMapping("/conversation/groupe/nouvelle")
