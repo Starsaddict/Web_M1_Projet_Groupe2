@@ -35,5 +35,3 @@ build/
 src/main/resources/application.properties
 
 db/reseauSocial.db
-
-src/test
