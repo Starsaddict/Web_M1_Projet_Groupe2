@@ -97,7 +97,7 @@ public class UtilisateurController {
                 .map(d -> d.getRecepteur())
                 .toList();
         List<Utilisateur> notFriends = allUtilisateurs.stream()
-                .filter(u ->!u.getIdUti().equals(user.getIdUti()))
+                .filter(u -> !u.getIdUti().equals(user.getIdUti()))
                 .filter(u -> !user.getAmis().contains(u))
                 .filter(u -> !almostFriends.contains(u))
                 .limit(5)
@@ -108,7 +108,7 @@ public class UtilisateurController {
         return "friends";
     }
 
-    @PostMapping("/supprimer-ami")
+    @RequestMapping("/supprimer-ami")
     public String supprimerAmi(@RequestParam("idAmi") Integer idAmi,
                                HttpSession session,
                                RedirectAttributes redirectAttributes,
@@ -129,53 +129,53 @@ public class UtilisateurController {
         } else {
             redirectAttributes.addFlashAttribute("error", "Impossible de supprimer cet ami.");
         }
-        return RedirectUtil.getSafeRedirectUrl(referer,"redirect:/user/mes-amis");
+        return RedirectUtil.getSafeRedirectUrl(referer, "redirect:/user/mes-amis");
     }
 
-@GetMapping("/{id}/profil")
-public String userProfil(
-        @RequestParam(value = "type", defaultValue = "post") String type,
-        @PathVariable Integer id,
-        Model model,
-        HttpSession session
-){
-    Utilisateur user = utilisateurRepository.findByIdUti(id);
-    Utilisateur sessionUser = utilisateurService.getUtilisateurFromSession(session);
+    @GetMapping("/{id}/profil")
+    public String userProfil(
+            @RequestParam(value = "type", defaultValue = "post") String type,
+            @PathVariable Integer id,
+            Model model,
+            HttpSession session
+    ) {
+        Utilisateur user = utilisateurRepository.findByIdUti(id);
+        Utilisateur sessionUser = utilisateurService.getUtilisateurFromSession(session);
 
-    model.addAttribute("user", user);
-    List<Post> posts = user.getPosts().stream()
-            .filter(i -> i.getGroupe()==null)
-            .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
-            .limit(10)
-            .toList();
+        model.addAttribute("user", user);
+        List<Post> posts = user.getPosts().stream()
+                .filter(i -> i.getGroupe() == null)
+                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
+                .limit(10)
+                .toList();
 
-    List<Post> reposts = user.getPostsRepostes().stream()
-            .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
-            .limit(10)
-            .toList();
+        List<Post> reposts = user.getPostsRepostes().stream()
+                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
+                .limit(10)
+                .toList();
 
-    List<Utilisateur> Amis = user.getAmis().stream()
-                    .limit(6)
-                            .toList();
+        List<Utilisateur> Amis = user.getAmis().stream()
+                .limit(6)
+                .toList();
 
-    model.addAttribute("Friends", Amis);
-    model.addAttribute("posts", "repost".equals(type) ? reposts : posts);
-    model.addAttribute("type", type);
-    model.addAttribute("reposts", reposts);
+        model.addAttribute("Friends", Amis);
+        model.addAttribute("posts", "repost".equals(type) ? reposts : posts);
+        model.addAttribute("type", type);
+        model.addAttribute("reposts", reposts);
 
-    boolean etreAmi = sessionUser.getAmis().stream()
-            .anyMatch(u -> u.getIdUti().equals(user.getIdUti()));
-    model.addAttribute("etreAmi", etreAmi);
+        boolean etreAmi = sessionUser.getAmis().stream()
+                .anyMatch(u -> u.getIdUti().equals(user.getIdUti()));
+        model.addAttribute("etreAmi", etreAmi);
 
-    boolean demandeEnvoyee = sessionUser.getDemandesEnvoyees().stream()
-            .anyMatch(d -> d.getRecepteur().getIdUti().equals(user.getIdUti()) && d.getStatut().equals("en attente"));
-    model.addAttribute("demandeEnvoyee", demandeEnvoyee);
+        boolean demandeEnvoyee = sessionUser.getDemandesEnvoyees().stream()
+                .anyMatch(d -> d.getRecepteur().getIdUti().equals(user.getIdUti()) && d.getStatut().equals("en attente"));
+        model.addAttribute("demandeEnvoyee", demandeEnvoyee);
 
-    return "profil_user";
-}
+        return "profil_user";
+    }
 
     @GetMapping("/modifierProfil")
-    public String modifierProfil( ) {
+    public String modifierProfil() {
         return "setting";
     }
 
@@ -185,14 +185,14 @@ public String userProfil(
             @RequestParam String emailU,
             @RequestParam String introductionU,
             HttpSession session
-            ) {
+    ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         user.setPseudoU(pseudoU);
         user.setEmailU(emailU);
         user.setIntroductionU(introductionU);
         utilisateurRepository.save(user);
         session.setAttribute("user", user);
-        return "redirect:/user/"+user.getIdUti() + "/profil";
+        return "redirect:/user/" + user.getIdUti() + "/profil";
     }
 
 
@@ -202,10 +202,10 @@ public String userProfil(
             @RequestParam String newP,
             HttpSession session,
             @RequestHeader(value = "Referer", required = false) String referer
-    ){
+    ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-        if(BCrypt.checkpw(currentP, user.getMdpU())){
+        if (BCrypt.checkpw(currentP, user.getMdpU())) {
             newP = BCrypt.hashpw(newP, BCrypt.gensalt());
             user.setMdpU(newP);
             utilisateurRepository.save(user);
@@ -220,15 +220,15 @@ public String userProfil(
             HttpSession session,
             @RequestParam int idGrp,
             @RequestHeader(value = "Referer", required = false) String referer
-    ){
+    ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
-        groupeService.joinGroupe(user,groupe);
+        groupeService.joinGroupe(user, groupe);
 
         user.getGroupesAppartenance().size();
         session.setAttribute("user", user);
-        return RedirectUtil.getSafeRedirectUrl(referer,"/user/mes-groupes");
+        return RedirectUtil.getSafeRedirectUrl(referer, "/user/mes-groupes");
     }
 
     @RequestMapping("/quitterGroupe")
@@ -240,26 +240,25 @@ public String userProfil(
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
 
-        groupeService.quitterGroupe(user,idGrp);
+        groupeService.quitterGroupe(user, idGrp);
         if (user.equals(groupe.getCreateur())) {
             groupeService.supprimerGroupe(user, groupe);
         }
         user.getGroupesAppartenance().size();
         session.setAttribute("user", user);
-        return RedirectUtil.getSafeRedirectUrl(referer,"/user/mes-groupes");
-        }
+        return RedirectUtil.getSafeRedirectUrl(referer, "/user/mes-groupes");
+    }
 
     @RequestMapping("/supprimerGroupe")
     public String supprimerGroupe(
             HttpSession session,
             @RequestParam int idGrp
-    ){
+    ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-        groupeService.supprimerGroupe(user,idGrp);
+        groupeService.supprimerGroupe(user, idGrp);
 
         return "redirect:/user/mes-groupes";
     }
-
 
 
     @PostMapping("/uploadAvatar")
@@ -281,7 +280,6 @@ public String userProfil(
 
         return RedirectUtil.getSafeRedirectUrl(referer, "/user/" + user.getIdUti());
     }
-
 
 
 }
