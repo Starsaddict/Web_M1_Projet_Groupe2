@@ -3,6 +3,7 @@ package miage.groupe2.reseausocial.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.io.Serializable;
@@ -298,6 +299,9 @@ public class Utilisateur implements Serializable {
     }
 
     public List<Utilisateur> getAmis() {
+        if (amis == null) {
+            amis = new ArrayList<>();
+        }
         return amis;
     }
 

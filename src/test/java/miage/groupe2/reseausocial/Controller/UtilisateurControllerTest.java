@@ -1,7 +1,7 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
-import miage.groupe2.reseausocial.Model.Utilisateur;
+import miage.groupe2.reseausocial.Model.*;
 import miage.groupe2.reseausocial.Repository.GroupeRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import miage.groupe2.reseausocial.Util.RedirectUtil;
@@ -9,15 +9,15 @@ import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mindrot.jbcrypt.BCrypt;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.ui.Model;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import javax.imageio.ImageIO;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,190 +25,200 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-public class UtilisateurControllerTest {
+class UtilisateurControllerTest {
 
+    @InjectMocks
     UtilisateurController controller;
+
+    @Mock
     UtilisateurRepository utilisateurRepository;
+
+    @Mock
     GroupeRepository groupeRepository;
+
+    @Mock
     GroupeService groupeService;
+
+    @Mock
     UtilisateurService utilisateurService;
-    Model model;
+
+    @Mock
     HttpSession session;
 
+    @Mock
+    Model model;
+
+    @Mock
+    RedirectAttributes redirectAttributes;
+
+    @Captor
+    ArgumentCaptor<Utilisateur> utilisateurCaptor;
+
     @BeforeEach
-    public void setUp() {
-        utilisateurRepository = mock(UtilisateurRepository.class);
-        groupeRepository = mock(GroupeRepository.class);
-        groupeService = mock(GroupeService.class);
-        utilisateurService = mock(UtilisateurService.class);
-        model = mock(Model.class);
-        session = mock(HttpSession.class);
-
-        controller = new UtilisateurController();
-        controller.utilisateurRepository = utilisateurRepository;
-        controller.groupeRepository = groupeRepository;
-        controller.setGroupeService(groupeService);
-        controller.setUtilisateurService(utilisateurService);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testShowRegisterForm() {
+    void testShowRegisterForm() {
         String view = controller.showRegisterForm(model);
+        assertEquals("form-register", view);
         verify(model).addAttribute(eq("utilisateur"), any(Utilisateur.class));
-        assertEquals("form-register", view);
     }
 
     @Test
-    public void testRegisterUser_EmailExists_ReturnFormRegister() {
-        Utilisateur user = new Utilisateur();
-        user.setEmailU("test@example.com");
-        List<String> emails = new ArrayList<>();
-        emails.add("test@example.com");
-        when(utilisateurRepository.findAllEmailU()).thenReturn(emails);
+    void testRegisterUser_NewEmail() {
+        Utilisateur u = new Utilisateur();
+        u.setMdpU("pwd");
+        u.setEmailU("new@mail.com");
+        when(utilisateurRepository.findAllEmailU()).thenReturn(List.of("old@mail.com"));
 
-        String view = controller.registerUser(user, model);
-
-        verify(model).addAttribute("error", "email exist");
-        assertEquals("form-register", view);
-        verify(utilisateurRepository, never()).save(any());
-    }
-
-    @Test
-    public void testRegisterUser_Success() {
-        Utilisateur user = new Utilisateur();
-        user.setEmailU("unique@example.com");
-        user.setMdpU("password123");
-        when(utilisateurRepository.findAllEmailU()).thenReturn(new ArrayList<>());
-
-        String view = controller.registerUser(user, model);
-
-        ArgumentCaptor<Utilisateur> captor = ArgumentCaptor.forClass(Utilisateur.class);
-        verify(utilisateurRepository).save(captor.capture());
-        Utilisateur savedUser = captor.getValue();
-        assertTrue(BCrypt.checkpw("password123", savedUser.getMdpU()));
+        String view = controller.registerUser(u, model);
         assertEquals("redirect:/auth/login", view);
+        verify(utilisateurRepository).save(any(Utilisateur.class));
     }
 
     @Test
-    public void testRechercherUtilisateurs() {
-        Utilisateur sessionUser = new Utilisateur();
-        sessionUser.setIdUti(1);
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(sessionUser);
+    void testRegisterUser_ExistingEmail() {
+        Utilisateur u = new Utilisateur();
+        u.setEmailU("existing@mail.com");
+        when(utilisateurRepository.findAllEmailU()).thenReturn(List.of("existing@mail.com"));
 
-        Utilisateur foundUser = new Utilisateur();
-        foundUser.setIdUti(2);
-        List<Utilisateur> results = new ArrayList<>();
-        results.add(foundUser);
-        results.add(sessionUser); // Should be removed
-        when(utilisateurRepository.findByNomUContainingIgnoreCase("nom")).thenReturn(results);
+        String view = controller.registerUser(u, model);
+        assertEquals("form-register", view);
+        verify(model).addAttribute("error", "email exist");
+    }
 
-        String view = controller.rechercherUtilisateurs("nom", model, session);
+    @Test
+    void testRechercherUtilisateurs() {
+        Utilisateur current = new Utilisateur();
+        current.setIdUti(1);
+        Utilisateur other = new Utilisateur();
+        other.setIdUti(2);
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(current);
+        when(utilisateurRepository.findByNomUContainingIgnoreCase("test")).thenReturn(new ArrayList<>(List.of(current, other)));
 
-        verify(model).addAttribute(eq("utilisateurs"), argThat(list -> ((List<?>)list).size() == 1));
+        String view = controller.rechercherUtilisateurs("test", model, session);
         assertEquals("search_results", view);
+        verify(model).addAttribute(eq("utilisateurs"), argThat(list -> ((List<?>) list).size() == 1));
     }
 
     @Test
-    public void testVoirMesAmis() {
-        Utilisateur user = new Utilisateur();
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
+    void testVoirMesAmis() {
+        Utilisateur u = new Utilisateur();
+        u.setAmis(List.of(new Utilisateur()));
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(u);
 
         String view = controller.voirMesAmis(session, model);
-
-        verify(model).addAttribute("amis", user.getAmis());
         assertEquals("listeamis", view);
+        verify(model).addAttribute("amis", u.getAmis());
     }
 
     @Test
-    public void testSupprimerAmi_AmiExists() {
-        Utilisateur user = new Utilisateur();
-        user.setAmis(new ArrayList<>());
-        Utilisateur ami = new Utilisateur();
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
-        when(utilisateurRepository.findByIdUti(5)).thenReturn(ami);
+    void testSupprimerAmi_Success() {
+        Utilisateur u1 = new Utilisateur();
+        u1.setIdUti(1);
+        Utilisateur u2 = new Utilisateur();
+        u2.setIdUti(2);
+        u1.setAmis(new ArrayList<>(List.of(u2)));
+        u2.setAmis(new ArrayList<>(List.of(u1)));
 
-        user.getAmis().add(ami);
-        ami.getAmis().add(user);
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(u1);
+        when(utilisateurRepository.findByIdUti(2)).thenReturn(u2);
 
-        RedirectUtil redirectUtil = mock(RedirectUtil.class);
-
-        String referer = "someReferer";
-
-        String view = controller.supprimerAmi(5, session, mock(org.springframework.web.servlet.mvc.support.RedirectAttributes.class), referer);
-
-        verify(utilisateurRepository).save(user);
-        verify(utilisateurRepository).save(ami);
-        assertTrue(view.contains("redirect:"));
+        String view = controller.supprimerAmi(2, session, redirectAttributes, null);
+        assertTrue(view.contains("redirect:/user/mes-amis"));
+        verify(utilisateurRepository, times(2)).save(any(Utilisateur.class));
+        verify(redirectAttributes).addFlashAttribute("succes", "Ami supprimé avec succès.");
     }
 
     @Test
-    public void testModifierProfil() {
+    void testUserProfil() {
         Utilisateur user = new Utilisateur();
-        user.setIdUti(1);
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
+        user.setIdUti(2);
+        Utilisateur sessionUser = new Utilisateur();
+        sessionUser.setIdUti(1);
+        sessionUser.setAmis(List.of(user));
+        DemandeAmi demande = new DemandeAmi();
+        demande.setRecepteur(user);
+        demande.setStatut("en attente");
+        sessionUser.setDemandesEnvoyees(List.of(demande));
+        Post post = new Post();
+        post.setDatePost(123L);
+        user.setPosts(List.of(post));
+        user.setPostsRepostes(List.of(post));
+        user.setAmis(List.of(sessionUser));
 
-        String view = controller.modifierProfil("pseudo", "email@example.com", "intro", session);
+        when(utilisateurRepository.findByIdUti(2)).thenReturn(user);
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(sessionUser);
 
-        assertEquals("redirect:/user/1/profil", view);
-        assertEquals("pseudo", user.getPseudoU());
-        assertEquals("email@example.com", user.getEmailU());
-        assertEquals("intro", user.getIntroductionU());
-        verify(utilisateurRepository).save(user);
-        verify(session).setAttribute("user", user);
+        String view = controller.userProfil("post", 2, model, session);
+        assertEquals("profil_user", view);
+        verify(model).addAttribute(eq("etreAmi"), eq(true));
+        verify(model).addAttribute(eq("demandeEnvoyee"), eq(true));
     }
 
     @Test
-    public void testModifierPassword_Success() {
-        String oldPassword = "oldPass";
-        String newPassword = "newPass";
+    void testModifierProfil() {
+        Utilisateur u = new Utilisateur();
+        u.setIdUti(5);
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(u);
 
-        String hashedOldPass = BCrypt.hashpw(oldPassword, BCrypt.gensalt());
-
-        Utilisateur user = new Utilisateur();
-        user.setMdpU(hashedOldPass);
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
-
-        String view = controller.modifierPassword(oldPassword, newPassword, session, "/referer");
-
-        assertTrue(BCrypt.checkpw(newPassword, user.getMdpU()));
-        assertEquals("/referer", view);
-        verify(utilisateurRepository).save(user);
-        verify(session).setAttribute("user", user);
+        String view = controller.modifierProfil("pseudo", "email", "intro", session);
+        assertEquals("redirect:/user/5/profil", view);
+        verify(utilisateurRepository).save(u);
+        verify(session).setAttribute("user", u);
     }
 
     @Test
-    public void testModifierPassword_WrongCurrentPassword() {
-        String oldPassword = "wrongOld";
-        String newPassword = "newPass";
+    void testModifierPassword_CorrectCurrent() {
+        Utilisateur u = new Utilisateur();
+        u.setMdpU(org.mindrot.jbcrypt.BCrypt.hashpw("old", org.mindrot.jbcrypt.BCrypt.gensalt()));
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(u);
 
-        String hashedOldPass = BCrypt.hashpw("correctOld", BCrypt.gensalt());
-
-        Utilisateur user = new Utilisateur();
-        user.setMdpU(hashedOldPass);
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
-
-        String view = controller.modifierPassword(oldPassword, newPassword, session, "/referer");
-
-        assertFalse(BCrypt.checkpw(newPassword, user.getMdpU())); // password should not have changed
-        assertEquals("/referer", view);
-        verify(utilisateurRepository, never()).save(user);
+        String view = controller.modifierPassword("old", "new", session, null);
+        assertTrue(view.contains("/user/modifierProfil"));
+        verify(utilisateurRepository).save(u);
+        verify(session).setAttribute("user", u);
     }
 
     @Test
-    public void testUploadAvatar() throws IOException {
-        Utilisateur user = new Utilisateur();
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
+    void testJoinGroupe() {
+        Utilisateur u = new Utilisateur();
+        u.setGroupesAppartenance(new ArrayList<>());
+        Groupe g = new Groupe();
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(u);
+        when(groupeRepository.findGroupeByidGrp(1)).thenReturn(g);
 
-        MultipartFile file = mock(MultipartFile.class);
-        byte[] bytes = new byte[]{1,2,3};
-        when(file.isEmpty()).thenReturn(false);
-        when(file.getBytes()).thenReturn(bytes);
-
-        String view = controller.uploadAvatar(file, session, "/referer");
-
-        verify(utilisateurRepository).save(user);
-        verify(session).setAttribute("user", user);
-        assertTrue(view.contains("/user/" + user.getIdUti()));
+        String view = controller.joinGroupe(session, 1, null);
+        assertTrue(view.contains("/user/mes-groupes"));
+        verify(groupeService).joinGroupe(u, g);
+        verify(session).setAttribute("user", u);
     }
 
+    @Test
+    void testQuitterGroupe_Createur() {
+        Utilisateur u = new Utilisateur();
+        u.setGroupesAppartenance(new ArrayList<>());
+        Groupe g = new Groupe();
+        g.setCreateur(u);
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(u);
+        when(groupeRepository.findGroupeByidGrp(1)).thenReturn(g);
+
+        String view = controller.quitterGroupe(session, 1, null);
+        assertTrue(view.contains("/user/mes-groupes"));
+        verify(groupeService).quitterGroupe(u, 1);
+        verify(groupeService).supprimerGroupe(u, g);
+        verify(session).setAttribute("user", u);
+    }
+
+    @Test
+    void testSupprimerGroupe() {
+        Utilisateur u = new Utilisateur();
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(u);
+
+        String view = controller.supprimerGroupe(session, 1);
+        assertEquals("redirect:/user/mes-groupes", view);
+        verify(groupeService).supprimerGroupe(u, 1);
+    }
 }

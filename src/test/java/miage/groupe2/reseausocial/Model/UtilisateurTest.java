@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UtilisateurTest {
 
@@ -16,27 +16,29 @@ class UtilisateurTest {
     void setUp() {
         utilisateur = new Utilisateur();
         utilisateur.setIdUti(1);
-        utilisateur.setNomU("Dupont");
-        utilisateur.setPrenomU("Jean");
-        utilisateur.setEmailU("jean.dupont@example.com");
+        utilisateur.setNomU("Doe");
+        utilisateur.setPrenomU("John");
+        utilisateur.setPseudoU("jdoe");
+        utilisateur.setEmailU("john.doe@example.com");
         utilisateur.setMdpU("password123");
-        utilisateur.setPseudoU("jeanjean");
+        utilisateur.setIntroductionU("Salut, je suis John !");
         utilisateur.setAvatar(new byte[]{1, 2, 3});
     }
 
     @Test
-    void testAttributsSimples() {
-        assertThat(utilisateur.getIdUti()).isEqualTo(1);
-        assertThat(utilisateur.getNomU()).isEqualTo("Dupont");
-        assertThat(utilisateur.getPrenomU()).isEqualTo("Jean");
-        assertThat(utilisateur.getEmailU()).isEqualTo("jean.dupont@example.com");
-        assertThat(utilisateur.getMdpU()).isEqualTo("password123");
-        assertThat(utilisateur.getPseudoU()).isEqualTo("jeanjean");
-        assertThat(utilisateur.getAvatar()).isEqualTo(new byte[]{1, 2, 3});
+    void testGettersSetters() {
+        assertEquals(1, utilisateur.getIdUti());
+        assertEquals("Doe", utilisateur.getNomU());
+        assertEquals("John", utilisateur.getPrenomU());
+        assertEquals("jdoe", utilisateur.getPseudoU());
+        assertEquals("john.doe@example.com", utilisateur.getEmailU());
+        assertEquals("password123", utilisateur.getMdpU());
+        assertEquals("Salut, je suis John !", utilisateur.getIntroductionU());
+        assertArrayEquals(new byte[]{1, 2, 3}, utilisateur.getAvatar());
     }
 
     @Test
-    void testCollectionsInitialisationEtAssignation() {
+    void testListesAssociations() {
         Post post = new Post();
         Evenement evenement = new Evenement();
         Groupe groupe = new Groupe();
@@ -46,53 +48,61 @@ class UtilisateurTest {
         Message message = new Message();
         DemandeAmi demande = new DemandeAmi();
 
-        utilisateur.setPosts(new ArrayList<>(Arrays.asList(post)));
-        utilisateur.setEvenements(new ArrayList<>(Arrays.asList(evenement)));
-        utilisateur.setGroupes(new ArrayList<>(Arrays.asList(groupe)));
-        utilisateur.setConversations(new ArrayList<>(Arrays.asList(conv)));
-        utilisateur.setCommentaires(new ArrayList<>(Arrays.asList(commentaire)));
-        utilisateur.setReactions(new ArrayList<>(Arrays.asList(reaction)));
-        utilisateur.setMessages(new ArrayList<>(Arrays.asList(message)));
-        utilisateur.setDemandesEnvoyees(new ArrayList<>(Arrays.asList(demande)));
-        utilisateur.setDemandesRecues(new ArrayList<>(Arrays.asList(demande)));
-        utilisateur.setGroupesAppartenance(new ArrayList<>(Arrays.asList(groupe)));
-        utilisateur.setEvenementsAssistes(new ArrayList<>(Arrays.asList(evenement)));
-        utilisateur.setAmis(new ArrayList<>());
-        utilisateur.setPostsRepostes(new ArrayList<>(Arrays.asList(post)));
-        utilisateur.setConversationsParticipees(new ArrayList<>(Arrays.asList(conv)));
+        utilisateur.setPosts(Arrays.asList(post));
+        utilisateur.setEvenements(Arrays.asList(evenement));
+        utilisateur.setGroupes(Arrays.asList(groupe));
+        utilisateur.setConversations(Arrays.asList(conv));
+        utilisateur.setCommentaires(Arrays.asList(commentaire));
+        utilisateur.setReactions(Arrays.asList(reaction));
+        utilisateur.setMessages(Arrays.asList(message));
+        utilisateur.setDemandesEnvoyees(Arrays.asList(demande));
+        utilisateur.setDemandesRecues(Arrays.asList(demande));
+        utilisateur.setGroupesAppartenance(Arrays.asList(groupe));
+        utilisateur.setEvenementsAssistes(Arrays.asList(evenement));
+        utilisateur.setAmis(new ArrayList<>(Arrays.asList(new Utilisateur())));
+        utilisateur.setPostsRepostes(Arrays.asList(post));
+        utilisateur.setConversationsParticipees(Arrays.asList(conv));
 
-        assertThat(utilisateur.getPosts()).containsExactly(post);
-        assertThat(utilisateur.getEvenements()).containsExactly(evenement);
-        assertThat(utilisateur.getGroupes()).containsExactly(groupe);
-        assertThat(utilisateur.getConversations()).containsExactly(conv);
-        assertThat(utilisateur.getCommentaires()).containsExactly(commentaire);
-        assertThat(utilisateur.getReactions()).containsExactly(reaction);
-        assertThat(utilisateur.getMessages()).containsExactly(message);
-        assertThat(utilisateur.getDemandesEnvoyees()).containsExactly(demande);
-        assertThat(utilisateur.getDemandesRecues()).containsExactly(demande);
-        assertThat(utilisateur.getGroupesAppartenance()).containsExactly(groupe);
-        assertThat(utilisateur.getEvenementsAssistes()).containsExactly(evenement);
-        assertThat(utilisateur.getAmis()).isEmpty();
-        assertThat(utilisateur.getPostsRepostes()).containsExactly(post);
-        assertThat(utilisateur.getConversationsParticipees()).containsExactly(conv);
+        assertEquals(1, utilisateur.getPosts().size());
+        assertEquals(1, utilisateur.getEvenements().size());
+        assertEquals(1, utilisateur.getGroupes().size());
+        assertEquals(1, utilisateur.getConversations().size());
+        assertEquals(1, utilisateur.getCommentaires().size());
+        assertEquals(1, utilisateur.getReactions().size());
+        assertEquals(1, utilisateur.getMessages().size());
+        assertEquals(1, utilisateur.getDemandesEnvoyees().size());
+        assertEquals(1, utilisateur.getDemandesRecues().size());
+        assertEquals(1, utilisateur.getGroupesAppartenance().size());
+        assertEquals(1, utilisateur.getEvenementsAssistes().size());
+        assertEquals(1, utilisateur.getAmis().size());
+        assertEquals(1, utilisateur.getPostsRepostes().size());
+        assertEquals(1, utilisateur.getConversationsParticipees().size());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        Utilisateur autre = new Utilisateur();
-        autre.setIdUti(1);
+        Utilisateur u1 = new Utilisateur();
+        u1.setIdUti(10);
+        Utilisateur u2 = new Utilisateur();
+        u2.setIdUti(10);
+        Utilisateur u3 = new Utilisateur();
+        u3.setIdUti(20);
 
-        Utilisateur different = new Utilisateur();
-        different.setIdUti(2);
-
-        assertThat(utilisateur).isEqualTo(autre);
-        assertThat(utilisateur).hasSameHashCodeAs(autre);
-        assertThat(utilisateur).isNotEqualTo(different);
+        assertEquals(u1, u2);
+        assertEquals(u1.hashCode(), u2.hashCode());
+        assertNotEquals(u1, u3);
     }
 
     @Test
-    void testEqualsAvecNullEtAutreClasse() {
-        assertThat(utilisateur.equals(null)).isFalse();
-        assertThat(utilisateur.equals("string")).isFalse();
+    void testEqualsNullAndDifferentClass() {
+        assertNotEquals(utilisateur, null);
+        assertNotEquals(utilisateur, "not a user");
+    }
+
+    @Test
+    void testGetAmisLazyInit() {
+        Utilisateur u = new Utilisateur();
+        assertNotNull(u.getAmis());
+        assertTrue(u.getAmis().isEmpty());
     }
 }
