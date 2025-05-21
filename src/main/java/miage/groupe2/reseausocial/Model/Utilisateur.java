@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -315,6 +316,9 @@ public class Utilisateur implements Serializable {
     }
 
     public List<Utilisateur> getAmis() {
+        if (amis == null) {
+            amis = new ArrayList<>();
+        }
         return amis;
     }
 
@@ -322,13 +326,6 @@ public class Utilisateur implements Serializable {
         this.amis = amis;
     }
 
-//    public List<Utilisateur> getAmisDe() {
-//        return amisDe;
-//    }
-//
-//    public void setAmisDe(List<Utilisateur> amisDe) {
-//        this.amisDe = amisDe;
-//    }
 
     public List<Post> getPostsRepostes() {
         return postsRepostes;
