@@ -2,6 +2,7 @@ package miage.groupe2.reseausocial.Model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 /**
@@ -33,6 +34,7 @@ public class Message implements Serializable {
      */
     @ManyToOne
     @JoinColumn(name = "idConv")
+    @JsonIgnoreProperties({"messages", "participants", "createur"})
     private Conversation conversation;
 
     /**
@@ -40,6 +42,7 @@ public class Message implements Serializable {
      */
     @ManyToOne
     @JoinColumn(name = "idUti")
+    @JsonIgnoreProperties({"messages", "groupes", "amis", "posts"})
     private Utilisateur expediteur;
 
     /**
@@ -135,4 +138,5 @@ public class Message implements Serializable {
     public void setConversation(Conversation conversation) {
         this.conversation = conversation;
     }
+
 }

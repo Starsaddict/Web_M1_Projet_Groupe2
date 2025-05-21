@@ -172,7 +172,7 @@
                                         <div class="relative flex items-center gap-3 p-2 duration-200 rounded-xl pr-10 hover:bg-secondery dark:hover:bg-white/10 bg-teal-500/5">
                                             <div class="relative w-12 h-12 shrink-0">
                                                 <img th:if="${demande.demandeur.avatar != null}"
-                                                     th:src="'data:image/jpeg;base64,' + ${@@picUtil.encodeBase64(demande.demandeur.avatar)}"
+                                                     th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(demande.demandeur.avatar)}"
                                                      alt="avatar" class="object-cover w-full h-full rounded-full"/>
                                                 <img th:if="${demande.demandeur.avatar == null}"
                                                      th:src="@{/assets/images/avatars/avatar-0.png}"

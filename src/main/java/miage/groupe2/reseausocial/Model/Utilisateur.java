@@ -1,11 +1,15 @@
 package miage.groupe2.reseausocial.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.io.Serializable;
+
 
 /**
  * Représente un utilisateur dans le réseau social.
@@ -16,6 +20,23 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({
+        "evenements",
+        "groupes",
+        "amis",
+        "posts",
+        "conversations",
+        "conversationsParticipees",
+        "evenementsAssistes",
+        "demandesEnvoyees",
+        "demandesRecues",
+        "reactions",
+        "messages",
+        "commentaires",
+        "postsRepostes",
+        "groupesAppartenance"
+})
+
 public class Utilisateur implements Serializable {
     private static final long serialVersionUID = 1L;
     /**
@@ -160,13 +181,9 @@ public class Utilisateur implements Serializable {
     /**
      * Liste des conversations auxquelles l'utilisateur participe.
      */
-    @ManyToMany
-    @JoinTable(
-            name = "participerConv",
-            joinColumns = @JoinColumn(name = "idUti"),
-            inverseJoinColumns = @JoinColumn(name = "idConv")
-    )
+    @ManyToMany(mappedBy = "participants")
     private List<Conversation> conversationsParticipees;
+
 
 
     public Integer getIdUti() {

@@ -2,17 +2,39 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Mes amis</title>
+    <meta charset="UTF-8">
 </head>
 <body>
 <h2>Liste de mes amis</h2>
 
+<!-- Message ou bouton pour créer une conversation de groupe -->
+<div th:if="${amis.size() < 2}">
+    <p style="color: red;">Il vous faut au moins deux amis pour créer une conversation de groupe</p>
+</div>
+
+<div th:if="${amis.size() >= 2}">
+    <p>
+        <a th:href="@{/conversation/groupe/nouvelle}" style="display:inline-block; margin-bottom: 15px;">
+            <button type="button">Créer une conversation de groupe</button>
+        </a>
+    </p>
+</div>
+
+<!-- Liste des amis -->
 <ul>
     <li th:each="ami : ${amis}">
         <span th:text="${ami.nomU + ' ' + ami.prenomU}">Nom Prénom</span>
 
+        <!-- Supprimer ami -->
         <form th:action="@{/user/supprimer-ami}" method="post" style="display:inline;">
             <input type="hidden" name="idAmi" th:value="${ami.idUti}" />
             <button type="submit">Supprimer</button>
+        </form>
+
+        <!-- Envoyer message -->
+        <form th:action="@{/message/vers-conversation}" method="post" style="display:inline;">
+            <input type="hidden" name="idAmi" th:value="${ami.idUti}" />
+            <button type="submit">Envoyer un message</button>
         </form>
     </li>
 </ul>
@@ -21,5 +43,8 @@
 <div th:if="${succes}" th:text="${succes}" style="color: green;"></div>
 <div th:if="${error}" th:text="${error}" style="color: red;"></div>
 
+<!-- Lien vers les conversations -->
+<a th:href="@{/conversation/groupes}">Afficher mes conversations de groupe</a>
+<a th:href="@{'/user/' + ${session.user.idUti}}">Retour au menu</a>
 </body>
 </html>
