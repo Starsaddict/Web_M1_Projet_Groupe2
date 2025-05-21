@@ -46,6 +46,11 @@ public class Utilisateur implements Serializable {
     private String emailU;
 
     /**
+     * Introduction de l'utilisateur.
+     */
+    private String introductionU;
+
+    /**
      * Mot de passe de l'utilisateur.
      */
     private String mdpU;
@@ -110,7 +115,7 @@ public class Utilisateur implements Serializable {
     /**
      * Liste des groupes auxquels l'utilisateur appartient.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "appartenirGrp",
             joinColumns = @JoinColumn(name = "idUti"),
@@ -140,16 +145,11 @@ public class Utilisateur implements Serializable {
     )
     private List<Utilisateur> amis;
 
-//    /**
-//     * Liste des utilisateurs qui considèrent cet utilisateur comme un ami.
-//     */
-//    @ManyToMany(mappedBy = "amis")
-//    private List<Utilisateur> amisDe;
 
     /**
      * Liste des posts que l'utilisateur a repostés.
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "reposterPost",
             joinColumns = @JoinColumn(name = "idUti"),
@@ -339,6 +339,14 @@ public class Utilisateur implements Serializable {
 
     public void setPseudoU(String pseudoU) {
         this.pseudoU = pseudoU;
+    }
+
+    public String getIntroductionU() {
+        return introductionU;
+    }
+
+    public void setIntroductionU(String introductionU) {
+        this.introductionU = introductionU;
     }
 
     @Override

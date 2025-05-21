@@ -36,14 +36,6 @@ public class AuthController {
         return "form-login";
     }
 
-    /**
-     * Displays the registration page.
-     *
-     * @param model the model to pass to the view
-     * @return the registration view name
-     */
-
-
 
     /**
      * Handles user authentication.
@@ -60,17 +52,12 @@ public class AuthController {
                                HttpSession session
     ) {
         Utilisateur utilisateur = utilisateurRepository.findByEmailU(email);
-        if (utilisateur == null) {
-            model.addAttribute("error", "email n'exist pas");
-            return "form-login";
-        }else if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
-            // Auth successful, redirect to home or profile
+        if (utilisateur != null && BCrypt.checkpw(mdp, utilisateur.getMdpU())) {
             session.setAttribute("user", utilisateur);
-            return "redirect:/home";
         } else {
             model.addAttribute("error", "wrong password");
-            return "redirect:/home";
         }
+        return "redirect:/home";
     }
 
     @RequestMapping("/logout")

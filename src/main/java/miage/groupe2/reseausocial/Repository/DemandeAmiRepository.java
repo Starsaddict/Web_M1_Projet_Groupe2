@@ -34,5 +34,5 @@ public interface DemandeAmiRepository extends JpaRepository<DemandeAmi, Integer>
   boolean sontDejaAmis(@Param("id1") Integer id1, @Param("id2") Integer id2);
 
 
-
+    DemandeAmi findByIdDA(Integer idDemande);
 }
