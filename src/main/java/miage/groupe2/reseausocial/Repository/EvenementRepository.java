@@ -35,4 +35,7 @@ public interface EvenementRepository extends JpaRepository<Evenement, Integer> {
      * @return une liste d'événements créés par cet utilisateur
      */
     List<Evenement> findByCreateur(Utilisateur createur);
+
+    Evenement findByIdEve(Integer idEve);
+
 }

@@ -14,5 +14,7 @@ public interface GroupeRepository extends JpaRepository<Groupe, Integer> {
 
     Groupe findGroupeByidGrp(int id);
 
+    List<Groupe> findAll();
+
 
 }

@@ -72,14 +72,11 @@ public class GroupeService {
         utilisateurRepository.save(user);
     }
 
-    public void quitterGroupe(Utilisateur user, Groupe groupe) {
+    public void quitterGroupe(Utilisateur user, Integer id) {
 
-        if( user.getGroupesAppartenance() != null && user.getGroupesAppartenance().contains(groupe)){
-            user.getGroupesAppartenance().remove(groupe);
-        }
-        if(groupe.getMembres() != null && groupe.getMembres().contains(user)){
-            groupe.getMembres().remove(user);
-        }
+        Groupe groupe = groupeRepository.findGroupeByidGrp(id);
+        groupe.getMembres().remove(user);
+        user.getGroupesAppartenance().remove(groupe);
         groupeRepository.save(groupe);
         utilisateurRepository.save(user);
 
@@ -108,19 +105,21 @@ public class GroupeService {
     }
 
 
-    public boolean supprimerGroupe(Utilisateur user, Groupe groupe) {
-        Boolean iftrue = supprimerGroupe(user, groupe.getIdGrp());
-        return iftrue;
+    public void supprimerGroupe(Utilisateur user, Groupe groupe) {
+        supprimerGroupe(user, groupe.getIdGrp());
     }
 
-    public boolean supprimerGroupe(Utilisateur user, int groupeId) {
-        Groupe groupe = groupeRepository.findGroupeByidGrp(groupeId);
-        if (user.equals(groupe.getCreateur()))
-        {
-            deleteGroupe(groupeId);
-            return true;
+    public void supprimerGroupe(Utilisateur user, int idGroupe) {
+        Groupe managedGroupe = groupeRepository
+                .findById(idGroupe)
+                .orElseThrow(() -> new IllegalArgumentException("Groupe non trouvé : " + idGroupe));
+
+        for (Utilisateur membre : new ArrayList<>(managedGroupe.getMembres())) {
+            membre.getGroupesAppartenance().remove(managedGroupe);
+            utilisateurRepository.save(membre);
         }
-        return false;
+
+        groupeRepository.delete(managedGroupe);
     }
 
 }
