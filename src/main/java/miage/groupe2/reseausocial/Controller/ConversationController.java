@@ -255,4 +255,9 @@ public class ConversationController {
         return "redirect:/conversation/groupes";
     }
 
+
+    @GetMapping("/messages")
+    public String afficherMessages(HttpSession session, Model model) {
+        return "messages";
+    }
 }
