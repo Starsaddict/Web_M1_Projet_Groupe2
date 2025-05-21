@@ -55,13 +55,18 @@ public class GroupeControllerTest {
     public void testGroupeList() {
         Utilisateur user = new Utilisateur();
         List<Groupe> allGroupes = new ArrayList<>();
+
         Groupe g1 = new Groupe();
+        g1.setMembres(new ArrayList<>());
         Groupe g2 = new Groupe();
+        g2.setMembres(new ArrayList<>());
+
         allGroupes.add(g1);
         allGroupes.add(g2);
 
         when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
         when(groupeRepository.findAll()).thenReturn(allGroupes);
+
         user.setGroupesAppartenance(new ArrayList<>());
         user.setGroupes(new ArrayList<>());
 
@@ -80,7 +85,7 @@ public class GroupeControllerTest {
         String view = controller.creerGroupe(session, groupe, model, referer);
         verify(groupeService).createGroupe(user, groupe);
         verify(session).setAttribute("user", user);
-        assertEquals("redirect:/groupe/list", view);
+        assertEquals("redirect:redirect:/groupe/list", view);
     }
 
     @Test

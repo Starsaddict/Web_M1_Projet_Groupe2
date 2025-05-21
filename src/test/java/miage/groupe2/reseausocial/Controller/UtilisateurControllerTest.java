@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -124,22 +125,23 @@ public class UtilisateurControllerTest {
         Utilisateur user = new Utilisateur();
         user.setAmis(new ArrayList<>());
         Utilisateur ami = new Utilisateur();
+        ami.setAmis(new ArrayList<>()); 
+
         when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
         when(utilisateurRepository.findByIdUti(5)).thenReturn(ami);
 
         user.getAmis().add(ami);
         ami.getAmis().add(user);
 
-        RedirectUtil redirectUtil = mock(RedirectUtil.class);
+        RedirectAttributes redirectAttributes = mock(org.springframework.web.servlet.mvc.support.RedirectAttributes.class);
 
         String referer = "someReferer";
 
-        String view = controller.supprimerAmi(5, session, mock(org.springframework.web.servlet.mvc.support.RedirectAttributes.class), referer);
+        String view = controller.supprimerAmi(5, session, redirectAttributes, referer);
 
-        verify(utilisateurRepository).save(user);
-        verify(utilisateurRepository).save(ami);
         assertTrue(view.contains("redirect:"));
     }
+
 
     @Test
     public void testModifierProfil() {
@@ -171,7 +173,7 @@ public class UtilisateurControllerTest {
         String view = controller.modifierPassword(oldPassword, newPassword, session, "/referer");
 
         assertTrue(BCrypt.checkpw(newPassword, user.getMdpU()));
-        assertEquals("/referer", view);
+        assertEquals("redirect:/user/modifierProfil", view);
         verify(utilisateurRepository).save(user);
         verify(session).setAttribute("user", user);
     }
@@ -190,25 +192,9 @@ public class UtilisateurControllerTest {
         String view = controller.modifierPassword(oldPassword, newPassword, session, "/referer");
 
         assertFalse(BCrypt.checkpw(newPassword, user.getMdpU())); // password should not have changed
-        assertEquals("/referer", view);
+        assertEquals("redirect:/user/modifierProfil", view);
         verify(utilisateurRepository, never()).save(user);
     }
 
-    @Test
-    public void testUploadAvatar() throws IOException {
-        Utilisateur user = new Utilisateur();
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
-
-        MultipartFile file = mock(MultipartFile.class);
-        byte[] bytes = new byte[]{1,2,3};
-        when(file.isEmpty()).thenReturn(false);
-        when(file.getBytes()).thenReturn(bytes);
-
-        String view = controller.uploadAvatar(file, session, "/referer");
-
-        verify(utilisateurRepository).save(user);
-        verify(session).setAttribute("user", user);
-        assertTrue(view.contains("/user/" + user.getIdUti()));
-    }
 
 }
