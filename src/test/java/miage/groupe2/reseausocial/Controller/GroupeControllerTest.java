@@ -10,120 +10,124 @@ import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
 import org.springframework.ui.Model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class GroupeControllerTest {
 
-    @InjectMocks
-    private GroupeController groupeController;
-
-    @Mock
+    private GroupeController controller;
     private GroupeRepository groupeRepository;
-
-    @Mock
     private UtilisateurRepository utilisateurRepository;
-
-    @Mock
-    private GroupeService groupeService;
-
-    @Mock
     private UtilisateurService utilisateurService;
-
-    @Mock
+    private GroupeService groupeService;
     private HttpSession session;
-
-    @Mock
     private Model model;
 
     @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
+    public void setUp() {
+        controller = new GroupeController();
+
+        groupeRepository = mock(GroupeRepository.class);
+        utilisateurRepository = mock(UtilisateurRepository.class);
+        utilisateurService = mock(UtilisateurService.class);
+        groupeService = mock(GroupeService.class);
+        session = mock(HttpSession.class);
+        model = mock(Model.class);
+
+        controller.groupeRepository = groupeRepository;
+        controller.utilisateurRepository = utilisateurRepository;
+        controller.setUtilisateurService(utilisateurService);
+        controller.groupeService = groupeService;
     }
 
     @Test
-    void testIndexRedirect() {
-        String viewName = groupeController.index(model);
-        assertEquals("redirect:/groupe/list", viewName);
-    }
-
-    @Test
-    void testGroupeList() {
-        List<Groupe> groupes = Arrays.asList(new Groupe(), new Groupe());
-        when(groupeRepository.findAll()).thenReturn(groupes);
-
-        String viewName = groupeController.GroupeList(model);
-
-        verify(model).addAttribute("groupes", groupes);
-        assertEquals("listGroupe", viewName);
-    }
-
-    @Test
-    void testCreerGroupeGet() {
-        String viewName = groupeController.creerGroupe(model);
-        verify(model).addAttribute(eq("groupe"), any(Groupe.class));
-        assertEquals("creerGroupe", viewName);
-    }
-
-    @Test
-    void testCreerGroupePost() {
-        Utilisateur sessionUser = new Utilisateur();
-        sessionUser.setIdUti(1);
-        Groupe groupe = new Groupe();
-
-        when(session.getAttribute("user")).thenReturn(sessionUser);
-        when(utilisateurRepository.findByidUti(1)).thenReturn(sessionUser);
-
-        String viewName = groupeController.creerGroupe(session, groupe, model);
-
-        verify(groupeService).createGroupe(sessionUser, groupe);
-        verify(session).setAttribute("user", sessionUser);
-        assertEquals("redirect:/groupe/list", viewName);
-    }
-
-    @Test
-    void testAfficherGroupe_NotFound() {
-        when(groupeRepository.findGroupeByidGrp(1)).thenReturn(null);
-        String view = groupeController.afficherGroupe(1, model, session);
+    public void testIndex() {
+        String view = controller.index(model);
         assertEquals("redirect:/groupe/list", view);
     }
 
     @Test
-    void testAfficherGroupe_FoundAndMember() {
+    public void testGroupeList() {
+        Utilisateur user = new Utilisateur();
+        List<Groupe> allGroupes = new ArrayList<>();
+        Groupe g1 = new Groupe();
+        Groupe g2 = new Groupe();
+        allGroupes.add(g1);
+        allGroupes.add(g2);
+
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
+        when(groupeRepository.findAll()).thenReturn(allGroupes);
+        user.setGroupesAppartenance(new ArrayList<>());
+        user.setGroupes(new ArrayList<>());
+
+        String view = controller.groupeList(model, session);
+        assertEquals("groups", view);
+    }
+
+    @Test
+    public void testCreerGroupe() {
+        Utilisateur user = new Utilisateur();
+        Groupe groupe = new Groupe();
+        String referer = "/groupe/list";
+
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
+
+        String view = controller.creerGroupe(session, groupe, model, referer);
+        verify(groupeService).createGroupe(user, groupe);
+        verify(session).setAttribute("user", user);
+        assertEquals("redirect:/groupe/list", view);
+    }
+
+    @Test
+    public void testAfficherGroupe_NotFound() {
+        when(groupeRepository.findGroupeByidGrp(1)).thenReturn(null);
+        String view = controller.afficherGroupe(1, model, session);
+        assertEquals("redirect:/groupe/list", view);
+    }
+
+    @Test
+    public void testAfficherGroupe_Found() {
         Groupe groupe = new Groupe();
         groupe.setIdGrp(1);
         groupe.setPosts(new ArrayList<>());
         groupe.setMembres(new ArrayList<>());
 
         Utilisateur user = new Utilisateur();
-        user.setIdUti(1);
-        user.setGroupesAppartenance(List.of(groupe));
-
+        user.setGroupesAppartenance(new ArrayList<>());
         when(groupeRepository.findGroupeByidGrp(1)).thenReturn(groupe);
-        when(session.getAttribute("user")).thenReturn(user);
-        when(utilisateurRepository.findByidUti(1)).thenReturn(user);
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
+        when(groupeRepository.findAll()).thenReturn(List.of(groupe));
 
-        String view = groupeController.afficherGroupe(1, model, session);
-
-        verify(model).addAttribute("groupe", groupe);
-        verify(model).addAttribute("membres", groupe.getMembres());
-        verify(model).addAttribute("posts", groupe.getPosts());
-        verify(model).addAttribute(eq("post"), any(Post.class));
-        verify(model).addAttribute("estMembre", true);
-        assertEquals("groupe_detail", view);
+        String view = controller.afficherGroupe(1, model, session);
+        assertEquals("group_detail", view);
     }
 
     @Test
-    void testSupprimerMembreDuGroupe_Authorized() {
+    public void testPosterDansGroupe() {
+        Utilisateur user = new Utilisateur();
+        Groupe groupe = new Groupe();
+        groupe.setIdGrp(1);
+        groupe.setPosts(new ArrayList<>());
+        Post post = new Post();
+
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
+        when(groupeRepository.findGroupeByidGrp(1)).thenReturn(groupe);
+
+        String view = controller.posterDansGroupe(1, post, session);
+        assertEquals("redirect:/groupe/1", view);
+        assertEquals(post.getGroupe(), groupe);
+        assertEquals(post.getCreateur(), user);
+        verify(groupeRepository).save(groupe);
+    }
+
+    @Test
+    public void testSupprimerMembreDuGroupe() {
         Utilisateur createur = new Utilisateur();
-        createur.setIdUti(1);
         Utilisateur membre = new Utilisateur();
         Groupe groupe = new Groupe();
         groupe.setIdGrp(1);
@@ -131,11 +135,10 @@ public class GroupeControllerTest {
 
         when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(createur);
         when(groupeRepository.findGroupeByidGrp(1)).thenReturn(groupe);
-        when(utilisateurRepository.findByidUti(2)).thenReturn(membre);
+        when(utilisateurRepository.findByIdUti(2)).thenReturn(membre);
 
-        String view = groupeController.supprimerMembreDuGroupe(1, 2, session);
-
-        verify(groupeService).quitterGroupe(membre, groupe);
+        String view = controller.supprimerMembreDuGroupe(1, 2, session);
         assertEquals("redirect:/groupe/1", view);
+        verify(groupeService).quitterGroupe(membre, 1);
     }
 }

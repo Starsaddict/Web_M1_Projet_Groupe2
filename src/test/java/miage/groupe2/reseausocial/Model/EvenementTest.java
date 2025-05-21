@@ -1,71 +1,89 @@
 package miage.groupe2.reseausocial.Model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
+class EvenementTest {
 
- class EvenementTest {
+    private Evenement evenement;
+    private Utilisateur createur;
+    private List<Utilisateur> participants;
+
+    @BeforeEach
+    void setUp() {
+        createur = new Utilisateur();
+        createur.setIdUti(1);
+        createur.setNomU("Doe");
+        createur.setPrenomU("John");
+
+        Utilisateur p1 = new Utilisateur();
+        p1.setIdUti(2);
+
+        Utilisateur p2 = new Utilisateur();
+        p2.setIdUti(3);
+
+        participants = new ArrayList<>();
+        participants.add(p1);
+        participants.add(p2);
+
+        evenement = new Evenement(
+            10,
+            participants,
+            createur,
+            "Soirée de lancement",
+            "10 avenue de Paris",
+            1684303200000L, 
+            1684216800000L, 
+            "Lancement App"
+        );
+    }
 
     @Test
-    void testConstructeurEtGettersSetters() {
-        Utilisateur createur = new Utilisateur();
-        createur.setIdUti(1);
-        createur.setNomU("Durand");
-
-        Utilisateur participant1 = new Utilisateur();
-        participant1.setIdUti(2);
-        participant1.setNomU("Martin");
-
-        Utilisateur participant2 = new Utilisateur();
-        participant2.setIdUti(3);
-        participant2.setNomU("Dupont");
-
-        Evenement evenement = new Evenement(
-                10,
-                List.of(participant1, participant2),
-                createur,
-                "Soirée festive",
-                "10 rue des Lilas, Paris",
-                1716224400000L,
-                1716220800000L,
-                "Anniversaire"
-        );
-
+    void testGetters() {
         assertEquals(10, evenement.getIdEve());
-        assertEquals("Anniversaire", evenement.getNomE());
-        assertEquals("Soirée festive", evenement.getDescription());
-        assertEquals("10 rue des Lilas, Paris", evenement.getAdresseE());
-        assertEquals(1716220800000L, evenement.getDateDebutE());
-        assertEquals(1716224400000L, evenement.getDateFinE());
+        assertEquals("Soirée de lancement", evenement.getDescription());
+        assertEquals("10 avenue de Paris", evenement.getAdresseE());
+        assertEquals("Lancement App", evenement.getNomE());
+        assertEquals(1684303200000L, evenement.getDateFinE());
+        assertEquals(1684216800000L, evenement.getDateDebutE());
+
         assertEquals(createur, evenement.getCreateur());
         assertEquals(2, evenement.getParticipants().size());
+        assertTrue(evenement.getParticipants().containsAll(participants));
     }
 
     @Test
-    void testDatesTransitoires() {
-        Evenement evenement = new Evenement();
-        evenement.setDateDebutEString("20/05/2025 19:00");
-        evenement.setDateFinEString("20/05/2025 23:00");
+    void testSetters() {
+        evenement.setNomE("Nouvel Événement");
+        evenement.setDescription("Description modifiée");
+        evenement.setAdresseE("Nouvelle adresse");
+        evenement.setDateDebutE(1684000000000L);
+        evenement.setDateFinE(1684100000000L);
 
-        assertEquals("20/05/2025 19:00", evenement.getDateDebutEString());
-        assertEquals("20/05/2025 23:00", evenement.getDateFinEString());
+        Utilisateur newCreateur = new Utilisateur();
+        newCreateur.setIdUti(99);
+        evenement.setCreateur(newCreateur);
+
+        assertEquals("Nouvel Événement", evenement.getNomE());
+        assertEquals("Description modifiée", evenement.getDescription());
+        assertEquals("Nouvelle adresse", evenement.getAdresseE());
+        assertEquals(1684000000000L, evenement.getDateDebutE());
+        assertEquals(1684100000000L, evenement.getDateFinE());
+        assertEquals(newCreateur, evenement.getCreateur());
     }
 
     @Test
-    void testSettersEtGettersIndividuels() {
+    void testDefaultConstructor() {
         Evenement e = new Evenement();
-        e.setNomE("Conférence IA");
-        e.setDescription("Présentation sur l'IA");
-        e.setAdresseE("Université X");
-        e.setDateDebutE(1717000000000L);
-        e.setDateFinE(1717003600000L);
-
-        assertEquals("Conférence IA", e.getNomE());
-        assertEquals("Présentation sur l'IA", e.getDescription());
-        assertEquals("Université X", e.getAdresseE());
-        assertEquals(1717000000000L, e.getDateDebutE());
-        assertEquals(1717003600000L, e.getDateFinE());
+        assertNull(e.getIdEve());
+        assertNull(e.getNomE());
+        assertNull(e.getAdresseE());
+        assertNull(e.getCreateur());
+        assertNull(e.getParticipants());
     }
 }
