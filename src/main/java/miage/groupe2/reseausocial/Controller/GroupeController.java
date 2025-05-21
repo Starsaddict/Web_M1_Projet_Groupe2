@@ -153,5 +153,9 @@ public class GroupeController {
         return "redirect:/groupe/" + id;
     }
 
+    public void setUtilisateurService(UtilisateurService utilisateurService) {
+    this.utilisateurService = utilisateurService;
+    }
+
 
 }

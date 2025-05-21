@@ -243,5 +243,17 @@ public class EventController {
         return "event";
     }
 
+    public void setEvenementRepository(EvenementRepository evenementRepository) {
+    this.evenementRepository = evenementRepository;
+    }
+
+    public void setUtilisateurRepository(UtilisateurRepository utilisateurRepository) {
+        this.utilisateurRepository = utilisateurRepository;
+    }
+
+    public void setUtilisateurService(UtilisateurService utilisateurService) {
+        this.utilisateurService = utilisateurService;
+    }
+
 
 }

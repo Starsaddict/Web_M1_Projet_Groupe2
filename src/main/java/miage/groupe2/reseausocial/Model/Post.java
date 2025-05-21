@@ -216,4 +216,19 @@ public class Post implements Serializable {
     public void setGroupe(Groupe groupe) {
         this.groupe = groupe;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Post)) return false;
+        Post post = (Post) o;
+        return idPost != null && idPost.equals(post.idPost);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
+
+
 }
