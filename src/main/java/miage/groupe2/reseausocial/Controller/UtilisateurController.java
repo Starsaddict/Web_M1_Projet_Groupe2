@@ -1,21 +1,27 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
+import miage.groupe2.reseausocial.Model.DemandeAmi;
 import miage.groupe2.reseausocial.Model.Groupe;
 import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.GroupeRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 
+import miage.groupe2.reseausocial.Util.ImageUtil;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -23,6 +29,7 @@ import java.util.*;
 @RequestMapping("/user")
 public class UtilisateurController {
 
+    public static final String LOGIN = "redirect:/auth/login";
     @Autowired
     UtilisateurRepository utilisateurRepository;
 
@@ -61,15 +68,12 @@ public class UtilisateurController {
         String hashedPassword = BCrypt.hashpw(utilisateur.getMdpU(), BCrypt.gensalt());
         utilisateur.setMdpU(hashedPassword);
         utilisateurRepository.save(utilisateur);
-        return "redirect:/auth/login";
+        return LOGIN;
     }
 
     @GetMapping("/rechercher")
     public String rechercherUtilisateurs(@RequestParam("nom") String nom, Model model, HttpSession session) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) {
-            return "redirect:/auth/login";
-        }
+        Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
         List<Utilisateur> utilisateurs = utilisateurRepository.findByNomUContainingIgnoreCase(nom);
 
@@ -82,32 +86,26 @@ public class UtilisateurController {
 
     @GetMapping("/mes-amis")
     public String voirMesAmis(HttpSession session, Model model) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) {
-            return "redirect:/auth/login";
-        }
 
         // Rafraîchir l’utilisateur depuis la BDD pour charger les relations (lazy loading)
-        Utilisateur utilisateurAvecAmis = utilisateurRepository.findById(userConnecte.getIdUti()).orElse(null);
-        if (utilisateurAvecAmis == null) {
-            return "redirect:/auth/login";
-        }
+        Utilisateur utilisateurAvecAmis = utilisateurService.getUtilisateurFromSession(session);
 
         model.addAttribute("amis", utilisateurAvecAmis.getAmis());
         return "listeamis"; // correspond à amis.html
     }
 
     @PostMapping("/supprimer-ami")
-    public String supprimerAmi(@RequestParam("idAmi") Integer idAmi, HttpSession session, RedirectAttributes redirectAttributes) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) {
-            return "redirect:/auth/login";
-        }
+    public String supprimerAmi(@RequestParam("idAmi") Integer idAmi,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes,
+                               @RequestHeader(value = "Referer", required = false) String referer
+    ) {
 
-        Utilisateur utilisateur = utilisateurRepository.findById(userConnecte.getIdUti()).orElse(null);
-        Utilisateur ami = utilisateurRepository.findById(idAmi).orElse(null);
 
-        if (utilisateur != null && ami != null) {
+        Utilisateur utilisateur = utilisateurService.getUtilisateurFromSession(session);
+        Utilisateur ami = utilisateurRepository.findByIdUti(idAmi);
+
+        if (ami != null) {
             utilisateur.getAmis().remove(ami);
             ami.getAmis().remove(utilisateur); // pour supprimer dans les deux sens
             utilisateurRepository.save(utilisateur);
@@ -117,110 +115,124 @@ public class UtilisateurController {
         } else {
             redirectAttributes.addFlashAttribute("error", "Impossible de supprimer cet ami.");
         }
-
-        return "redirect:/user/mes-amis";
+        return RedirectUtil.getSafeRedirectUrl(referer,"redirect:/user/mes-amis");
     }
 
-@RequestMapping("/{id:[0-9]+}")
+@GetMapping("/{id}/profil")
 public String userProfil(
-        @PathVariable long id,
-        Model model
+        @RequestParam(value = "type", defaultValue = "post") String type,
+        @PathVariable Integer id,
+        Model model,
+        HttpSession session
 ){
-    Utilisateur user = utilisateurRepository.findByidUti(id);
-    if (user == null) {                // Ajout de cette vérification
-        return "redirect:/error404";  // Ou une autre page d’erreur/accueil, selon ton app
-    }
+    Utilisateur user = utilisateurRepository.findByIdUti(id);
+    Utilisateur sessionUser = utilisateurService.getUtilisateurFromSession(session);
+
     model.addAttribute("user", user);
     List<Post> posts = user.getPosts().stream()
+            .filter(i -> i.getGroupe()==null)
             .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
-            .limit(3)
+            .limit(10)
             .toList();
 
-    model.addAttribute("posts", posts);
-    return "user_profil";
+    List<Post> reposts = user.getPostsRepostes().stream()
+            .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
+            .limit(10)
+            .toList();
+
+    List<Utilisateur> Amis = user.getAmis().stream()
+                    .limit(6)
+                            .toList();
+
+    model.addAttribute("Friends", Amis);
+    model.addAttribute("posts", "repost".equals(type) ? reposts : posts);
+    model.addAttribute("type", type);
+    model.addAttribute("reposts", reposts);
+
+    boolean etreAmi = sessionUser.getAmis().stream()
+            .anyMatch(u -> u.getIdUti().equals(user.getIdUti()));
+    model.addAttribute("etreAmi", etreAmi);
+
+    boolean demandeEnvoyee = sessionUser.getDemandesEnvoyees().stream()
+            .anyMatch(d -> d.getRecepteur().getIdUti().equals(user.getIdUti()) && d.getStatut().equals("en attente"));
+    model.addAttribute("demandeEnvoyee", demandeEnvoyee);
+
+    return "profil_user";
 }
 
-    @GetMapping("/{id}/modifierProfil")
-    public String modifierProfil(@PathVariable long id, Model model) {
-        Utilisateur user = utilisateurRepository.findByidUti(id);
-        model.addAttribute("user", user);
-        return "modifier_profil";
+    @GetMapping("/modifierProfil")
+    public String modifierProfil( ) {
+        return "setting";
     }
 
-    @PostMapping("/{id}/modifierProfil")
+    @PostMapping("/modifierProfil")
     public String modifierProfil(
-            @PathVariable long id,
-            @RequestParam String nom,
-            @RequestParam String prenom,
-            @RequestParam String email,
+            @RequestParam String pseudoU,
+            @RequestParam String emailU,
+            @RequestParam String introductionU,
             HttpSession session
             ) {
-        Utilisateur user = utilisateurRepository.findByidUti(id);
-        user.setNomU(nom);
-        user.setPrenomU(prenom);
-        user.setEmailU(email);
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        user.setPseudoU(pseudoU);
+        user.setEmailU(emailU);
+        user.setIntroductionU(introductionU);
         utilisateurRepository.save(user);
         session.setAttribute("user", user);
-        return "redirect:/user/"+id;
+        return "redirect:/user/"+user.getIdUti() + "/profil";
     }
 
-    @GetMapping("/{id}/modifierPassword")
-    public String modifierPassword(
-            @PathVariable long id,
-            Model model
-    ){
-        Utilisateur user = utilisateurRepository.findByidUti(id);
-        model.addAttribute("user", user);
-        return "modifier_password";
-    }
 
-    @PostMapping("/{id}/modifierPassword")
+    @PostMapping("/modifierPassword")
     public String modifierPassword(
-            @PathVariable long id,
-            @RequestParam String password,
-            HttpSession session
+            @RequestParam String currentP,
+            @RequestParam String newP,
+            HttpSession session,
+            @RequestHeader(value = "Referer", required = false) String referer
     ){
-        Utilisateur user = utilisateurRepository.findByidUti(id);
-        password = BCrypt.hashpw(password, BCrypt.gensalt());
-        user.setMdpU(password);
-        utilisateurRepository.save(user);
-        session.setAttribute("user", user);
-        return "redirect:/user/"+id;
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+
+        if(BCrypt.checkpw(currentP, user.getMdpU())){
+            newP = BCrypt.hashpw(newP, BCrypt.gensalt());
+            user.setMdpU(newP);
+            utilisateurRepository.save(user);
+            session.setAttribute("user", user);
+        }
+        return RedirectUtil.getSafeRedirectUrl(referer, "/user/modifierProfil");
+
     }
 
     @RequestMapping("/joinGroupe")
     public String joinGroupe(
             HttpSession session,
-            @RequestParam int idGrp
+            @RequestParam int idGrp,
+            @RequestHeader(value = "Referer", required = false) String referer
     ){
-        Utilisateur userSession = (Utilisateur)session.getAttribute("user");
-        Utilisateur user = utilisateurRepository.findByidUti(userSession.getIdUti());
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
         groupeService.joinGroupe(user,groupe);
 
+        user.getGroupesAppartenance().size();
         session.setAttribute("user", user);
-
-        return "redirect:/user/mes-groupes";
-
+        return RedirectUtil.getSafeRedirectUrl(referer,"/user/mes-groupes");
     }
 
-    @PostMapping("/quitterGroupe")
+    @RequestMapping("/quitterGroupe")
     public String quitterGroupe(
             HttpSession session,
-            @RequestParam int idGrp
+            @RequestParam int idGrp,
+            @RequestHeader(value = "Referer", required = false) String referer
     ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(idGrp);
-        groupeService.quitterGroupe(user,groupe);
 
+        groupeService.quitterGroupe(user,idGrp);
         if (user.equals(groupe.getCreateur())) {
             groupeService.supprimerGroupe(user, groupe);
         }
-
+        user.getGroupesAppartenance().size();
         session.setAttribute("user", user);
-
-        return "redirect:/user/mes-groupes";
+        return RedirectUtil.getSafeRedirectUrl(referer,"/user/mes-groupes");
         }
 
     @RequestMapping("/supprimerGroupe")
@@ -234,13 +246,28 @@ public String userProfil(
         return "redirect:/user/mes-groupes";
     }
 
-    @GetMapping("/mes-groupes")
-    public String voirMesGroupes(HttpSession session, Model model) {
+
+
+    @PostMapping("/uploadAvatar")
+    public String uploadAvatar(@RequestParam("avatar") MultipartFile file,
+                               HttpSession session,
+                               @RequestHeader(value = "Referer", required = false) String referer
+    ) throws IOException {
+
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-        model.addAttribute("groupesCrees", user.getGroupes()); // createur
-        model.addAttribute("groupesMembre", user.getGroupesAppartenance()); // membre
-        return "mes_groupes";
+
+        if (!file.isEmpty()) {
+            byte[] originalBytes = file.getBytes();
+            byte[] croppedBytes = ImageUtil.cropCenterSquare(originalBytes);
+            user.setAvatar(croppedBytes);
+            utilisateurRepository.save(user);
+        }
+
+        session.setAttribute("user", user);
+
+        return RedirectUtil.getSafeRedirectUrl(referer, "/user/" + user.getIdUti());
     }
+
 
 
 }

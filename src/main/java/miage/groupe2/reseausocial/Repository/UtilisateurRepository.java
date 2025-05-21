@@ -19,8 +19,5 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
     List<Utilisateur> findByNomUContainingIgnoreCase(String nom);
 
 
-
-
-
-
+    Utilisateur findByIdUti(Integer idUti);
 }

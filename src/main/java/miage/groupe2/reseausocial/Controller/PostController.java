@@ -8,6 +8,7 @@ import miage.groupe2.reseausocial.Repository.CommentaireRepository;
 import miage.groupe2.reseausocial.Repository.PostRepository;
 import miage.groupe2.reseausocial.Repository.ReactionRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.PostService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
@@ -15,13 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
-
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/post")
@@ -44,116 +44,78 @@ public class PostController {
     @Autowired
     ReactionRepository reactionRepository;
 
-
-    @GetMapping("/{id}")
-    public String postPersonne(
-            @PathVariable Integer id,
-            Model model
-    ) {
-        Utilisateur user = utilisateurRepository.findByidUti(id);
-        List<Post> posts = postRepository.findByCreateur(user);
-        model.addAttribute("Posts", posts);
-        model.addAttribute("userId", id);
-        return "listPostsPersonne";
-    }
-
-
-    @GetMapping("/creer")
-    public String CreerPost(Model model) {
-        Post post = new Post();
-        model.addAttribute("Post", post);
-        return "creerPost";
-    }
+    public static final String HOME_PAGE = "/home";
 
     @PostMapping("/creer")
     public String creerPost(
             @ModelAttribute("post") Post post,
             @RequestParam(value = "idgrp", required = false) Integer idGrp,
-            HttpSession session
-    ) {
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            HttpSession session,
+            @RequestHeader(value = "Referer", required = false) String referer
+    ) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            post.setImagePost(imageFile.getBytes());
+        }
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         if (idGrp != null) {
             Groupe groupe = groupeService.getGroupeByidGrp(idGrp);
             postService.publierPostDansGroupe(post, user, groupe);
-            return "redirect:/groupe/" + idGrp;
+            return RedirectUtil.getSafeRedirectUrl(referer,"redirect:/groupe/" + idGrp);
         } else {
             postService.publierPostSansGroupe(post, user);
-            return "redirect:/user/" + user.getIdUti();
+            return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
+
         }
     }
 
-    @GetMapping("/list")
-    public String listPosts(Model model) {
-        List<Post> posts = postRepository.findAll();
-        posts = posts.stream()
-                .filter(post -> post.getGroupe() == null)
-                .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
-                .limit(10)
-                .toList();
-        model.addAttribute("posts", posts);
-        return "listPosts";
-    }
 
-    @GetMapping("/list/amis")
-    public String listAmis(
-            Model model,
-            HttpSession session) {
-
-        List<Post> posts = postService.listPostFriends(session);
-
-        posts = posts.stream().limit(10).toList();
-        model.addAttribute("posts", posts);
-        return "listPostAmis";
-    }
-
-    @GetMapping("")
-    public String afficherPostParId(@RequestParam("id") Integer id, Model model) {
-        Post post = postRepository.findById(id).orElse(null);
-        if (post == null) {
-            return "redirect:/home";
-        }
-
-        List<Commentaire> commentaires = commentaireRepository.findByPost(post);
-        model.addAttribute("post", post);
-        model.addAttribute("commentaires", commentaires);
-        model.addAttribute("nouveauCommentaire", new Commentaire());
-
-        return "detailPost";
-    }
-
-
-    @GetMapping("/modifier")
-    public String afficherFormulaireModification(@RequestParam("id") Integer id, Model model) {
-        Post post = postRepository.findById(id).orElse(null);
-        if (post == null) {
-            return "redirect:/home";
-        }
-
-        model.addAttribute("post", post);
-        return "modifierPost";
-    }
 
     @PostMapping("/modifier")
-    public String modifierPost(@ModelAttribute("post") Post post, HttpSession session) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        post.setCreateur(user);
+    public String modifierPost(@RequestParam(name = "titre", required = false ) String titre,
+                               @RequestParam(name = "text", required = false ) String text,
+                               @RequestParam(value = "imagePost", required = false) MultipartFile imageFile,
+                               @RequestParam(value = "idPost") Integer idPost,
+                               @RequestParam(name = "deleteImage", required = false) Boolean deleteImage,
+                               @RequestHeader(value = "Referer", required = false) String referer
+    ) throws IOException {
+        Post post = postRepository.findByIdPost(idPost);
+
+        if ( titre != null && !titre.isEmpty()) {
+            post.setTitrePost(titre);
+        }
+        if ( text != null && !text.isEmpty()) {
+            post.setTextePost(text);
+        }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            post.setImagePost(imageFile.getBytes());
+
+        }else if (Boolean.TRUE.equals(deleteImage)) {
+            post.setImagePost(null);
+        }
+
         postRepository.save(post);
-        return "redirect:/user/" + user.getIdUti();
+
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
     @GetMapping("/supprimer")
-    public String supprimerPost(@RequestParam("id") Integer id, HttpSession session) {
-        Post post = postRepository.findById(id).orElse(null);
+    public String supprimerPost(@RequestParam("id") Integer id,
+                                HttpSession session,
+                                @RequestHeader(value = "Referer", required = false) String referer
+    ) {
+        Post post = postRepository.findByIdPost(id);
         Utilisateur user = (Utilisateur) session.getAttribute("user");
 
         if (post != null && post.getCreateur().getIdUti().equals(user.getIdUti())) {
             postRepository.delete(post);
         }
 
-        return "redirect:/user/" + user.getIdUti();
+        return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
     }
 
-    @PostMapping("/repost")
+    @GetMapping("/repost")
     public String repostPost(@RequestParam("id") Integer postId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes,
@@ -170,16 +132,35 @@ public class PostController {
             user.setPostsRepostes(repostList);
             utilisateurRepository.save(user);
         }
-
-        return "redirect:" + (referer != null ? referer : "/home");
+        session.setAttribute("user", user);
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
+    @GetMapping("/repost/annuler")
+    public String repostAnnuler(@RequestParam("id") Integer postId,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes,
+                             @RequestHeader(value = "Referer", required = false) String referer
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Post post = postService.findPostById(postId);
+
+        List<Post> repostList = user.getPostsRepostes();
+        if (repostList.contains(post)) {
+            repostList.remove(post);
+            user.setPostsRepostes(repostList);
+            utilisateurRepository.save(user);
+        }
+        session.setAttribute("user", user);
+
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+    }
     @PostMapping("/commenter")
     public String ajouterCommentaire(@ModelAttribute("nouveauCommentaire") Commentaire commentaire,
                                      @RequestParam("postId") Integer postId,
                                      HttpSession session,
                                      @RequestHeader(value = "Referer", required = false) String referer) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Post post = postRepository.findById(postId).orElse(null);
 
         if (user == null || post == null) {
@@ -192,7 +173,7 @@ public class PostController {
 
         commentaireRepository.save(commentaire);
 
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
     @PostMapping("/react")
@@ -201,8 +182,8 @@ public class PostController {
                                   @RequestParam("type") String emoji,
                                   HttpSession session,
                                   @RequestHeader(value = "Referer", required = false) String referer) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        Post post = postRepository.findById(postId).orElseThrow();
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Post post = postRepository.findByIdPost(postId);
 
         reactionRepository.deleteByPostAndUtilisateur(post, user);
 
@@ -212,7 +193,7 @@ public class PostController {
         reaction.setType(emoji);
         reactionRepository.save(reaction);
 
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
 
