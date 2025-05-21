@@ -23,20 +23,42 @@ import java.util.List;
 
 @Controller
 public class ConversationController {
-
+    /** Repository pour la gestion des conversations */
     private final ConversationRepository conversationRepository;
+
+    /** Repository pour la gestion des utilisateurs */
     private final UtilisateurRepository utilisateurRepository;
+
+    /** Repository pour la gestion des messages */
     private final MessageRepository messageRepository;
+
+    /** Template pour l'envoi de messages via WebSocket */
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    // ✅ Constructeur avec injection de dépendances
+    /**
+     * Constructeur avec injection des dépendances nécessaires.
+     *
+     * @param conversationRepository Repository des conversations
+     * @param utilisateurRepository Repository des utilisateurs
+     * @param messageRepository     Repository des messages
+     */
     @Autowired
     public ConversationController(ConversationRepository conversationRepository, UtilisateurRepository utilisateurRepository, MessageRepository messageRepository) {
         this.conversationRepository = conversationRepository;
         this.utilisateurRepository = utilisateurRepository;
         this.messageRepository = messageRepository;
     }
+
+    /**
+     * Redirige vers une conversation privée avec un ami existant,
+     * ou en crée une si elle n'existe pas encore.
+     *
+     * @param idAmi ID de l'ami avec qui discuter
+     * @param session Session HTTP de l'utilisateur
+     * @param redirectAttributes Attributs de redirection
+     * @return Redirection vers la conversation
+     */
 
     @PostMapping("/message/vers-conversation")
     public String versConversation(@RequestParam("idAmi") Integer idAmi,
@@ -82,7 +104,14 @@ public class ConversationController {
     }
 
 
-
+    /**
+     * Affiche la page d'une conversation spécifique avec les messages.
+     *
+     * @param idConv ID de la conversation
+     * @param session Session HTTP
+     * @param model Modèle pour la vue
+     * @return Vue de la conversation
+     */
     @GetMapping("/message/conversation/{id}")
     public String afficherConversation(@PathVariable("id") Integer idConv, HttpSession session, Model model) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
@@ -105,7 +134,16 @@ public class ConversationController {
         return "conversation";
     }
 
-
+    /**
+     * Envoie un message dans une conversation existante
+     * et le transmet via WebSocket aux autres participants.
+     *
+     * @param idConv ID de la conversation
+     * @param texte Texte du message
+     * @param session Session HTTP
+     * @param redirectAttributes Attributs de redirection
+     * @return Redirection vers la conversation
+     */
     @PostMapping("/message/envoyer/{idConv}")
     public String envoyerMessage(@PathVariable("idConv") Integer idConv,
                                  @RequestParam("texte") String texte,
@@ -137,7 +175,13 @@ public class ConversationController {
         return "redirect:/message/conversation/" + idConv;
     }
 
-
+    /**
+     * Affiche la page permettant de créer une nouvelle conversation de groupe.
+     *
+     * @param session Session HTTP
+     * @param model Modèle pour la vue
+     * @return Vue pour sélectionner les amis
+     */
 
     @GetMapping("/conversation/groupe/nouvelle")
     public String voirMesAmis1(HttpSession session, Model model) {
@@ -151,6 +195,15 @@ public class ConversationController {
         return "conversationgroupe"; // ❗affiche la page avec les amis à cocher
     }
 
+    /**
+     * Crée une nouvelle conversation de groupe avec les participants sélectionnés.
+     *
+     * @param participantIds Liste des IDs des participants
+     * @param nomdiscussion Nom de la discussion
+     * @param session Session HTTP
+     * @param redirectAttributes Attributs de redirection
+     * @return Redirection vers la nouvelle conversation
+     */
     @PostMapping("/conversation/groupe/creer")
     public String creerConversationGroupe(
             @RequestParam("participantIds") List<Integer> participantIds,
@@ -181,6 +234,13 @@ public class ConversationController {
         return "redirect:/message/conversation/" + conversation.getIdConv();
     }
 
+    /**
+     * Affiche toutes les conversations de groupe auxquelles participe l'utilisateur connecté.
+     *
+     * @param session Session HTTP
+     * @param model Modèle pour la vue
+     * @return Vue des conversations de groupe
+     */
 
     @GetMapping("/conversation/groupes")
     public String afficherConversationsDeGroupe(HttpSession session, Model model) {
@@ -202,6 +262,15 @@ public class ConversationController {
 
         return "afficherconversationgroupe";
     }
+
+    /**
+     * Supprime une conversation de groupe (réservé au créateur).
+     *
+     * @param idConv ID de la conversation
+     * @param session Session HTTP
+     * @param redirectAttributes Attributs de redirection
+     * @return Redirection après suppression
+     */
     @PostMapping("/conversation/supprimer/{idConv}")
     public String supprimerConversation(@PathVariable("idConv") Integer idConv, HttpSession session,  RedirectAttributes redirectAttributes) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
@@ -229,6 +298,15 @@ public class ConversationController {
         return "redirect:/conversation/groupes";
     }
 
+    /**
+     * Permet à un utilisateur de quitter une conversation de groupe
+     * (le créateur ne peut pas quitter).
+     *
+     * @param idConv ID de la conversation
+     * @param session Session HTTP
+     * @param redirectAttributes Attributs de redirection
+     * @return Redirection après avoir quitté
+     */
     @PostMapping("/conversation/quitter/{idConv}")
     public String quitterConversation(@PathVariable("idConv") Integer idConv, HttpSession session, RedirectAttributes redirectAttributes) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");

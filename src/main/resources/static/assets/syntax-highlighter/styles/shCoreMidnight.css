@@ -258,7 +258,7 @@
 }
 .syntaxhighlighter .toolbar a {
   color: #d1edff !important;
-  display: none !;
+  display: none ;
 }
 .syntaxhighlighter .toolbar a:hover {
   color: #8aa6c1 !important;

@@ -14,7 +14,6 @@ import miage.groupe2.reseausocial.service.PostService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -23,6 +22,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Contrôleur gérant les opérations relatives aux publications (posts) sur le réseau social.
+ * Gère la création, modification, suppression, repost, réaction et commentaires des publications.
+ */
 @Controller
 @RequestMapping("/post")
 public class PostController {
@@ -35,17 +38,32 @@ public class PostController {
 
     @Autowired
     CommentaireRepository commentaireRepository;
+
     @Autowired
     private UtilisateurService utilisateurService;
+
     @Autowired
     private GroupeService groupeService;
+
     @Autowired
     private PostService postService;
+
     @Autowired
     ReactionRepository reactionRepository;
 
     public static final String HOME_PAGE = "/home";
 
+    /**
+     * Crée un nouveau post, avec ou sans groupe, et avec ou sans image.
+     *
+     * @param post     Le post à créer.
+     * @param idGrp    L'identifiant du groupe (facultatif).
+     * @param imageFile Image du post (facultative).
+     * @param session  Session HTTP.
+     * @param referer  URL de provenance.
+     * @return Redirection vers la page précédente ou appropriée.
+     * @throws IOException si une erreur survient lors du traitement de l'image.
+     */
     @PostMapping("/creer")
     public String creerPost(
             @ModelAttribute("post") Post post,
@@ -61,19 +79,28 @@ public class PostController {
         if (idGrp != null) {
             Groupe groupe = groupeService.getGroupeByidGrp(idGrp);
             postService.publierPostDansGroupe(post, user, groupe);
-            return RedirectUtil.getSafeRedirectUrl(referer,"redirect:/groupe/" + idGrp);
+            return RedirectUtil.getSafeRedirectUrl(referer, "redirect:/groupe/" + idGrp);
         } else {
             postService.publierPostSansGroupe(post, user);
-            return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
-
+            return RedirectUtil.getSafeRedirectUrl(referer, "/user/" + user.getIdUti() + "/profil");
         }
     }
 
-
-
+    /**
+     * Modifie un post existant, y compris le texte, le titre et l’image.
+     *
+     * @param titre        Nouveau titre (facultatif).
+     * @param text         Nouveau texte (facultatif).
+     * @param imageFile    Nouvelle image (facultative).
+     * @param idPost       ID du post à modifier.
+     * @param deleteImage  Si vrai, supprime l’image existante.
+     * @param referer      URL de provenance.
+     * @return Redirection vers la page d'accueil ou précédente.
+     * @throws IOException si une erreur survient lors du traitement de l'image.
+     */
     @PostMapping("/modifier")
-    public String modifierPost(@RequestParam(name = "titre", required = false ) String titre,
-                               @RequestParam(name = "text", required = false ) String text,
+    public String modifierPost(@RequestParam(name = "titre", required = false) String titre,
+                               @RequestParam(name = "text", required = false) String text,
                                @RequestParam(value = "imagePost", required = false) MultipartFile imageFile,
                                @RequestParam(value = "idPost") Integer idPost,
                                @RequestParam(name = "deleteImage", required = false) Boolean deleteImage,
@@ -81,25 +108,32 @@ public class PostController {
     ) throws IOException {
         Post post = postRepository.findByIdPost(idPost);
 
-        if ( titre != null && !titre.isEmpty()) {
+        if (titre != null && !titre.isEmpty()) {
             post.setTitrePost(titre);
         }
-        if ( text != null && !text.isEmpty()) {
+        if (text != null && !text.isEmpty()) {
             post.setTextePost(text);
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
             post.setImagePost(imageFile.getBytes());
-
-        }else if (Boolean.TRUE.equals(deleteImage)) {
+        } else if (Boolean.TRUE.equals(deleteImage)) {
             post.setImagePost(null);
         }
 
         postRepository.save(post);
 
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
 
+    /**
+     * Supprime un post si l'utilisateur connecté en est le créateur.
+     *
+     * @param id      ID du post à supprimer.
+     * @param session Session HTTP.
+     * @param referer URL de provenance.
+     * @return Redirection vers le profil utilisateur ou autre URL.
+     */
     @GetMapping("/supprimer")
     public String supprimerPost(@RequestParam("id") Integer id,
                                 HttpSession session,
@@ -112,18 +146,25 @@ public class PostController {
             postRepository.delete(post);
         }
 
-        return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
+        return RedirectUtil.getSafeRedirectUrl(referer, "/user/" + user.getIdUti() + "/profil");
     }
 
+    /**
+     * Permet à un utilisateur de republier un post (repost).
+     *
+     * @param postId  ID du post à republier.
+     * @param session Session HTTP.
+     * @param redirectAttributes Attributs de redirection.
+     * @param referer URL de provenance.
+     * @return Redirection vers la page d'accueil ou précédente.
+     */
     @GetMapping("/repost")
     public String repostPost(@RequestParam("id") Integer postId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes,
                              @RequestHeader(value = "Referer", required = false) String referer
     ) {
-
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-
         Post post = postService.findPostById(postId);
 
         List<Post> repostList = user.getPostsRepostes();
@@ -133,14 +174,23 @@ public class PostController {
             utilisateurRepository.save(user);
         }
         session.setAttribute("user", user);
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
 
+    /**
+     * Permet à un utilisateur d'annuler un repost.
+     *
+     * @param postId  ID du post dont on annule le repost.
+     * @param session Session HTTP.
+     * @param redirectAttributes Attributs de redirection.
+     * @param referer URL de provenance.
+     * @return Redirection vers la page d'accueil ou précédente.
+     */
     @GetMapping("/repost/annuler")
     public String repostAnnuler(@RequestParam("id") Integer postId,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes,
-                             @RequestHeader(value = "Referer", required = false) String referer
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes,
+                                @RequestHeader(value = "Referer", required = false) String referer
     ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Post post = postService.findPostById(postId);
@@ -153,8 +203,20 @@ public class PostController {
         }
         session.setAttribute("user", user);
 
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
+
+    /**
+     * Ajoute un commentaire à un post.
+     *
+     * @param commentaire Commentaire à ajouter.
+     * @param postId      ID du post concerné.
+     * @param session     Session HTTP.
+     * @param referer     URL de provenance.
+     * @return Redirection vers la page d'accueil ou précédente.
+     */
+
+
     @PostMapping("/commenter")
     public String ajouterCommentaire(@ModelAttribute("nouveauCommentaire") Commentaire commentaire,
                                      @RequestParam("postId") Integer postId,

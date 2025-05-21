@@ -15,34 +15,50 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * Contrôleur Spring MVC pour la gestion des groupes dans le réseau social.
+ * Permet aux utilisateurs de créer, consulter, rejoindre ou quitter des groupes.
+ */
 @Controller
 @RequestMapping("/groupe")
 public class GroupeController {
 
     @Autowired
-    GroupeRepository groupeRepository;
+    private GroupeRepository groupeRepository;
+
     @Autowired
-    UtilisateurRepository utilisateurRepository;
+    private UtilisateurRepository utilisateurRepository;
+
     @Autowired
-    GroupeService groupeService;
+    private GroupeService groupeService;
+
     @Autowired
     private UtilisateurService utilisateurService;
 
     public static final String LIST_GROUPS = "redirect:/groupe/list";
+
+    /**
+     * Redirige vers la liste des groupes.
+     *
+     * @param model le modèle Spring MVC
+     * @return la redirection vers la liste des groupes
+     */
     @RequestMapping("")
     public String index(Model model) {
         return LIST_GROUPS;
     }
 
+    /**
+     * Affiche la liste des groupes disponibles, ceux recommandés et ceux auxquels l'utilisateur appartient ou a créés.
+     *
+     * @param model   le modèle utilisé pour la vue
+     * @param session la session HTTP pour identifier l'utilisateur
+     * @return le nom de la vue "groups"
+     */
     @RequestMapping("/list")
-    public String groupeList(
-            Model model,
-            HttpSession session
-    ) {
+    public String groupeList(Model model, HttpSession session) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         List<Groupe> recommandGroupes = groupeRepository.findAll().stream()
@@ -52,28 +68,43 @@ public class GroupeController {
 
         List<Groupe> monGroupes = user.getGroupesAppartenance();
         model.addAttribute("monGroupes", monGroupes);
+
         List<Groupe> monGroupCreer = user.getGroupes();
         model.addAttribute("monGroupCreer", monGroupCreer);
 
         return "groups";
     }
 
+    /**
+     * Permet de créer un nouveau groupe.
+     *
+     * @param session la session utilisateur
+     * @param groupe  le groupe à créer (rempli par formulaire)
+     * @param model   le modèle MVC
+     * @param referer l'URL précédente
+     * @return redirection sécurisée vers la liste des groupes
+     */
     @PostMapping("/creer")
     public String creerGroupe(
             HttpSession session,
             @ModelAttribute Groupe groupe,
             Model model,
             @RequestHeader(value = "Referer", required = false) String referer
-
-    ){
+    ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-
         groupeService.createGroupe(user, groupe);
-
         session.setAttribute("user", user);
-        return RedirectUtil.getSafeRedirectUrl(referer,LIST_GROUPS);
+        return RedirectUtil.getSafeRedirectUrl(referer, LIST_GROUPS);
     }
 
+    /**
+     * Affiche les détails d’un groupe spécifique.
+     *
+     * @param id      l'identifiant du groupe
+     * @param model   le modèle MVC
+     * @param session la session utilisateur
+     * @return la vue des détails du groupe, ou redirection si non trouvé
+     */
     @GetMapping("/{id}")
     public String afficherGroupe(
             @PathVariable("id") int id,
@@ -85,12 +116,8 @@ public class GroupeController {
 
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-
-
         boolean estMembre = user.getGroupesAppartenance().stream()
                 .anyMatch(g -> g.getIdGrp().equals(groupe.getIdGrp()));
-
-        user.getGroupesAppartenance().size();
 
         List<Post> posts = groupe.getPosts().stream()
                 .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
@@ -111,6 +138,14 @@ public class GroupeController {
         return "group_detail";
     }
 
+    /**
+     * Permet de poster un message dans un groupe donné.
+     *
+     * @param id      identifiant du groupe
+     * @param post    message à publier
+     * @param session session HTTP de l'utilisateur
+     * @return redirection vers la page du groupe
+     */
     @PostMapping("/{id}/poster")
     public String posterDansGroupe(
             @PathVariable("id") int id,
@@ -134,6 +169,14 @@ public class GroupeController {
         return "redirect:/groupe/" + id;
     }
 
+    /**
+     * Supprime un membre d’un groupe (si l’utilisateur est le créateur).
+     *
+     * @param id        identifiant du groupe
+     * @param idMembre  identifiant du membre à retirer
+     * @param session   session HTTP de l'utilisateur
+     * @return redirection vers la page du groupe
+     */
     @PostMapping("/{id}/supprimerMembre")
     public String supprimerMembreDuGroupe(
             @PathVariable("id") int id,
@@ -152,6 +195,4 @@ public class GroupeController {
 
         return "redirect:/groupe/" + id;
     }
-
-
 }
