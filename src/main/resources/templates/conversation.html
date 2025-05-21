@@ -30,12 +30,11 @@
 <!-- Lien retour -->
 <p><a th:href="@{/user/mes-amis}">Retour à mes amis</a></p>
 
-<!-- WebSocket 监听脚本（极简无样式） -->
 <script th:inline="javascript">
     const conversationId = /*[[${conversation.idConv}]]*/ 0;
     const socket = new SockJS('/ws');
     const stompClient = Stomp.over(socket);
-    stompClient.debug = null; // 不打印日志
+    stompClient.debug = null;
 
     stompClient.connect({}, () => {
         stompClient.subscribe(`/topic/conversation/${conversationId}`, (message) => {

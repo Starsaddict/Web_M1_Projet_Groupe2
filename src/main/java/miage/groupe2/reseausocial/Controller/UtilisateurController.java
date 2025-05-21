@@ -88,10 +88,24 @@ public class UtilisateurController {
     public String voirMesAmis(HttpSession session, Model model) {
 
         // Rafraîchir l’utilisateur depuis la BDD pour charger les relations (lazy loading)
-        Utilisateur utilisateurAvecAmis = utilisateurService.getUtilisateurFromSession(session);
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-        model.addAttribute("amis", utilisateurAvecAmis.getAmis());
-        return "listeamis"; // correspond à amis.html
+        model.addAttribute("Amis", user.getAmis());
+        List<Utilisateur> allUtilisateurs = utilisateurRepository.findAll();
+        List<Utilisateur> almostFriends = user.getDemandesEnvoyees().stream()
+                .filter(d -> d.getStatut().equals("en attente"))
+                .map(d -> d.getRecepteur())
+                .toList();
+        List<Utilisateur> notFriends = allUtilisateurs.stream()
+                .filter(u ->!u.getIdUti().equals(user.getIdUti()))
+                .filter(u -> !user.getAmis().contains(u))
+                .filter(u -> !almostFriends.contains(u))
+                .limit(5)
+                .toList();
+
+        model.addAttribute("recommande", notFriends);
+        model.addAttribute("almostFriends", almostFriends);
+        return "friends";
     }
 
     @PostMapping("/supprimer-ami")

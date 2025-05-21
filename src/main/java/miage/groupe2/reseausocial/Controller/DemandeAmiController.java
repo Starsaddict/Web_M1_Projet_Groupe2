@@ -68,7 +68,7 @@ public class DemandeAmiController {
     }
 
 
-    @PostMapping("/ajouterAmi")
+    @RequestMapping("/ajouterAmi")
     public String envoyerDemandeAmi(@RequestParam("idAmi") Integer idAmi,
                                     @RequestParam(value = "nom", required = false) String nomRecherche,
                                     HttpSession session,
@@ -77,25 +77,18 @@ public class DemandeAmiController {
     ) {
         Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
-        if (idAmi.equals(userConnecte.getIdUti())) {
-            redirectAttributes.addFlashAttribute("error", "Vous ne pouvez pas vous ajouter vous-même.");
-            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
+        boolean demandeExist = demandeAmiRepository.findByDemandeur(userConnecte).stream()
+                .filter(d -> d.getStatut().equals("en attente"))
+                .anyMatch(d -> d.getRecepteur().getIdUti().equals(idAmi));
+
+        boolean dejaAmis = userConnecte.getAmis().stream().anyMatch(a -> a.getIdUti().equals(idAmi));
+
+        if (demandeExist || dejaAmis) {
+            redirectAttributes.addFlashAttribute("error", "Une demande d'ami existe déjà.");
+            return RedirectUtil.getSafeRedirectUrl(referer, "/mes-amis");
         }
 
         Utilisateur recepteur = utilisateurRepository.findByidUti(idAmi);
-        if (recepteur == null) {
-            redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
-            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
-        }
-
-        boolean demandeExistante = demandeAmiRepository.existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(
-                userConnecte.getIdUti(), idAmi, List.of("en attente"));
-
-        boolean dejaAmis = demandeAmiRepository.sontDejaAmis(userConnecte.getIdUti(), idAmi);
-        if (demandeExistante || dejaAmis) {
-            redirectAttributes.addFlashAttribute("error", "Une demande d'ami existe déjà.");
-            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
-        }
 
         DemandeAmi demande = new DemandeAmi();
         demande.setDemandeur(userConnecte);

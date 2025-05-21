@@ -1,8 +1,6 @@
 package miage.groupe2.reseausocial.Repository;
 
 
-
-
 import jakarta.transaction.Transactional;
 import miage.groupe2.reseausocial.Model.DemandeAmi;
 import miage.groupe2.reseausocial.Model.Utilisateur;
@@ -15,14 +13,14 @@ import java.util.List;
 
 public interface DemandeAmiRepository extends JpaRepository<DemandeAmi, Integer> {
 
-  public List<DemandeAmi> findByRecepteur(Utilisateur recepteur);
+    public List<DemandeAmi> findByRecepteur(Utilisateur recepteur);
 
-  public boolean existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(
+    public boolean existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(
             Integer demandeurId,
             Integer recepteurId,
             List<String> statuts);
 
-  public  List<DemandeAmi> findByRecepteurIdUtiAndStatut(Integer idUti, String statut);
+    public List<DemandeAmi> findByRecepteurIdUtiAndStatut(Integer idUti, String statut);
 
     @Modifying
     @Transactional
@@ -30,9 +28,11 @@ public interface DemandeAmiRepository extends JpaRepository<DemandeAmi, Integer>
     void ajouterLienAmitie(@Param("id1") Integer id1, @Param("id2") Integer id2);
 
 
-  @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Utilisateur u JOIN u.amis a WHERE u.idUti = :id1 AND a.idUti = :id2")
-  boolean sontDejaAmis(@Param("id1") Integer id1, @Param("id2") Integer id2);
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Utilisateur u JOIN u.amis a WHERE u.idUti = :id1 AND a.idUti = :id2")
+    boolean sontDejaAmis(@Param("id1") Integer id1, @Param("id2") Integer id2);
 
 
     DemandeAmi findByIdDA(Integer idDemande);
+
+    List<DemandeAmi> findByDemandeur(Utilisateur demandeur);
 }
