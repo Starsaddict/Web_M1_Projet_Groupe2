@@ -1,141 +1,207 @@
 package miage.groupe2.reseausocial.Controller;
 
+import jakarta.servlet.http.HttpSession;
 import miage.groupe2.reseausocial.Model.Evenement;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.EvenementRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import miage.groupe2.reseausocial.service.UtilisateurService;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.springframework.ui.Model;
-import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-public class EventControllerTest {
+class EventControllerTest {
 
-    private EventController controller;
-    private EvenementRepository evenementRepository;
-    private UtilisateurRepository utilisateurRepository;
-    private UtilisateurService utilisateurService;
-    private HttpSession session;
-    private Model model;
+    @InjectMocks
+    EventController eventController;
 
-    private Utilisateur utilisateur;
-    private Evenement evenement;
+    @Mock
+    EvenementRepository evenementRepository;
+
+    @Mock
+    UtilisateurRepository utilisateurRepository;
+
+    @Mock
+    UtilisateurService utilisateurService;
+
+    @Mock
+    HttpSession session;
+
+    @Mock
+    Model model;
+
+    Utilisateur user;
+    Evenement evenement;
 
     @BeforeEach
-    public void setup() {
-        evenementRepository = mock(EvenementRepository.class);
-        utilisateurRepository = mock(UtilisateurRepository.class);
-        utilisateurService = mock(UtilisateurService.class);
-        session = mock(HttpSession.class);
-        model = mock(Model.class);
-
-        controller = new EventController();
-        controller.setEvenementRepository(evenementRepository);
-        controller.setUtilisateurRepository(utilisateurRepository);
-        controller.setUtilisateurService(utilisateurService);
-
-
-        utilisateur = new Utilisateur();
-        utilisateur.setIdUti(1);
-        utilisateur.setEvenements(new ArrayList<>());
-        utilisateur.setEvenementsAssistes(new ArrayList<>());
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        user = new Utilisateur();
+        user.setIdUti(1);
+        user.setEvenementsAssistes(new ArrayList<>());
+        user.setEvenementsAssistes(new ArrayList<>());
 
         evenement = new Evenement();
-        evenement.setIdEve(10);
+        evenement.setCreateur(user);
         evenement.setParticipants(new ArrayList<>());
-        evenement.setCreateur(utilisateur);
+        evenement.setIdEve(10);
+
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
     }
 
     @Test
-    public void testCreerEvenement() {
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(utilisateur);
-        String view = controller.creerEvenement(evenement, session, LocalDateTime.now(), LocalDateTime.now().plusHours(2), "/evenement/tous");
-        verify(evenementRepository, times(1)).save(evenement);
-        assertEquals("/evenement/tous", view);
+    void creerEvenement_shouldSaveEventAndRedirect() {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime fin = start.plusHours(1);
+
+        String referer = "/previousPage";
+
+        String result = eventController.creerEvenement(evenement, session, start, fin, referer);
+
+        verify(evenementRepository).save(evenement);
+        assertEquals(RedirectUtil.getSafeRedirectUrl(referer, EventController.EVENEMENT_TOUS), result);
     }
 
     @Test
-    public void testSupprimerEvenement_Creator() {
-        evenement.setCreateur(utilisateur);
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(utilisateur);
+    void supprimerEvenement_shouldDeleteIfCreator() {
         when(evenementRepository.findById(10)).thenReturn(Optional.of(evenement));
-        String view = controller.supprimerEvenement(10, session, "/evenement/tous");
-        verify(evenementRepository, times(1)).delete(evenement);
-        assertEquals("/evenement/tous", view);
+
+        String result = eventController.supprimerEvenement(10, session, "/previousPage");
+
+        verify(evenementRepository).delete(evenement);
+        assertEquals(RedirectUtil.getSafeRedirectUrl("/previousPage", "EVENEMENT_TOUS"), result);
     }
 
     @Test
-    public void testModifierEvenement() {
-        when(evenementRepository.findByIdEve(10)).thenReturn(evenement);
-        String view = controller.modifierEvenement(
-                10, "Nom", "Desc", "Adresse", LocalDateTime.now(), LocalDateTime.now().plusHours(1), "/evenement/tous"
-        );
-        verify(evenementRepository, times(1)).save(evenement);
-        assertEquals("/evenement/tous", view);
+    void supprimerEvenement_shouldNotDeleteIfNotCreator() {
+        Utilisateur autreUser = new Utilisateur();
+        autreUser.setIdUti(2);
+        evenement.setCreateur(autreUser);
+
+        when(evenementRepository.findById(10)).thenReturn(Optional.of(evenement));
+
+        String result = eventController.supprimerEvenement(10, session, "/previousPage");
+
+        verify(evenementRepository, never()).delete(any());
+        assertEquals(RedirectUtil.getSafeRedirectUrl("/previousPage", "EVENEMENT_TOUS"), result);
     }
 
     @Test
-    public void testAfficherTousLesEvenements() {
-        utilisateur.setEvenementsAssistes(List.of(evenement));
-        utilisateur.setEvenements(List.of(evenement));
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(utilisateur);
-        when(evenementRepository.findAll()).thenReturn(List.of(evenement));
-        evenement.setDateFinE(System.currentTimeMillis() + 100000);
-        evenement.setDateDebutE(System.currentTimeMillis() + 1000);
-
-        String view = controller.afficherTousLesEvenements(model, session);
-        verify(model).addAttribute(eq("monEvenements"), any());
-        verify(model).addAttribute(eq("evenementCree"), any());
-        verify(model).addAttribute(eq("upcoming"), any());
-        verify(model).addAttribute("user", utilisateur);
-        assertEquals("events", view);
-    }
-
-    @Test
-    public void testRejoindreEvenement() {
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(utilisateur);
+    void modifierEvenement_shouldUpdateAndSave() {
         when(evenementRepository.findByIdEve(10)).thenReturn(evenement);
 
-        String view = controller.rejoindreEvenement(10, session, "/evenement/tous");
-        verify(utilisateurRepository, times(1)).save(utilisateur);
-        verify(session).setAttribute("user", utilisateur);
-        assertEquals("/evenement/tous", view);
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime fin = start.plusHours(2);
+
+        String result = eventController.modifierEvenement(10, "Nouveau nom", "Nouvelle desc", "Nouvelle adresse", start, fin, "/referer");
+
+        verify(evenementRepository).save(evenement);
+        assertEquals(RedirectUtil.getSafeRedirectUrl("/referer", EventController.EVENEMENT_TOUS), result);
+        assertEquals("Nouveau nom", evenement.getNomE());
+        assertEquals("Nouvelle desc", evenement.getDescription());
+        assertEquals("Nouvelle adresse", evenement.getAdresseE());
     }
 
     @Test
-    public void testQuitterEvenement() {
-        utilisateur.getEvenementsAssistes().add(evenement);
-        evenement.getParticipants().add(utilisateur);
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(utilisateur);
-        when(evenementRepository.findByIdEve(10)).thenReturn(evenement);
+    void afficherTousLesEvenements_shouldPopulateModel() {
+    Evenement futureEvent = new Evenement();
+    futureEvent.setDateDebutE(System.currentTimeMillis() + 5000);
+    futureEvent.setDateFinE(System.currentTimeMillis() + 10000);
+    if (futureEvent.getParticipants() == null) {
+        futureEvent.setParticipants(new ArrayList<>());
+    }
+    if (user.getEvenementsAssistes() == null) {
+        user.setEvenementsAssistes(new ArrayList<>());
+    }
+    if (user.getEvenements() == null) {
+        user.setEvenements(new ArrayList<>());
+    }
+    user.getEvenementsAssistes().add(futureEvent);
+    user.getEvenements().add(futureEvent);
 
-        String view = controller.quitterEvenement(10, session, "/evenement/tous");
-        verify(utilisateurRepository, times(1)).save(utilisateur);
-        verify(session).setAttribute("user", utilisateur);
-        assertEquals("/evenement/tous", view);
+    if (evenement.getDateFinE() == null) {
+        evenement.setDateFinE(System.currentTimeMillis() + 15000);
+    }
+    if (evenement.getDateDebutE() == null) {
+        evenement.setDateDebutE(System.currentTimeMillis() + 10000);
+    }
+    if (evenement.getParticipants() == null) {
+        evenement.setParticipants(new ArrayList<>());
+    }
+
+    when(evenementRepository.findAll()).thenReturn(List.of(futureEvent, evenement));
+
+    String view = eventController.afficherTousLesEvenements(model, session);
+
+    verify(model).addAttribute(eq("monEvenements"), any());
+    verify(model).addAttribute(eq("evenementCree"), any());
+    verify(model).addAttribute(eq("upcoming"), any());
+    verify(model).addAttribute("user", user);
+
+    assertEquals("events", view);
+}
+
+
+
+
+
+    @Test
+    void rejoindreEvenement_shouldAddParticipant() {
+        when(evenementRepository.findByIdEve(10)).thenReturn(evenement);
+        String result = eventController.rejoindreEvenement(10, session, "/referer");
+
+        verify(utilisateurRepository).save(user);
+        verify(session).setAttribute("user", user);
+        assertEquals(RedirectUtil.getSafeRedirectUrl("/referer", EventController.EVENEMENT_TOUS), result);
+        assert(user.getEvenementsAssistes().contains(evenement));
+        assert(evenement.getParticipants().contains(user));
     }
 
     @Test
-    public void testRedirectToEvenement() {
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(utilisateur);
-        when(evenementRepository.findByIdEve(10)).thenReturn(evenement);
-        evenement.setDateDebutE(System.currentTimeMillis() + 3600000);
-        evenement.getParticipants().add(utilisateur);
+    void quitterEvenement_shouldRemoveParticipant() {
+        user.getEvenementsAssistes().add(evenement);
+        evenement.getParticipants().add(user);
 
-        String view = controller.redirectToEvenement(10, model, session);
+        when(evenementRepository.findByIdEve(10)).thenReturn(evenement);
+
+        String result = eventController.quitterEvenement(10, session, "/referer");
+
+        verify(utilisateurRepository).save(user);
+        verify(session).setAttribute("user", user);
+        assertEquals(RedirectUtil.getSafeRedirectUrl("/referer", EventController.EVENEMENT_TOUS), result);
+        assert(!user.getEvenementsAssistes().contains(evenement));
+        assert(!evenement.getParticipants().contains(user));
+    }
+
+    @Test
+    void redirectToEvenement_shouldAddAttributesAndReturnView() {
+        evenement.setDateDebutE(System.currentTimeMillis() + 5000);
+        evenement.setDateFinE(System.currentTimeMillis() + 10000);
+        if (evenement.getParticipants() == null) {
+            evenement.setParticipants(new ArrayList<>());
+        }
+
+        when(evenementRepository.findByIdEve(10)).thenReturn(evenement);
+
+        String view = eventController.redirectToEvenement(10, model, session);
+
+        verify(model).addAttribute(eq("estParticipants"), eq(false));
+        verify(model).addAttribute(eq("eventDate"), anyString());
         verify(model).addAttribute("event", evenement);
-        verify(model).addAttribute(eq("eventDate"), any());
-        verify(model).addAttribute("estParticipants", true);
+
         assertEquals("event", view);
     }
+
 }

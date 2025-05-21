@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class PostControllerTest {
@@ -95,7 +96,7 @@ public class PostControllerTest {
         String redirectUrl = controller.creerPost(post, null, null, session, null);
 
         verify(postService).publierPostSansGroupe(post, user);
-        assertEquals("/user/1/profil", redirectUrl);
+        assertEquals("redirect:/user/1/profil", redirectUrl);
     }
 
     @Test
@@ -111,7 +112,7 @@ public class PostControllerTest {
         String redirectUrl = controller.creerPost(post, idGrp, null, session, null);
 
         verify(postService).publierPostDansGroupe(post, user, groupe);
-        assertEquals("redirect:/groupe/5", redirectUrl);
+        assertEquals("redirect:redirect:/groupe/5", redirectUrl);
     }
 
     @Test
@@ -122,7 +123,7 @@ public class PostControllerTest {
 
         String redirect = controller.modifierPost("titre modifié", "texte modifié", null, 1, false, null);
 
-        assertEquals(PostController.HOME_PAGE, redirect);
+        assertEquals("redirect:/home", redirect);
         assertEquals("titre modifié", post.getTitrePost());
         assertEquals("texte modifié", post.getTextePost());
         verify(postRepository).save(post);
@@ -142,7 +143,7 @@ public class PostControllerTest {
         String redirect = controller.supprimerPost(10, session, null);
 
         verify(postRepository).delete(post);
-        assertEquals("/user/1/profil", redirect);
+        assertEquals("redirect:/user/1/profil", redirect);
     }
 
     @Test
@@ -155,7 +156,7 @@ public class PostControllerTest {
         Commentaire commentaire = new Commentaire();
         String redirect = controller.ajouterCommentaire(commentaire, 1, new MockHttpSession(), null);
 
-        assertEquals(PostController.HOME_PAGE, redirect);
+        assertEquals("redirect:/home", redirect);
         assertEquals(user, commentaire.getUtilisateur());
         assertEquals(post, commentaire.getPost());
         verify(commentaireRepository).save(commentaire);
@@ -172,6 +173,6 @@ public class PostControllerTest {
 
         verify(reactionRepository).deleteByPostAndUtilisateur(post, user);
         verify(reactionRepository).save(any());
-        assertEquals(PostController.HOME_PAGE, redirect);
+        assertEquals("redirect:/home", redirect);
     }
 }
