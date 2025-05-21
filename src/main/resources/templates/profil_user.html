@@ -727,7 +727,7 @@
                             <div class="sm:p-4 p-2.5 border-t border-gray-100 font-normal space-y-3 relative dark:border-slate-700/40">
                                 <div th:each="comment : ${post.commentaires}">
                                     <div class="flex items-start gap-3 relative">
-                                        <a th:href="@{'/user/' + ${comment.utilisateur.idUti}}">
+                                        <a th:href="@{'/user/' + ${comment.utilisateur.idUti} + '/profil'}">
                                             <img th:if="${comment.utilisateur.avatar != null}"
                                                  th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(comment.utilisateur.avatar)}"
                                                  class="w-6 h-6 mt-1 rounded-full object-cover" alt="avatar">
@@ -736,7 +736,7 @@
                                                  class="w-6 h-6 mt-1 rounded-full object-cover" alt="default">
                                         </a>
                                         <div class="flex-1">
-                                            <a th:href="@{'/user/' + ${comment.utilisateur.idUti}}"
+                                            <a th:href="@{'/user/' + ${comment.utilisateur.idUti} + '/profil'}"
                                                class="text-black font-medium inline-block dark:text-white"
                                                th:text="${comment.utilisateur.prenomU + ' ' + comment.utilisateur.nomU}">Nom</a>
                                             <p class="mt-0.5" th:text="${comment.textCom}"></p>
