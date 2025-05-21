@@ -8,6 +8,7 @@ import miage.groupe2.reseausocial.Repository.CommentaireRepository;
 import miage.groupe2.reseausocial.Repository.PostRepository;
 import miage.groupe2.reseausocial.Repository.ReactionRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.PostService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
@@ -43,6 +44,7 @@ public class PostController {
     @Autowired
     ReactionRepository reactionRepository;
 
+    public static final String HOME_PAGE = "/home";
 
     @PostMapping("/creer")
     public String creerPost(
@@ -59,10 +61,11 @@ public class PostController {
         if (idGrp != null) {
             Groupe groupe = groupeService.getGroupeByidGrp(idGrp);
             postService.publierPostDansGroupe(post, user, groupe);
-            return "redirect:" + (referer != null ? referer : "redirect:/groupe/" + idGrp);
+            return RedirectUtil.getSafeRedirectUrl(referer,"redirect:/groupe/" + idGrp);
         } else {
             postService.publierPostSansGroupe(post, user);
-            return "redirect:" + (referer != null ? referer : user.getIdUti() + "/profil");
+            return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
+
         }
     }
 
@@ -78,12 +81,6 @@ public class PostController {
     ) throws IOException {
         Post post = postRepository.findByIdPost(idPost);
 
-        System.out.println("=== upload image debug ===");
-        System.out.println("originalFilename=" + (imageFile==null? "null": imageFile.getOriginalFilename()));
-        System.out.println("size=" + (imageFile==null? "null": imageFile.getSize()));
-        System.out.println("isEmpty=" + (imageFile==null? "null": imageFile.isEmpty()));
-
-
         if ( titre != null && !titre.isEmpty()) {
             post.setTitrePost(titre);
         }
@@ -93,16 +90,14 @@ public class PostController {
 
         if (imageFile != null && !imageFile.isEmpty()) {
             post.setImagePost(imageFile.getBytes());
-            System.out.println("已经更换image");
-        }else{
-            System.out.println("没换");
-        }
-        if (Boolean.TRUE.equals(deleteImage)) {
+
+        }else if (Boolean.TRUE.equals(deleteImage)) {
             post.setImagePost(null);
         }
 
         postRepository.save(post);
-        return "redirect:" + (referer != null ? referer : "/home");
+
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
     @GetMapping("/supprimer")
@@ -110,14 +105,14 @@ public class PostController {
                                 HttpSession session,
                                 @RequestHeader(value = "Referer", required = false) String referer
     ) {
-        Post post = postRepository.findById(id).orElse(null);
+        Post post = postRepository.findByIdPost(id);
         Utilisateur user = (Utilisateur) session.getAttribute("user");
 
         if (post != null && post.getCreateur().getIdUti().equals(user.getIdUti())) {
             postRepository.delete(post);
         }
 
-        return "redirect:" + (referer != null ? referer : "/user/" + user.getIdUti() + "/profil");
+        return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
     }
 
     @GetMapping("/repost")
@@ -138,7 +133,7 @@ public class PostController {
             utilisateurRepository.save(user);
         }
         session.setAttribute("user", user);
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
     @GetMapping("/repost/annuler")
@@ -158,14 +153,14 @@ public class PostController {
         }
         session.setAttribute("user", user);
 
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
     @PostMapping("/commenter")
     public String ajouterCommentaire(@ModelAttribute("nouveauCommentaire") Commentaire commentaire,
                                      @RequestParam("postId") Integer postId,
                                      HttpSession session,
                                      @RequestHeader(value = "Referer", required = false) String referer) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Post post = postRepository.findById(postId).orElse(null);
 
         if (user == null || post == null) {
@@ -178,7 +173,7 @@ public class PostController {
 
         commentaireRepository.save(commentaire);
 
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
     @PostMapping("/react")
@@ -187,8 +182,8 @@ public class PostController {
                                   @RequestParam("type") String emoji,
                                   HttpSession session,
                                   @RequestHeader(value = "Referer", required = false) String referer) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        Post post = postRepository.findById(postId).orElseThrow();
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Post post = postRepository.findByIdPost(postId);
 
         reactionRepository.deleteByPostAndUtilisateur(post, user);
 
@@ -198,7 +193,7 @@ public class PostController {
         reaction.setType(emoji);
         reactionRepository.save(reaction);
 
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
     }
 
 

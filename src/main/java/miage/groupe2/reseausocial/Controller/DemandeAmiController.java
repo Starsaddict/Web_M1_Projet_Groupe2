@@ -5,6 +5,8 @@ import miage.groupe2.reseausocial.Model.DemandeAmi;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.DemandeAmiRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
+import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,8 +26,8 @@ public class DemandeAmiController {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
-
-
+    @Autowired
+    private UtilisateurService utilisateurService;
 
 
     @PostMapping("/accepter")
@@ -34,12 +36,9 @@ public class DemandeAmiController {
                                   RedirectAttributes redirectAttributes,
                                   @RequestHeader(value = "Referer", required = false) String referer
     ) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) {
-            return "redirect:/auth/login";
-        }
+        Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
-        DemandeAmi demande = demandeAmiRepository.findById(idDemande).orElse(null);
+        DemandeAmi demande = demandeAmiRepository.findByIdDA(idDemande);
         if (demande != null && demande.getRecepteur().getIdUti().equals(userConnecte.getIdUti())) {
             demande.setStatut("acceptée");
             demandeAmiRepository.save(demande);
@@ -47,7 +46,7 @@ public class DemandeAmiController {
             redirectAttributes.addFlashAttribute("succes", "Demande d'ami acceptée.");
         }
 
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer, "/home");
     }
 
     @PostMapping("/refuser")
@@ -56,10 +55,7 @@ public class DemandeAmiController {
                                  RedirectAttributes redirectAttributes,
                                  @RequestHeader(value = "Referer", required = false) String referer
     ) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) {
-            return "redirect:/auth/login";
-        }
+        Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
         DemandeAmi demande = demandeAmiRepository.findById(idDemande).orElse(null);
         if (demande != null && demande.getRecepteur().getIdUti().equals(userConnecte.getIdUti())) {
@@ -68,7 +64,7 @@ public class DemandeAmiController {
             redirectAttributes.addFlashAttribute("succes", "Demande d'ami refusée.");
         }
 
-        return "redirect:" + (referer != null ? referer : "/home");
+        return RedirectUtil.getSafeRedirectUrl(referer, "/home");
     }
 
 
@@ -79,10 +75,8 @@ public class DemandeAmiController {
                                     RedirectAttributes redirectAttributes,
                                     @RequestHeader(value = "Referer", required = false) String referer
     ) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) {
-            return "redirect:/auth/login";
-        }
+        Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
+
         if (idAmi.equals(userConnecte.getIdUti())) {
             redirectAttributes.addFlashAttribute("error", "Vous ne pouvez pas vous ajouter vous-même.");
             return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
@@ -115,7 +109,7 @@ public class DemandeAmiController {
         redirectAttributes.addFlashAttribute("success", "Demande d'ami envoyée à " + recepteur.getNomU() + ".");
 
         if (referer != null) {
-            return "redirect:" + referer;
+            return RedirectUtil.getSafeRedirectUrl(referer, "/home");
         }
 
         String redirectUrl = "/home";

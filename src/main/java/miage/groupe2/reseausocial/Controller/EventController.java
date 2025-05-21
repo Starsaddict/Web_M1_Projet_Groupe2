@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import miage.groupe2.reseausocial.Util.DateUtil;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,8 @@ public class EventController {
     @Autowired
     private UtilisateurService utilisateurService;
 
+    public static final String EVENEMENT_TOUS = "/evenement/tous";
+
 
     /**
      * Traite la soumission du formulaire de création d’un événement.
@@ -51,8 +54,7 @@ public class EventController {
                                  @RequestParam(name="fin") LocalDateTime dateFin,
                                  @RequestHeader(value = "Referer", required = false) String referer
     ) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) return "redirect:/auth/login";
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         long dd = DateUtil.toEpochMilli(dateStart);
         long df = DateUtil.toEpochMilli(dateFin);
@@ -61,7 +63,8 @@ public class EventController {
         evenement.setDateFinE(df);
 
         evenementRepository.save(evenement);
-        return "redirect:" + (referer != null ? referer : "/evenement/tous");
+        return RedirectUtil.getSafeRedirectUrl(referer,EVENEMENT_TOUS);
+
 
     }
 
@@ -82,15 +85,14 @@ public class EventController {
                                      @RequestHeader(value = "Referer", required = false) String referer
 
     ) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) return "redirect:/auth/login";
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         Evenement evenement = evenementRepository.findById(id).orElse(null);
         if (evenement != null && evenement.getCreateur().getIdUti().equals(user.getIdUti())) {
             evenementRepository.delete(evenement);
         }
+        return RedirectUtil.getSafeRedirectUrl(referer,"EVENEMENT_TOUS");
 
-        return "redirect:" + (referer != null ? referer : "/evenement/tous");
     }
 
 
@@ -98,7 +100,6 @@ public class EventController {
      * Traite la soumission du formulaire de modification d’un événement.
      *
      * @ modifierEvenement l’objet contenant les modifications de l’événement
-     * @param session la session HTTP contenant l’utilisateur connecté
      * @return redirection vers la liste des événements de l’utilisateur
      */
     @PostMapping("/modifier")
@@ -106,7 +107,6 @@ public class EventController {
                                     @RequestParam(name = "nomE",required = false) String nomE,
                                     @RequestParam(name = "description",required = false) String description,
                                     @RequestParam(name = "adressE",required = false) String adressE,
-                                    HttpSession session,
                                     @RequestParam(name = "start") LocalDateTime start,
                                     @RequestParam(name = "fin") LocalDateTime fin,
                                     @RequestHeader(value = "Referer", required = false) String referer
@@ -130,8 +130,8 @@ public class EventController {
         evenement.setDateFinE(df);
 
         evenementRepository.save(evenement);
+        return RedirectUtil.getSafeRedirectUrl(referer,EVENEMENT_TOUS);
 
-        return "redirect:" + (referer != null ? referer : "/evenement/tous");
     }
 
     /**
@@ -194,7 +194,7 @@ public class EventController {
             utilisateurRepository.save(user);
             session.setAttribute("user", user);
         }
-        return "redirect:" + (referer != null ? referer : "/evenement/tous");
+        return RedirectUtil.getSafeRedirectUrl(referer, EVENEMENT_TOUS);
     }
 
 
@@ -220,7 +220,7 @@ public class EventController {
             utilisateurRepository.save(user);
             session.setAttribute("user", user);
         }
-        return "redirect:" + (referer != null ? referer : "/evenement/tous");
+        return RedirectUtil.getSafeRedirectUrl(referer, EVENEMENT_TOUS);
     }
 
 

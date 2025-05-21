@@ -6,6 +6,7 @@ import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.GroupeRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
+import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +25,21 @@ public class GroupeController {
 
     @Autowired
     GroupeRepository groupeRepository;
-
     @Autowired
     UtilisateurRepository utilisateurRepository;
-
     @Autowired
     GroupeService groupeService;
     @Autowired
     private UtilisateurService utilisateurService;
 
+    public static final String LIST_GROUPS = "redirect:/groupe/list";
     @RequestMapping("")
     public String index(Model model) {
-        return "redirect:/groupe/list";
+        return LIST_GROUPS;
     }
 
     @RequestMapping("/list")
-    public String GroupeList(
+    public String groupeList(
             Model model,
             HttpSession session
     ) {
@@ -47,7 +47,7 @@ public class GroupeController {
 
         List<Groupe> recommandGroupes = groupeRepository.findAll().stream()
                 .filter(groupe -> !groupe.getMembres().contains(user))
-                .collect(Collectors.toList());
+                .toList();
         model.addAttribute("recommandGroupes", recommandGroupes);
 
         List<Groupe> monGroupes = user.getGroupesAppartenance();
@@ -66,13 +66,12 @@ public class GroupeController {
             @RequestHeader(value = "Referer", required = false) String referer
 
     ){
-        Utilisateur userSession = (Utilisateur) session.getAttribute("user");
-        Utilisateur user = utilisateurRepository.findByIdUti(userSession.getIdUti());
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         groupeService.createGroupe(user, groupe);
 
         session.setAttribute("user", user);
-        return "redirect:" + (referer != null ? referer : "/groupe/list");
+        return RedirectUtil.getSafeRedirectUrl(referer,LIST_GROUPS);
     }
 
     @GetMapping("/{id}")
@@ -82,11 +81,11 @@ public class GroupeController {
             HttpSession session
     ) {
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
-        if (groupe == null) return "redirect:/groupe/list";
+        if (groupe == null) return LIST_GROUPS;
 
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-        user.getGroupesAppartenance().size();
+
 
         boolean estMembre = user.getGroupesAppartenance().stream()
                 .anyMatch(g -> g.getIdGrp().equals(groupe.getIdGrp()));
@@ -97,9 +96,10 @@ public class GroupeController {
                 .sorted((p1, p2) -> Long.compare(p2.getDatePost(), p1.getDatePost()))
                 .toList();
 
-        List<Groupe> groupes = groupeRepository.findAll();
-        groupes.remove(groupe);
-        groupes.stream().limit(6).toList();
+        List<Groupe> groupes = groupeRepository.findAll().stream()
+                .filter(g -> !g.equals(groupe))
+                .limit(6)
+                .toList();
 
         model.addAttribute("groupe", groupe);
         model.addAttribute("membres", groupe.getMembres());
@@ -111,39 +111,25 @@ public class GroupeController {
         return "group_detail";
     }
 
-
-    @GetMapping("/{id}/poster")
-    public String formPosterDansGroupe(
-            @PathVariable("id") int id,
-            Model model
-    ) {
-        Groupe groupe = groupeRepository.findGroupeByidGrp(id);
-        if (groupe == null) return "redirect:/groupe/list";
-
-        model.addAttribute("post", new Post());
-        model.addAttribute("groupe", groupe);
-        return "posterDansGroupe";
-    }
-
     @PostMapping("/{id}/poster")
     public String posterDansGroupe(
             @PathVariable("id") int id,
             @ModelAttribute Post post,
             HttpSession session
     ) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
 
         post.setDatePost(System.currentTimeMillis());
         post.setCreateur(user);
-        post.setGroupe(groupe); // 要求你的 Post 实体有 Groupe groupe 字段
+        post.setGroupe(groupe);
 
         if (groupe.getPosts() == null) {
             groupe.setPosts(new ArrayList<>());
         }
         groupe.getPosts().add(post);
 
-        groupeRepository.save(groupe); // 级联保存 Post（或用 postRepository.save(post)）
+        groupeRepository.save(groupe);
 
         return "redirect:/groupe/" + id;
     }
