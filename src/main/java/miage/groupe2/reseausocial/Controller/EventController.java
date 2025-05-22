@@ -197,4 +197,24 @@ public class EventController {
         return "event";
     }
 
+    /**
+     * Injection manuelle du repository d'événements.
+     */
+    public void setEvenementRepository(EvenementRepository evenementRepository) {
+        this.evenementRepository = evenementRepository;
+    }
+
+    /**
+     * Injection manuelle du repository d'utilisateurs.
+     */
+    public void setUtilisateurRepository(UtilisateurRepository utilisateurRepository) {
+        this.utilisateurRepository = utilisateurRepository;
+    }
+
+    /**
+     * Injection manuelle du service utilisateur.
+     */
+    public void setUtilisateurService(UtilisateurService utilisateurService) {
+        this.utilisateurService = utilisateurService;
+    }
 }

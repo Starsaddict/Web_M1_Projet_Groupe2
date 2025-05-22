@@ -305,4 +305,12 @@ public class UtilisateurController {
         session.setAttribute("user", user);
         return RedirectUtil.getSafeRedirectUrl(referer, "/user/" + user.getIdUti());
     }
+
+    public void setGroupeService(GroupeService groupeService) {
+        this.groupeService = groupeService;
+    }
+
+    public void setUtilisateurService(UtilisateurService utilisateurService) {
+        this.utilisateurService = utilisateurService;
+    }
 }

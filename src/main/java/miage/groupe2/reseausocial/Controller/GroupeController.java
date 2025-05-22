@@ -150,4 +150,11 @@ public class GroupeController {
         return "redirect:/groupe/" + id;
     }
 
+    /**
+     * Setter pour injection manuelle du service utilisateur (test).
+     */
+    public void setUtilisateurService(UtilisateurService utilisateurService) {
+        this.utilisateurService = utilisateurService;
+    }
+
 }
