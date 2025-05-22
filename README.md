@@ -1,3 +1,10 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Starsaddict_Web_M1_Projet_Groupe2&metric=alert_status&token=557cbc8eb238aa4055c85375205fae7521e90d9e)](https://sonarcloud.io/summary/new_code?id=Starsaddict_Web_M1_Projet_Groupe2)  
+🎓 Réseau Social d'Étudiants
+Bienvenue sur le dépôt GitHub de notre projet de réseau social destiné aux étudiants. Cette application permet de créer des profils, publier du contenu, interagir avec d'autres utilisateurs, et bien plus encore — le tout dans un cadre convivial et moderne.
 
-UserStory : https://docs.google.com/spreadsheets/d/1iG27oJL2E0n3X4_MlrW_M3vX63v4MqA2rIkyyOclYX0/edit?usp=sharing  
+👨‍💻 Équipe de Développement
+Kaiyang
+Oussama
+Walid
+
+📊 Analyse SonarCloud
+Lien vers l'analyse : 🔗 [SonarCloud](https://sonarcloud.io/project/overview?id=Starsaddict_Web_M1_Projet_Groupe2)
