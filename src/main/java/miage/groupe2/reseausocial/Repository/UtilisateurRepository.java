@@ -16,8 +16,5 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
     @Query("SELECT u.emailU FROM Utilisateur u")
     public List<String> findAllEmailU();
 
-    List<Utilisateur> findByNomUContainingIgnoreCase(String nom);
-
-
     Utilisateur findByIdUti(Integer idUti);
 }

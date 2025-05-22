@@ -12,12 +12,6 @@ import java.util.List;
 
 public interface ReactionRepository extends JpaRepository<Reaction, Integer> {
 
-    List<Reaction> findByPost(Post post);
-
-    List<Reaction> findByPostAndType(Post post, String type);
-
-    Reaction findByPostAndUtilisateur(Post post, Utilisateur utilisateur);
-
     void deleteByPostAndUtilisateur(Post post, Utilisateur utilisateur);
 
 

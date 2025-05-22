@@ -86,26 +86,6 @@ public class ConversationController {
 
 
 
-    @GetMapping("/message/conversation/{id}")
-    public String afficherConversation(@PathVariable("id") Integer idConv, HttpSession session, Model model) {
-        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-
-        Conversation conv = conversationRepository.findByIdConv(idConv);
-        if (conv == null) return "redirect:/user/mes-amis";
-
-        List<Message> messages = messageRepository.findByConversationOrderByDateMAsc(conv);
-
-        // Récupérer tous les noms des participants sauf l'utilisateur connecté
-        List<String> nomsParticipants = conv.getParticipants().stream()
-                .filter(u -> !u.getIdUti().equals(user.getIdUti()))
-                .map(u -> u.getPrenomU() + " " + u.getNomU())
-                .toList();
-
-        model.addAttribute("conversation", conv);
-        model.addAttribute("messages", messages);
-        model.addAttribute("nomsParticipants", nomsParticipants);
-        return "conversation";
-    }
 
 
     @PostMapping("/message/envoyer/{idConv}")

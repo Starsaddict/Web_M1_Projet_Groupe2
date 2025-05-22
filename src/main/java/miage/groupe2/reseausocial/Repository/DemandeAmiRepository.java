@@ -15,12 +15,6 @@ public interface DemandeAmiRepository extends JpaRepository<DemandeAmi, Integer>
 
     public List<DemandeAmi> findByRecepteur(Utilisateur recepteur);
 
-    public boolean existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(
-            Integer demandeurId,
-            Integer recepteurId,
-            List<String> statuts);
-
-    public List<DemandeAmi> findByRecepteurIdUtiAndStatut(Integer idUti, String statut);
 
     @Modifying
     @Transactional
