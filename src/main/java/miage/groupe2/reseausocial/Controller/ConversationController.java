@@ -228,10 +228,10 @@ public class ConversationController {
                     .filter(a -> !selected.getParticipants().contains(a))
                     .toList();
             model.addAttribute("amisDisponibles", amisDisponibles);
+        } else if (!convs.isEmpty()) {
+            Conversation selectedConv = convs.get(0);
+            model.addAttribute("selectedConv", selectedConv);
         }
-
-
-
         return "messages";
     }
 
