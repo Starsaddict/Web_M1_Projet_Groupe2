@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ConversationController {
@@ -41,31 +42,32 @@ public class ConversationController {
 
     @RequestMapping("/message/vers-conversation")
     public String versConversation(@RequestParam("idAmi") Integer idAmi,
-                                   HttpSession session,
-                                   RedirectAttributes redirectAttributes) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
+                                   HttpSession session
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-        // Recherche d'une conversation privée existante entre les deux utilisateurs
-        List<Conversation> conversations = conversationRepository
-                .findConversationBetweenTwoUsers(user.getIdUti(), idAmi);
+        List<Conversation> monConv = user.getConversationsParticipees();
 
+        monConv = monConv.stream()
+                .filter(c -> !c.isEstconversationDeGroupe())
+                .filter(c -> c.getParticipants().stream()
+                        .map(Utilisateur::getIdUti)
+                        .anyMatch(id -> id == idAmi)
+                )
+                .toList();
         Conversation conv = null;
 
-        for (Conversation c : conversations) {
-            if (!c.isEstconversationDeGroupe()) {
-                conv = c;
-                break;
-            }
+        boolean ifHaveConversations = !monConv.isEmpty();
+        if (ifHaveConversations) {
+            conv = monConv.get(0);
         }
 
         // Si aucune conversation privée n'existe, en créer une
-        if (conv == null) {
+        if (!ifHaveConversations) {
             Utilisateur ami = utilisateurRepository.findByidUti(idAmi);
 
             conv = new Conversation();
-            conv.setNomConv("Conversation entre " + user.getNomU() + " et " + ami.getNomU());
             conv.setCreateur(user);
-
 
             List<Utilisateur> participants = new ArrayList<>();
             participants.add(user);
@@ -76,17 +78,16 @@ public class ConversationController {
             conversationRepository.save(conv);
         }
 
-        return "redirect:/message/conversation/" + conv.getIdConv();
+        return "redirect:/messages?idConv=" + conv.getIdConv();
     }
 
 
 
     @GetMapping("/message/conversation/{id}")
     public String afficherConversation(@PathVariable("id") Integer idConv, HttpSession session, Model model) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) return "redirect:/auth/login";
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-        Conversation conv = conversationRepository.findById(idConv).orElse(null);
+        Conversation conv = conversationRepository.findByIdConv(idConv);
         if (conv == null) return "redirect:/user/mes-amis";
 
         List<Message> messages = messageRepository.findByConversationOrderByDateMAsc(conv);
@@ -108,12 +109,11 @@ public class ConversationController {
     public String envoyerMessage(@PathVariable("idConv") Integer idConv,
                                  @RequestParam("texte") String texte,
                                  HttpSession session,
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes,
+                                 @RequestHeader(value = "Referer", required = false) String referer
+    ) {
 
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         Conversation conv = conversationRepository.findById(idConv).orElse(null);
         if (conv == null) {
@@ -129,10 +129,9 @@ public class ConversationController {
 
         messageRepository.save(msg);
 
-        // ✅ WebSocket 推送
         messagingTemplate.convertAndSend("/topic/conversation/" + idConv, msg);
 
-        return "redirect:/message/conversation/" + idConv;
+        return RedirectUtil.getSafeRedirectUrl(referer,"/message/conversation/" + idConv);
     }
 
 
@@ -162,11 +161,6 @@ public class ConversationController {
         // On ajoute l'utilisateur lui-même dans la conversation
         participantIds.add(utilisateurConnecte.getIdUti());
 
-        if (participantIds.size() < 2) {
-            redirectAttributes.addFlashAttribute("error", "Veuillez sélectionner au moins 3 participants.");
-            return "redirect:/conversation/groupe/nouvelle";
-        }
-
         List<Utilisateur> participants = utilisateurRepository.findAllById(participantIds);
 
         Conversation conversation = new Conversation();
@@ -177,7 +171,7 @@ public class ConversationController {
 
         conversationRepository.save(conversation);
 
-        return RedirectUtil.getSafeRedirectUrl(referer,"/message/conversation/" + conversation.getIdConv());
+        return "redirect:/messages?idConv=" + conversation.getIdConv();
     }
 
 
@@ -202,30 +196,26 @@ public class ConversationController {
         return "afficherconversationgroupe";
     }
     @PostMapping("/conversation/supprimer/{idConv}")
-    public String supprimerConversation(@PathVariable("idConv") Integer idConv, HttpSession session,  RedirectAttributes redirectAttributes) {
+    public String supprimerConversation(
+            @PathVariable("idConv") Integer idConv,
+            HttpSession session,
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = "Referer", required = false) String referer
+    ) {
         Utilisateur user = (Utilisateur) session.getAttribute("user");
         if (user == null) {
             return "redirect:/auth/login";
         }
 
-        Conversation conv = conversationRepository.findById(idConv).orElse(null);
+        Conversation conv = conversationRepository.findByIdConv(idConv);
 
         assert conv != null;
-        if (!conv.getCreateur().getIdUti().equals(user.getIdUti())) {
-            redirectAttributes.addFlashAttribute("error", "Vous n'êtes pas le créateur de cette conversation.");
-            return "redirect:/conversation/groupes";
+        if (conv.getCreateur().getIdUti().equals(user.getIdUti())) {
+            conversationRepository.delete(conv);
+            return "redirect:/messages";
+        }else{
+            return "redirect:/messages?idConv=" + idConv;
         }
-
-
-        // Supprimer d'abord les messages liés
-        List<Message> messages = messageRepository.findByConversationOrderByDateMAsc(conv);
-        messageRepository.deleteAll(messages);
-
-        // Ensuite supprimer la conversation
-        conversationRepository.delete(conv);
-
-
-        return "redirect:/conversation/groupes";
     }
 
     @PostMapping("/conversation/quitter/{idConv}")
@@ -257,7 +247,70 @@ public class ConversationController {
 
 
     @GetMapping("/messages")
-    public String afficherMessages(HttpSession session, Model model) {
+    public String afficherMessages(HttpSession session,
+                                   Model model,
+                                   @RequestParam(value = "idConv", required = false) Integer idConv
+                                   ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        List <Conversation> Convs = user.getConversationsParticipees();
+        Convs.forEach(c -> c.getParticipants().remove(user));
+        model.addAttribute("conversations", Convs);
+        if (idConv != null) {
+            Conversation selected = conversationRepository.findByIdConv(idConv);
+            model.addAttribute("selectedConv", selected);
+            List<Utilisateur> amisDisponibles = user.getAmis().stream()
+                    .filter(a -> !selected.getParticipants().contains(a))
+                    .toList();
+            model.addAttribute("amisDisponibles", amisDisponibles);
+        }
+
+
+
         return "messages";
     }
+
+    @RequestMapping("/conversation/supprimerParticipant")
+    public String supprimerParticipant(HttpSession session,
+                                       Model model,
+                                       @RequestParam(value = "idConv") Integer idConv,
+                                       @RequestParam(value = "idUti") Integer idUti,
+                                       @RequestHeader(value = "Referer", required = false) String referer
+                                       ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Conversation conv = conversationRepository.findByIdConv(idConv);
+        Utilisateur kicked = utilisateurRepository.findByIdUti(idUti);
+
+        if(conv.getCreateur().getIdUti().equals(user.getIdUti())) {
+            if(!user.getIdUti().equals(idUti)) {
+                conv.getParticipants().remove(kicked);
+                kicked.getConversationsParticipees().remove(conv);
+                conversationRepository.save(conv);
+            }
+        }
+        return RedirectUtil.getSafeRedirectUrl(referer,"/messages?idConv="+idConv);
+    }
+
+    @PostMapping("/conversation/ajouterParticipant")
+    public String ajouterParticipant(
+            HttpSession session,
+            Model model,
+            @RequestParam(value = "idConv") Integer idConv,
+            @RequestParam(value = "idUti") Integer idUti,
+            @RequestHeader(value = "Referer", required = false) String referer
+    ){
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+        Conversation conv = conversationRepository.findByIdConv(idConv);
+        Utilisateur ajouter = utilisateurRepository.findByIdUti(idUti);
+
+        if(conv.getCreateur().getIdUti().equals(user.getIdUti())) {
+            if(!user.getIdUti().equals(idUti)) {
+                conv.getParticipants().add(ajouter);
+                ajouter.getConversationsParticipees().add(conv);
+                conversationRepository.save(conv);
+            }
+        }
+        return RedirectUtil.getSafeRedirectUrl(referer,"/messages?idConv="+idConv);
+    }
+
+
 }

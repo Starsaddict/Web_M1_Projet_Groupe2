@@ -26,4 +26,5 @@ public interface ConversationRepository extends JpaRepository<Conversation, Inte
     List<Conversation> findByParticipants_IdUti(Integer idUti);
 
 
+    Conversation findByIdConv(Integer idConv);
 }
