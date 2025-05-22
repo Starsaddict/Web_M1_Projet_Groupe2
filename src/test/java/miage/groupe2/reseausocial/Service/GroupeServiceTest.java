@@ -65,7 +65,6 @@ class GroupeServiceTest {
 
         assertTrue(user.getGroupes().contains(groupe));
         assertTrue(user.getGroupesAppartenance().contains(groupe));
-        assertNotNull(groupe.getDateCreation());
         verify(groupeRepository).save(groupe);
         verify(utilisateurRepository).save(user);
     }

@@ -9,14 +9,14 @@ import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Contrôleur pour la gestion des demandes d'amis.
+ */
 @Controller
 @RequestMapping("/demande")
 public class DemandeAmiController {
@@ -26,19 +26,27 @@ public class DemandeAmiController {
 
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+
     @Autowired
     private UtilisateurService utilisateurService;
 
-
+    /**
+     * Accepte une demande d'ami.
+     *
+     * @param idDemande identifiant de la demande
+     * @param session session utilisateur
+     * @param redirectAttributes attributs de redirection
+     * @param referer URL précédente
+     * @return redirection
+     */
     @PostMapping("/accepter")
     public String accepterDemande(@RequestParam("idDemande") Integer idDemande,
                                   HttpSession session,
                                   RedirectAttributes redirectAttributes,
-                                  @RequestHeader(value = "Referer", required = false) String referer
-    ) {
+                                  @RequestHeader(value = "Referer", required = false) String referer) {
         Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
-
         DemandeAmi demande = demandeAmiRepository.findByIdDA(idDemande);
+
         if (demande != null && demande.getRecepteur().getIdUti().equals(userConnecte.getIdUti())) {
             demande.setStatut("acceptée");
             demandeAmiRepository.save(demande);
@@ -49,15 +57,23 @@ public class DemandeAmiController {
         return RedirectUtil.getSafeRedirectUrl(referer, "/home");
     }
 
+    /**
+     * Refuse une demande d'ami.
+     *
+     * @param idDemande identifiant de la demande
+     * @param session session utilisateur
+     * @param redirectAttributes attributs de redirection
+     * @param referer URL précédente
+     * @return redirection
+     */
     @PostMapping("/refuser")
     public String refuserDemande(@RequestParam("idDemande") Integer idDemande,
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes,
-                                 @RequestHeader(value = "Referer", required = false) String referer
-    ) {
+                                 @RequestHeader(value = "Referer", required = false) String referer) {
         Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
-
         DemandeAmi demande = demandeAmiRepository.findById(idDemande).orElse(null);
+
         if (demande != null && demande.getRecepteur().getIdUti().equals(userConnecte.getIdUti())) {
             demande.setStatut("refusée");
             demandeAmiRepository.save(demande);
@@ -67,14 +83,22 @@ public class DemandeAmiController {
         return RedirectUtil.getSafeRedirectUrl(referer, "/home");
     }
 
-
+    /**
+     * Envoie une demande d'ami à un utilisateur.
+     *
+     * @param idAmi identifiant du destinataire
+     * @param nomRecherche nom utilisé pour la recherche
+     * @param session session utilisateur
+     * @param redirectAttributes attributs de redirection
+     * @param referer URL précédente
+     * @return redirection
+     */
     @PostMapping("/ajouterAmi")
     public String envoyerDemandeAmi(@RequestParam("idAmi") Integer idAmi,
                                     @RequestParam(value = "nom", required = false) String nomRecherche,
                                     HttpSession session,
                                     RedirectAttributes redirectAttributes,
-                                    @RequestHeader(value = "Referer", required = false) String referer
-    ) {
+                                    @RequestHeader(value = "Referer", required = false) String referer) {
         Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
         if (idAmi.equals(userConnecte.getIdUti())) {
@@ -101,8 +125,7 @@ public class DemandeAmiController {
         demande.setDemandeur(userConnecte);
         demande.setRecepteur(recepteur);
         demande.setStatut("en attente");
-        long timestamp = System.currentTimeMillis();
-        demande.setDateDA(timestamp);
+        demande.setDateDA(System.currentTimeMillis());
 
         demandeAmiRepository.save(demande);
 

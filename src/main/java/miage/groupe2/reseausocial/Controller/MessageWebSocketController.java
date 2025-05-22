@@ -12,7 +12,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-
 @Controller
 public class MessageWebSocketController {
 
@@ -25,6 +24,9 @@ public class MessageWebSocketController {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    /**
+     * Traite l'envoi d'un message via WebSocket.
+     */
     @MessageMapping("/chat.sendMessage/{convId}")
     @SendTo("/topic/conversation/{convId}")
     public Message envoyerViaSocket(@DestinationVariable int convId, Message message) {
