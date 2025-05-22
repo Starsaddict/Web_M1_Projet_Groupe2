@@ -10,7 +10,7 @@
     <link th:href="@{/assets/images/favicon.png}" rel="icon" type="image/png">
 
     <!-- title and description-->
-    <title>Profil Page</title>
+    <title>Friend Posts</title>
     <meta name="description" content="Socialite - Social sharing network HTML Template">
 
     <!-- CSS -->
@@ -18,15 +18,14 @@
     <link th:href="@{/assets/css/style.css}" rel="stylesheet">
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
 </head>
+
 <body>
 
 <div id="wrapper">
-
-
-
 
     <!-- header -->
     <header class="z-[100] h-[--m-top] fixed top-0 left-0 w-full flex items-center bg-white/80 sky-50 backdrop-blur-xl border-b border-slate-200 dark:bg-dark2 dark:border-slate-800">
@@ -311,7 +310,8 @@
     </header>
 
     <!-- sidebar -->
-    <div id="site__sidebar" class="fixed top-0 left-0 z-[99] pt-[--m-top] overflow-hidden transition-transform xl:duration-500 max-xl:w-full max-xl:-translate-x-full">
+    <div id="site__sidebar"
+         class="fixed top-0 left-0 z-[99] pt-[--m-top] overflow-hidden transition-transform xl:duration-500 max-xl:w-full max-xl:-translate-x-full">
 
         <!-- sidebar inner -->
         <div class="p-2 max-xl:bg-white shadow-sm 2xl:w-72 sm:w-64 w-[80%] h-[calc(100vh-64px)] relative z-30 max-lg:border-r dark:max-xl:!bg-slate-700 dark:border-slate-700">
@@ -368,11 +368,11 @@
 
                                 <img th:if="${friend.avatar != null}"
                                      th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(friend.avatar)}"
-                                     alt="avatar" class="w-6 rounded-full object-cover" />
+                                     alt="avatar" class="w-6 rounded-full object-cover"/>
 
                                 <img th:if="${friend.avatar == null}"
                                      th:src="@{/assets/images/avatars/avatar-0.png}"
-                                     alt="avatar par défaut" class="w-6 rounded-full object-cover" />
+                                     alt="avatar par défaut" class="w-6 rounded-full object-cover"/>
 
                                 <div th:text="${friend.nomU + ' ' + friend.prenomU}"></div>
                             </div>
@@ -381,7 +381,8 @@
 
                 </div>
 
-                <nav id="side" class="font-medium text-sm text-black border-t pt-3 mt-2 dark:text-white dark:border-slate-800">
+                <nav id="side"
+                     class="font-medium text-sm text-black border-t pt-3 mt-2 dark:text-white dark:border-slate-800">
                     <div class="px-3 pb-2 text-sm font-medium">
                         <div class="text-black dark:text-white">Pages</div>
                     </div>
@@ -391,17 +392,22 @@
 
                         <li>
                             <a th:href="@{'/user/modifierProfil'}">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                                 <span> Setting </span>
                             </a>
                         </li>
                         <li>
                             <a href="/auth/logout">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
                                 </svg>
                                 <span>   Log out   </span>
                             </a>
@@ -421,437 +427,204 @@
         </div>
     </div>
 
-
     <!-- main contents -->
-    <main id="site__main" class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
+    <main id="site__main"
+          class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
 
-        <div class="max-w-[1065px] mx-auto max-lg:-m-2.5">
+        <div class="flex max-lg:flex-col 2xl:gap-12 gap-10 2xl:max-w-[1220px] max-w-[1065px] mx-auto" id="js-oversized">
 
-            <!-- cover  -->
-            <div class="bg-white shadow lg:rounded-b-2xl lg:-mt-10 dark:bg-dark2">
+            <div class="flex-1">
 
-                <!-- cover -->
-                <div class="relative overflow-hidden w-full lg:h-72 h-48">
-                    <img src="/assets/images/avatars/profile-cover.jpg" alt="" class="h-full w-full object-cover inset-0">
+                <div class="max-w-[680px] w-full mx-auto">
 
+                    <div class="page-heading">
 
-                </div>
-
-                <!-- user info -->
-                <div class="p-3">
-
-                    <div class="flex flex-col justify-center md:items-center lg:-mt-48 -mt-28">
-
-                        <div class="relative lg:h-48 lg:w-48 w-28 h-28 mb-4 z-10">
-                            <div class="relative overflow-hidden rounded-full md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900 shadow">
-<!--                                <img th:src="" alt="avatar" class="h-full w-full object-cover inset-0">-->
-                                <img th:if="${user.avatar != null}"
-                                     th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
-                                     alt="avatar" class="h-full w-full object-cover inset-0" />
-
-                                <img th:if="${user.avatar == null}"
-                                     th:src="@{/assets/images/avatars/avatar-0.png}"
-                                     alt="avatar par défaut" class="h-full w-full object-cover inset-0" />
-                            </div>
-<!--                            <button type="button" class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full sm:flex hidden"> <ion-icon name="camera" class="text-2xl md hydrated" role="img" aria-label="camera"></ion-icon></button>-->
-                            <form th:action="@{/user/uploadAvatar}" method="post" enctype="multipart/form-data" th:if="${session.user.idUti == user.idUti}">
-                                <label for="avatarInput"
-                                       class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full sm:flex hidden cursor-pointer">
-                                    <ion-icon name="camera" class="text-2xl md hydrated" role="img" aria-label="camera"></ion-icon>
-                                </label>
-                                <input type="file" name="avatar" id="avatarInput" accept="image/*" style="display: none;" onchange="this.form.submit()" />
-                            </form>
-
-
-                        </div>
-
-                        <h3 class="md:text-3xl text-base font-bold text-black dark:text-white" th:text="${user.prenomU} + ' ' + ${user.nomU}"> </h3>
-                        <th:block th:if="${session.user.idUti != user.idUti}">
-                            <th:block th:if="${!etreAmi and demandeEnvoyee}">
-                                <span class="text-gray-400 text-xs italic">Demande envoyée</span>
-                            </th:block>
-                            <th:block th:if="${!etreAmi and !demandeEnvoyee}">
-                                <form th:action="@{/demande/ajouterAmi}" method="post">
-                                    <input type="hidden" name="idAmi" th:value="${user.idUti}" />
-                                    <button type="submit" class="px-4 py-1.5 text-sm font-medium rounded-full bg-blue-500 text-white hover:bg-blue-600">
-                                        Ajouter en ami
-                                    </button>
-                                </form>
-                            </th:block>
-                        </th:block>
-
-
-
-                        <p class="mt-2 text-gray-500 dark:text-white/80" th:text="${user.introductionU}"> </p>
+                        <h1 class="page-title"> Mon Amis </h1>
 
                     </div>
 
-                </div>
+                    <!-- page feautred -->
+                    <div tabindex="-1" uk-slider="finite:true">
 
-                <!-- navigations -->
-                <div class="flex items-center justify-between mt-3 border-t border-gray-100 px-2 max-lg:flex-col dark:border-slate-700"
-                     uk-sticky="offset:50; cls-active: bg-white/80 shadow rounded-b-2xl z-50 backdrop-blur-xl dark:!bg-slate-700/80; animation:uk-animation-slide-top ; media: 992">
-
-                    <nav class="flex gap-0.5 rounded-xl -mb-px text-gray-600 font-medium text-[15px] dark:text-white max-md:w-full max-md:overflow-x-auto">
-                        <a th:href="@{'/user/' + ${user.idUti} + '/profil?type=post'}"
-                           th:classappend="${type == 'post'} ? 'border-b-2 border-blue-600 text-blue-600' : ''"
-                           class="inline-block py-3 leading-8 px-3.5">
-                            Posts <span class="text-xs pl-2 font-normal lg:inline-block hidden" th:text="${user.posts.size()}"></span>
+                        <!-- slide nav icons -->
+                        <a class="nav-prev" href="#" uk-slider-item="previous">
+                            <ion-icon name="chevron-back" class="text-2xl"></ion-icon>
                         </a>
-                        <a th:href="@{'/user/' + ${user.idUti} + '/profil?type=repost'}"
-                           th:classappend="${type == 'repost'} ? 'border-b-2 border-blue-600 text-blue-600' : ''"
-                           class="inline-block py-3 leading-8 px-3.5">
-                            Reposts <span class="text-xs pl-2 font-normal lg:inline-block hidden" th:text="${user.postsRepostes.size()}"></span>
+                        <a class="nav-next" href="#" uk-slider-item="next">
+                            <ion-icon name="chevron-forward" class="text-2xl"></ion-icon>
                         </a>
-                    </nav>
-                </div>
-
-
-            </div>
-
-            <div class="flex 2xl:gap-12 gap-10 mt-8 max-lg:flex-col" id="js-oversized">
-
-                <!-- feed story -->
-
-                <div class="flex-1 xl:space-y-6 space-y-3">
-
-                    <!-- add story -->
-                    <div th:if="${user.idUti == session.user.idUti}" class="bg-white rounded-xl shadow-sm p-4 space-y-4 text-sm font-medium border1 dark:bg-dark2">
-
-                        <div class="flex items-center gap-3">
-                            <div class="flex-1 bg-slate-100 hover:bg-opacity-80 transition-all rounded-lg cursor-pointer dark:bg-dark3" uk-toggle="target: #create-status">
-                                <div class="py-2.5 text-center dark:text-white"> À quoi pensez-vous ? </div>
-                            </div>
-                        </div>
 
                     </div>
+                    <div class="grid sm:grid-cols-2 gap-3"
+                         uk-scrollspy="target: > div; cls: uk-animation-scale-up; delay: 100 ;repeat: true">
+                        <!-- chaque personne -->
+                        <th:block th:each="user :${Amis}">
 
-                    <!-- posts -->
-                    <th:block th:each="post : ${posts}">
-                        <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1 dark:bg-dark2">
+                            <div class="card flex space-x-5 p-5 relative">
 
-                            <!-- post heading -->
-                            <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
-                                <a th:href="@{'/user/' + ${post.createur.idUti} + '/profil'}">
-                                    <img th:if="${post.createur.avatar != null}"
-                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(post.createur.avatar)}"
-                                         alt="avatar" class="w-9 h-9 rounded-full">
-                                    <img th:if="${post.createur.avatar == null}"
-                                         th:src="@{/assets/images/avatars/avatar-0.png}"
-                                         alt="avatar" class="w-9 h-9 rounded-full">
+                                <!-- avatar -->
+                                <a th:href=" '/user/' + ${user.idUti} +'/profil'">
+                                    <div class="card-media w-16 h-16 shrink-0 rounded-full">
+                                        <img th:if="${user.avatar != null}"
+                                             th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                             alt="avatar"/>
+
+                                        <img th:if="${user.avatar == null}"
+                                             th:src="@{/assets/images/avatars/avatar-0.png}"
+                                             alt="avatar par défaut"/>
+                                        <div class="card-overly"></div>
+                                    </div>
                                 </a>
-                                <div class="flex-1">
-                                    <a th:href="@{'/user/' + ${post.createur.idUti} + '/profil'}">
-                                        <h4 class="text-black dark:text-white" th:text="${post.createur.prenomU + ' ' + post.createur.nomU}"></h4>
-                                    </a>
-                                    <div class="text-xs text-gray-500 dark:text-white/80"
-                                         th:text="${@dateUtil.formatString(post.datePost)}"></div>
-                                </div>
 
-                                <div class="-mr-1">
+                                <!-- button -->
+                                <div class="absolute top-2 right-2">
                                     <button type="button" class="button-icon w-8 h-8">
                                         <ion-icon class="text-xl" name="ellipsis-horizontal"></ion-icon>
                                     </button>
                                     <div class="w-[245px]"
                                          uk-dropdown="pos: bottom-right; animation: uk-animation-scale-up uk-transform-origin-top-right; animate-out: true; mode: click">
                                         <nav>
-
-                                            <a th:if="${post.createur.idUti != session.user.idUti and !session.user.postsRepostes.contains(post)}"
-                                               th:href="@{/post/repost(id=${post.idPost})}"
+                                            <a th:href="@{/user/supprimer-ami(idAmi=${user.idUti})}"
                                                class="text-black dark:text-white hover:!bg-gray-100 dark:hover:!bg-slate-800 flex items-center gap-2">
-                                                <ion-icon class="text-xl shrink-0" name="share-outline"></ion-icon>
-                                                Repost
-                                            </a>
-
-                                            <a th:if="${post.createur.idUti != session.user.idUti and session.user.postsRepostes.contains(post)}"
-                                               th:href="@{/post/repost/annuler(id=${post.idPost})}"
-                                               class="text-red-500 dark:text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/50 flex items-center gap-2">
-                                                <ion-icon class="text-xl shrink-0" name="close-outline"></ion-icon>
-                                                Annuler le repost
-                                            </a>
-
-                                            <a th:if="${post.createur.idUti == session.user.idUti}"
-                                               href="#"
-                                               class="text-black dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 px-2 py-1 rounded flex items-center gap-2"
-                                               uk-toggle="target: #modifier-status"
-                                            >
-
-                                                <!--                                                   th:href="@{/post/modifier(id=${post.idPost})}"-->
-                                                <ion-icon class="text-xl shrink-0" name="create-outline"></ion-icon>
-                                                Modifier
-                                            </a>
-
-                                            <hr  th:if = "${session.user.idUti == post.createur.idUti}">
-
-                                            <a th:if="${session.user.idUti == post.createur.idUti}" th:href="@{/post/supprimer(id=${post.idPost})}"
-                                               class="text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/50">
                                                 <ion-icon class="text-xl shrink-0" name="trash-outline"></ion-icon>
                                                 Supprimer
                                             </a>
-
                                         </nav>
                                     </div>
-
-                                    <!-- modifier status -->
-                                    <div id="modifier-status" uk-modal>
-                                        <form th:action="@{/post/modifier}"
-                                              method="post"
-                                              enctype="multipart/form-data"
-                                              class="uk-modal-dialog tt relative overflow-hidden mx-auto bg-white shadow-xl rounded-lg md:w-[520px] w-full dark:bg-dark2">
-
-                                            <input name="idPost" th:value="${post.idPost}" class="hidden">
-
-                                            <div class="text-center py-4 border-b mb-0 dark:border-slate-700">
-                                                <h2 class="text-sm font-medium text-black">Modifier une publication</h2>
-                                                <button type="button" class="button-icon absolute top-0 right-0 m-2.5 uk-modal-close">
-                                                </button>
-                                            </div>
-
-                                            <div class="space-y-5 mt-3 p-2">
-                                                      <textarea name="titre"
-                                                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                                                                rows="1"
-                                                                th:placeholder="${post.titrePost}"></textarea>
-                                            </div>
-
-                                            <div class="space-y-5 mt-3 p-2">
-                                                      <textarea name="text"
-                                                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                                                                rows="6"
-                                                                th:placeholder="${post.textePost}"
-                                                      ></textarea>
-                                            </div>
-
-
-
-                                            <div class="flex items-center gap-2 text-sm py-2 px-4 font-medium flex-wrap">
-                                                <label
-                                                        class="relative flex items-center gap-1.5
-                                                               bg-sky-50 text-sky-600 rounded-full
-                                                               py-1 px-2 border-2 border-sky-100 cursor-pointer"
-                                                >
-                                                    <ion-icon name="image" class="text-base"></ion-icon>
-                                                    Image
-                                                    <input
-                                                            type="file"
-                                                            name="imagePost"
-                                                            accept="image/*"
-                                                            class="hidden"
-                                                    />
-                                                </label>
-                                            </div>
-
-
-                                            <div class="p-5 flex justify-between items-center">
-                                                <button type="submit"
-                                                        class="button bg-blue-500 text-white py-2 px-12 text-[14px]">
-                                                    Modifier
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <!-- post titre (if exists) -->
-                            <div th:if="${post.titrePost != null}" class="sm:px-4 p-2.5 pt-0">
-                                <p class="font-bold" th:text="${post.titrePost}"></p>
-                            </div>
-
-                            <!-- post image -->
-                            <div th:if="${post.imagePost != null}" class="relative w-full lg:h-96 h-full sm:px-4">
-                                <img
-                                        th:src="|data:image/jpeg;base64,${@picUtil.encodeBase64(post.imagePost)}|"
-                                        class="sm:rounded-lg w-full h-full object-cover"
-                                        alt="Post image"/>
-                            </div>
-                            <!-- post texte -->
-                            <div th:if="${post.textePost != null}" class="sm:px-4 p-2.5 pt-0">
-                                <p class="font-normal" th:text="${post.textePost}"></p>
-                            </div>
-
-                            <!-- post icons -->
-                            <div class="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
-                                <div>
-                                    <div class="flex items-center gap-2.5">
-                                        <button type="button" class="button-icon text-red-500 bg-red-100 dark:bg-slate-700">
-                                            <ion-icon class="text-lg" name="heart"></ion-icon>
-                                        </button>
-                                        <a href="#" th:text="${post.reactions.size()}"></a>
-                                    </div>
-                                    <div class="p-1 px-2 bg-white rounded-full drop-shadow-md w-[212px] dark:bg-slate-700 text-2xl"
-                                         uk-drop="offset:10;pos: top-left; animate-out: true; animation: uk-animation-scale-up uk-transform-origin-bottom-left">
-                                        <div class="flex gap-2" uk-scrollspy="target: > form; cls: uk-animation-scale-up; delay: 100; repeat: true">
-
-                                            <form th:action="@{/post/react}" method="post">
-                                                <input type="hidden" name="id" th:value="${post.idPost}"/>
-                                                <input type="hidden" name="type" value="👍"/>
-                                                <button type="submit" class="text-red-600 hover:scale-125 duration-300">👍</button>
-                                            </form>
-                                            <form th:action="@{/post/react}" method="post">
-                                                <input type="hidden" name="id" th:value="${post.idPost}"/>
-                                                <input type="hidden" name="type" value="❤️"/>
-                                                <button type="submit" class="text-red-600 hover:scale-125 duration-300">❤️</button>
-                                            </form>
-                                            <form th:action="@{/post/react}" method="post">
-                                                <input type="hidden" name="id" th:value="${post.idPost}"/>
-                                                <input type="hidden" name="type" value="😂"/>
-                                                <button type="submit" class="text-red-600 hover:scale-125 duration-300">😂</button>
-                                            </form>
-                                            <form th:action="@{/post/react}" method="post">
-                                                <input type="hidden" name="id" th:value="${post.idPost}"/>
-                                                <input type="hidden" name="type" value="😯"/>
-                                                <button type="submit" class="text-red-600 hover:scale-125 duration-300">😯</button>
-                                            </form>
-                                            <form th:action="@{/post/react}" method="post">
-                                                <input type="hidden" name="id" th:value="${post.idPost}"/>
-                                                <input type="hidden" name="type" value="😢"/>
-                                                <button type="submit" class="text-red-600 hover:scale-125 duration-300">😢</button>
-                                            </form>
-                                        </div>
-                                        <div class="w-2.5 h-2.5 absolute -bottom-1 left-3 bg-white rotate-45 hidden"></div>
-                                    </div>
                                 </div>
 
-                                <!-- comments count -->
-                                <div class="flex items-center gap-3">
-                                    <button type="button" class="button-icon bg-slate-200/70 dark:bg-slate-700">
-                                        <ion-icon class="text-lg" name="chatbubble-ellipses"></ion-icon>
-                                    </button>
-                                    <span th:text="${post.commentaires.size()}"></span>
-                                </div>
-                            </div>
-
-
-                            <!-- comments -->
-                            <div class="sm:p-4 p-2.5 border-t border-gray-100 font-normal space-y-3 relative dark:border-slate-700/40">
-                                <div th:each="comment : ${post.commentaires}">
-                                    <div class="flex items-start gap-3 relative">
-                                        <a th:href="@{'/user/' + ${comment.utilisateur.idUti} + '/profil'}">
-                                            <img th:if="${comment.utilisateur.avatar != null}"
-                                                 th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(comment.utilisateur.avatar)}"
-                                                 class="w-6 h-6 mt-1 rounded-full object-cover" alt="avatar">
-                                            <img th:if="${comment.utilisateur.avatar == null}"
-                                                 th:src="@{/assets/images/avatars/avatar-0.png}"
-                                                 class="w-6 h-6 mt-1 rounded-full object-cover" alt="default">
+                                <!-- information -->
+                                <div class="card-body flex-1 p-0">
+                                    <a th:href=" '/user/' + ${user.idUti} +'/profil'"><h4 class="card-title"
+                                                                                          th:text="${user.prenomU} + ' ' + ${user.nomU}">
+                                        Jesse Steeve </h4></a>
+                                    <p class="card-text" th:text="'@'+${user.pseudoU}"
+                                       th:href=" '/user/' + ${user.idUti} +'/profil'"></p>
+                                    <div class="flex gap-1 mt-1">
+                                        <a type="button" class="button bg-primary-soft text-primary dark:text-white"
+                                           th:href=" '/user/' + ${user.idUti} +'/profil'">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                 fill="currentColor" class="w-6 h-6">
+                                                <path d="M7.493 18.75c-.425 0-.82-.236-.975-.632A7.48 7.48 0 016 15.375c0-1.75.599-3.358 1.602-4.634.151-.192.373-.309.6-.397.473-.183.89-.514 1.212-.924a9.042 9.042 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23h-.777zM2.331 10.977a11.969 11.969 0 00-.831 4.398 12 12 0 00.52 3.507c.26.85 1.084 1.368 1.973 1.368H4.9c.445 0 .72-.498.523-.898a8.963 8.963 0 01-.924-3.977c0-1.708.476-3.305 1.302-4.666.245-.403-.028-.959-.5-.959H4.25c-.832 0-1.612.453-1.918 1.227z"/>
+                                            </svg>
+                                            View
                                         </a>
-                                        <div class="flex-1">
-                                            <a th:href="@{'/user/' + ${comment.utilisateur.idUti} + '/profil'}"
-                                               class="text-black font-medium inline-block dark:text-white"
-                                               th:text="${comment.utilisateur.prenomU + ' ' + comment.utilisateur.nomU}">Nom</a>
-                                            <p class="mt-0.5" th:text="${comment.textCom}"></p>
-                                        </div>
+                                        <a type="button" class="button bg-primary-soft text-primary dark:text-white"
+                                           th:href="@{/message/vers-conversation(idAmi=${user.idUti})}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                 fill="currentColor" class="w-6 h-6">
+                                                <path fill-rule="evenodd"
+                                                      d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97zM6.75 8.25a.75.75 0 01.75-.75h9a.75.75 0 010 1.5h-9a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H7.5z"
+                                                      clip-rule="evenodd"/>
+                                            </svg>
+                                            Message
+                                        </a>
                                     </div>
+
+
                                 </div>
+
+
+
                             </div>
-
-                            <!-- add comment -->
-                            <div class="sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 flex items-center gap-1 dark:border-slate-700/40">
-                                <form th:action="@{/post/commenter}" method="post" class="flex items-center gap-1 w-full">
-                                    <img th:if="${session.user.avatar != null}"
-                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(session.user.avatar)}"
-                                         class="w-6 h-6 rounded-full object-cover" alt="avatar">
-                                    <img th:if="${session.user.avatar == null}"
-                                         th:src="@{/assets/images/avatars/avatar-0.png}"
-                                         class="w-6 h-6 rounded-full object-cover" alt="default">
-
-                                    <input type="hidden" name="postId" th:value="${post.idPost}">
-
-                                    <div class="flex-1 relative overflow-hidden h-10">
-                                        <input type="text" name="textCom"
-                                               placeholder="Add Comment...."
-                                               class="w-full resize-none !bg-transparent px-4 py-2 focus:!border-transparent focus:!ring-transparent"/>
-                                    </div>
-
-                                    <button type="submit"
-                                            class="text-sm rounded-full py-1.5 px-3.5 bg-secondery">
-                                        Comment
-                                    </button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </th:block>
-
-                    <!-- placeholder -->
-                    <div class="rounded-xl shadow-sm p-4 space-y-4 bg-slate-200/40 animate-pulse border1 dark:bg-dark2">
-
-                        <div class="flex gap-3">
-                            <div class="w-9 h-9 rounded-full bg-slate-300/20"></div>
-                            <div class="flex-1 space-y-3">
-                                <div class="w-40 h-5 rounded-md bg-slate-300/20"></div>
-                                <div class="w-24 h-4 rounded-md bg-slate-300/20"></div>
-                            </div>
-                            <div class="w-6 h-6 rounded-full bg-slate-300/20"></div>
-                        </div>
-
-                        <div class="w-full h-52 rounded-lg bg-slate-300/10 my-3"> </div>
-
-                        <div class="flex gap-3">
-
-                            <div class="w-16 h-5 rounded-md bg-slate-300/20"></div>
-
-                            <div class="w-14 h-5 rounded-md bg-slate-300/20"></div>
-
-                            <div class="w-6 h-6 rounded-full bg-slate-300/20 ml-auto"></div>
-                            <div class="w-6 h-6 rounded-full bg-slate-300/20  "></div>
-                        </div>
-
+                        </th:block>
                     </div>
 
 
                 </div>
 
-                <!-- sidebar -->
 
-                <div class="lg:w-[400px]">
+            </div>
 
-                    <div class="lg:space-y-4 lg:pb-8 max-lg:grid sm:grid-cols-2 max-lg:gap-6"
-                         uk-sticky="media: 1024; end: #js-oversized; offset: 80">
+            <!-- sidebar -->
+            <div class="2xl:w-[380px] lg:w-[330px] w-full">
 
-                        <div class="box p-5 px-6">
+                <div class="lg:space-y-6 space-y-4 lg:pb-8 max-lg:grid sm:grid-cols-2 max-lg:gap-6"
+                     uk-sticky="media: 1024; end: #js-oversized; offset: 80">
 
-                            <div class="flex items-ce justify-between text-black dark:text-white">
-                                <h3 class="font-bold text-lg"> Friends
-                                    <span class="block text-sm text-gray-500 mt-0. font-normal dark:text-white" th:text="${user.amis.size} + ' amis'">  </span>
-                                </h3>
-                            </div>
+                    <div class="box p-50 px-60">
 
-                            <div class="grid grid-cols-3 gap-2 gap-y-5 text-center text-sm mt-4 mb-2">
 
-                                <th:block th:each="ami:${Friends}">
-                                <div>
-                                    <div class="relative w-full aspect-square rounded-lg overflow-hidden">
-                                        <img th:if="${ami.avatar != null}"
-                                             th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(ami.avatar)}"
-                                             alt="avatar" class="object-cover w-full h-full inset-0">
-                                        <img th:if="${ami.avatar == null}"
-                                             th:src="@{/assets/images/avatars/avatar-0.png}"
-                                             alt="avatar_defaut" class="object-cover w-full h-full inset-0">
-                                    </div>
-                                    <div class="mt-2 line-clamp-1" th:text="${ami.prenomU} + ' ' + ${ami.nomU}">  </div>
+                    </div>
+
+                    <!-- Friends I may know  -->
+
+                    <div class="bg-white rounded-xl shadow p-5 px-6 border1 dark:bg-dark2">
+
+                        <div class="flex items-baseline justify-between text-black dark:text-white">
+                            <h3 class="font-bold text-base"> Friends I may know </h3>
+                        </div>
+
+                        <div class="side-list" th:each="user : ${recommande}">
+
+                            <div class="side-list-item">
+                                <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                    <img th:if="${user.avatar != null}"
+                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                         alt="avatar"
+                                         class="side-list-image rounded-full"/>
+
+                                    <img th:if="${user.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         alt="avatar par défaut"
+                                         class="side-list-image rounded-full"/>
+                                </a>
+                                <div class="flex-1">
+                                    <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                        <h4 class="side-list-title" th:text="${user.prenomU} + ' ' + ${user.nomU}"> John
+                                            Michael</h4>
+                                    </a>
                                 </div>
-                                </th:block>
-
+                                <a th:href="@{/demande/ajouterAmi(idAmi=${user.idUti})}"
+                                   class="button bg-primary-soft text-primary dark:text-white">Ajouter</a>
                             </div>
 
 
                         </div>
                     </div>
+
+                    <!-- Demande d'ami envoyée -->
+                    <div class="bg-white rounded-xl shadow p-5 px-6 border1 dark:bg-dark2">
+
+                        <div class="flex items-baseline justify-between text-black dark:text-white">
+                            <h3 class="font-bold text-base"> Demande d'ami envoyée </h3>
+                        </div>
+
+                        <div class="side-list" th:each="user : ${almostFriends}">
+
+                            <div class="side-list-item">
+                                <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                    <img th:if="${user.avatar != null}"
+                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                         alt="avatar"
+                                         class="side-list-image rounded-full"/>
+
+                                    <img th:if="${user.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         alt="avatar par défaut"
+                                         class="side-list-image rounded-full"/>
+                                </a>
+                                <div class="flex-1">
+                                    <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                        <h4 class="side-list-title" th:text="${user.prenomU} + ' ' + ${user.nomU}"> John
+                                            Michael</h4>
+                                    </a>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
 
                 </div>
 
             </div>
-
         </div>
 
     </main>
 
 </div>
-
-
-<!-- post preview modal -->
 
 <!-- create status -->
 <div id="create-status" uk-modal>
@@ -979,6 +752,7 @@
         </form>
     </div>
 </div>
+
 <!-- Créer groupe chat -->
 <div id="modal-creer-conversation" uk-modal>
     <div class="uk-modal-dialog bg-white dark:bg-dark2 rounded-lg shadow-xl w-full max-w-lg mx-auto overflow-hidden">

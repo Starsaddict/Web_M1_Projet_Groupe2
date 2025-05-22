@@ -74,4 +74,13 @@ public class GlobalModelAttributes {
         }
         model.addAttribute("newgroupe", new Groupe());
     }
+
+//    @ModelAttribute
+//    public void ajouterConversation(Model model, HttpSession session) {
+//        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+//        if (user == null) {
+//            return;
+//        }
+//        model.addAttribute("newconversation", new Conversation());
+//    }
 }

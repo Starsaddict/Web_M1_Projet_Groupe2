@@ -1,27 +1,20 @@
-<!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- favicon -->
+<link th:href="@{/assets/images/favicon.png}" rel="icon" type="image/png">
 
+<!-- title and description-->
+<title>Friend Posts</title>
+<meta name="description" content="Socialite - Social sharing network HTML Template">
 
-    <!-- favicon -->
-    <link th:href="@{/assets/images/favicon.png}" rel="icon" type="image/png">
+<!-- CSS -->
+<link th:href="@{/assets/css/tailwind.css}" rel="stylesheet">
+<link th:href="@{/assets/css/style.css}" rel="stylesheet">
 
-    <!-- title and description-->
-    <title>Events profil</title>
-    <meta name="description" content="Socialite - Social sharing network HTML Template">
-
-    <!-- CSS -->
-    <link th:href="@{/assets/css/tailwind.css}" rel="stylesheet">
-    <link th:href="@{/assets/css/style.css}" rel="stylesheet">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap"
-          rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap"
+      rel="stylesheet">
 
 </head>
+
 <body>
 
 <div id="wrapper">
@@ -362,7 +355,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href = "/messages">
+                            <a href="/messages">
                                 <img src="/assets/images/icons/message.png" alt="messages" class="w-5">
                                 <span> Messages </span>
                             </a>
@@ -454,89 +447,171 @@
              uk-toggle="target: #site__sidebar ; cls :!-translate-x-0">
         </div>
     </div>
-
     <!-- main contents -->
     <main id="site__main"
           class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
 
-        <div class="max-w-[1065px] mx-auto">
+        <div class="flex max-lg:flex-col 2xl:gap-12 gap-10 2xl:max-w-[1220px] max-w-[1065px] mx-auto" id="js-oversized">
 
-            <!-- cover  -->
-            <div class="bg-white shadow lg:rounded-b-2xl lg:-mt-10 dark:bg-dark2">
+            <div class="flex-1">
 
-                <!-- cover -->
-                <div class="relative overflow-hidden lg:h-72 h-36 w-full">
-                    <img src="/assets/images/group/group-cover-4.jpg" alt="" class="h-full w-full object-cover inset-0">
+                <div class="max-w-[680px] w-full mx-auto">
 
-                    <!-- overly -->
-                    <div class="w-full bottom-0 absolute left-0 bg-gradient-to-t from -black/60 pt-10 z-10"></div>
+                    <div class="page-heading">
 
+                        <h1 class="page-title"> Résultats de recherche </h1>
 
-                </div>
+                        <nav class="nav__underline">
 
-                <div class="lg:px-10 md:p-5 p-3">
+                            <ul class="group"
+                                uk-switcher="connect: #page-tabs ; animation: uk-animation-slide-right-medium, uk-animation-slide-left-medium">
 
-                    <div class="flex flex-col justify-center md:-mt-20 -mt-12">
+                                <li><a href="#"> My Friends </a></li>
+                                <li><a href="#"> Not Friends </a></li>
+                                <li><a href="#"> Invitation already sent</a></li>
 
-                        <div class="md:w-20 md:h-20 w-12 h-12 overflow-hidden bg-white shadow-md rounded-md z-10 mb-5">
-                            <div class="w-full md:h-5 bg-rose-500 h-3"></div>
-                            <div class="grid place-items-center text-black font-semibold md:text-3xl text-lg h-full md:pb-5 pb-3">
-                                14
-                            </div>
-                        </div>
+                            </ul>
 
-                        <div class="flex lg:items-center justify-between max-lg:flex-col max-lg:gap-2">
-
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-rose-600 mb-1.5"
-                                   th:text="${@dateUtil.formatRange(event)}"> 7 OCT AT 07:00 – 11 OCT AT 12:00 </p>
-                                <h3 class="md:text-2xl text-base font-bold text-black dark:text-white"
-                                    th:text="${event.nomE}"> Webinar - Raising Ducks For Egg Production </h3>
-                            </div>
-
-                            <div>
-                                <div th:attr="uk-countdown='date: ' + ${eventDate}"
-                                     class="flex gap-3 text-2xl font-semibold text-primary dark:text-white max-lg:justify-center">
-
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <span class="uk-countdown-days"></span>
-                                        <span class="inline-block text-xs">Days</span>
-                                    </div>
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <div class="uk-countdown-hours"></div>
-                                        <span class="inline-block text-xs">Hours</span>
-                                    </div>
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <div class="uk-countdown-minutes"></div>
-                                        <span class="inline-block text-xs">min </span>
-                                    </div>
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <div class="uk-countdown-seconds"></div>
-                                        <span class="inline-block text-xs">sec </span>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                        </div>
+                        </nav>
 
                     </div>
 
-                </div>
+                    <div id="page-tabs" class="uk-switcher mt-10">
 
-                <div class="flex items-center justify-between px-2 max-md:flex-col">
+                        <!-- pages card layout 1 -->
 
-                    <div class="flex items-center gap-2 text-sm py-2 pr-1 ml-auto">
-                        <a type="button" class="button bg-secondery flex items-center gap-2 py-2 px-3.5 dark:bg-dark3"
-                           th:if="${estParticipants}" th:href="@{/evenement/quitter(id=${event.idEve})}">
-                            <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
-                            <span class="text-sm"> Quitter </span>
-                        </a>
-                        <a type="button" class="button bg-secondery flex items-center gap-2 py-2 px-3.5 dark:bg-dark3"
-                           th:if="${!estParticipants}" th:href="@{/evenement/rejoindre(id=${event.idEve})}">
-                            <ion-icon name="person-add-outline" class="text-xl"></ion-icon>
-                            <span class="text-sm"> Participer </span>
-                        </a>
+                        <div class="grid sm:grid-cols-2 gap-3"
+                             uk-scrollspy="target: > div; cls: uk-animation-scale-up; delay: 100 ;repeat: true">
+                            <!-- chaque personne -->
+                            <th:block th:each="user :${alreadyFriend}">
+
+                                <div class="card flex space-x-5 p-5 relative">
+
+                                    <!-- avatar -->
+                                    <a th:href=" '/user/' + ${user.idUti} +'/profil'">
+                                        <div class="card-media w-16 h-16 shrink-0 rounded-full">
+                                            <img th:if="${user.avatar != null}"
+                                                 th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                                 alt="avatar"/>
+
+                                            <img th:if="${user.avatar == null}"
+                                                 th:src="@{/assets/images/avatars/avatar-0.png}"
+                                                 alt="avatar par défaut"/>
+                                            <div class="card-overly"></div>
+                                        </div>
+                                    </a>
+
+                                    <!-- button -->
+                                    <div class="absolute top-2 right-2">
+                                        <button type="button" class="button-icon w-8 h-8">
+                                            <ion-icon class="text-xl" name="ellipsis-horizontal"></ion-icon>
+                                        </button>
+                                        <div class="w-[245px]"
+                                             uk-dropdown="pos: bottom-right; animation: uk-animation-scale-up uk-transform-origin-top-right; animate-out: true; mode: click">
+                                            <nav>
+                                                <a th:href="@{/user/supprimer-ami(idAmi=${user.idUti})}"
+                                                   class="text-black dark:text-white hover:!bg-gray-100 dark:hover:!bg-slate-800 flex items-center gap-2">
+                                                    <ion-icon class="text-xl shrink-0" name="trash-outline"></ion-icon>
+                                                    Supprimer
+                                                </a>
+                                            </nav>
+                                        </div>
+                                    </div>
+
+                                    <!-- information -->
+                                    <div class="card-body flex-1 p-0">
+                                        <a th:href=" '/user/' + ${user.idUti} +'/profil'"><h4 class="card-title"
+                                                                                              th:text="${user.prenomU} + ' ' + ${user.nomU}">
+                                            Jesse Steeve </h4></a>
+                                        <p class="card-text" th:text="'@'+${user.pseudoU}"
+                                           th:href=" '/user/' + ${user.idUti} +'/profil'"></p>
+                                        <div class="flex gap-1 mt-1">
+                                            <a type="button" class="button bg-primary-soft text-primary dark:text-white"
+                                               th:href=" '/user/' + ${user.idUti} +'/profil'">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                     fill="currentColor" class="w-6 h-6">
+                                                    <path d="M7.493 18.75c-.425 0-.82-.236-.975-.632A7.48 7.48 0 016 15.375c0-1.75.599-3.358 1.602-4.634.151-.192.373-.309.6-.397.473-.183.89-.514 1.212-.924a9.042 9.042 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23h-.777zM2.331 10.977a11.969 11.969 0 00-.831 4.398 12 12 0 00.52 3.507c.26.85 1.084 1.368 1.973 1.368H4.9c.445 0 .72-.498.523-.898a8.963 8.963 0 01-.924-3.977c0-1.708.476-3.305 1.302-4.666.245-.403-.028-.959-.5-.959H4.25c-.832 0-1.612.453-1.918 1.227z"/>
+                                                </svg>
+                                                View
+                                            </a>
+                                            <a type="button" class="button bg-primary-soft text-primary dark:text-white"
+                                               th:href="@{/message/vers-conversation(idAmi=${user.idUti})}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                     fill="currentColor" class="w-6 h-6">
+                                                    <path fill-rule="evenodd"
+                                                          d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97zM6.75 8.25a.75.75 0 01.75-.75h9a.75.75 0 010 1.5h-9a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H7.5z"
+                                                          clip-rule="evenodd"/>
+                                                </svg>
+                                                Message
+                                            </a>
+                                        </div>
+
+
+                                    </div>
+
+
+
+                                </div>
+                            </th:block>
+                        </div>
+
+                        <!-- pages card layout 2-->
+
+                        <div class="grid sm:grid-cols-3 grid-cols-2 gap-3"
+                             uk-scrollspy="target: > div; cls: uk-animation-scale-up; delay: 100 ;repeat: true">
+                            <th:block th:each="user:${notFriendsAtAll}">
+                            <div class="card">
+                                <a th:href=" '/user/' + ${user.idUti} +'/profil'">
+                                <div class="card-media sm:aspect-[2/1.7] h-40">
+                                        <img th:if="${user.avatar != null}"
+                                             th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                             alt="avatar"/>
+
+                                        <img th:if="${user.avatar == null}"
+                                             th:src="@{/assets/images/avatars/avatar-0.png}"
+                                             alt="avatar par défaut"/>
+                                        <div class="card-overly"></div>
+                                    </div>
+                                </a>
+                                <div class="card-body">
+                                    <a th:href=" '/user/' + ${user.idUti} +'/profil'"><h4 class="card-title" th:text="${user.prenomU} + ' ' + ${user.nomU}" > Monroe Parker </h4></a>
+                                    <a type="button" class="button bg-primary text-white" th:href="@{/demande/ajouterAmi(idAmi=${user.idUti})}"  >Send Invitation</a>
+                                </div>
+                            </div>
+                            </th:block>
+
+
+                        </div>
+
+
+                        <!-- pages card layout 3 -->
+
+                        <div class="grid sm:grid-cols-3 grid-cols-2 gap-3"
+                             uk-scrollspy="target: > div; cls: uk-animation-scale-up; delay: 100 ;repeat: true">
+                            <th:block th:each="user : ${alreadySent}">
+                            <div class="card">
+                                <div class="card-media sm:h-24 h-16">
+                                    <img th:if="${user.avatar != null}"
+                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                         alt="avatar"/>
+
+                                    <img th:if="${user.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         alt="avatar par défaut"/>
+                                    <div class="card-overly"></div>
+                                </div>
+                                <div class="card-body relative z-10">
+                                    <img src="/assets/images/avatars/avatar-1.jpg" alt=""
+                                         class="w-10 rounded-full sm:mb-2 mb-1 shadow -mt-8 relative border-2 border-white">
+                                    <h4 class="card-title" th:text="${user.prenomU} + ' ' + ${user.nomU}"> Jesse Steeve </h4>
+
+                                </div>
+                            </div>
+                            </th:block>
+
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -544,74 +619,86 @@
 
             </div>
 
-            <div class="flex 2xl:gap-12 gap-10 mt-8 max-lg:flex-col" id="js-oversized">
+            <!-- sidebar -->
+            <div class="2xl:w-[380px] lg:w-[330px] w-full">
 
-                <div class="flex-1 space-y-4">
+                <div class="lg:space-y-6 space-y-4 lg:pb-8 max-lg:grid sm:grid-cols-2 max-lg:gap-6"
+                     uk-sticky="media: 1024; end: #js-oversized; offset: 80">
 
-                    <div class="box p-5 px-6 relative">
+                    <div class="box p-50 px-60">
 
-                        <!-- intro -->
-                        <h3 class="font-semibold text-lg text-black dark:text-white"> Intro </h3>
-
-                        <div class="space-y-4 leading-7 tracking-wide mt-4 text-black text-sm dark:text-white">
-                            <p th:text="${event.description}"> Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-                                Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
-                                nisl ut aliquip ex ea commodo consequat</p>
-                        </div>
 
                     </div>
 
+                    <!-- Friends I may know  -->
 
-                </div>
+                    <div class="bg-white rounded-xl shadow p-5 px-6 border1 dark:bg-dark2">
 
-                <div class="lg:w-[400px]">
-
-                    <div class="lg:space-y-4 lg:pb-8 max-lg:grid sm:grid-cols-2 max-lg:gap-6"
-                         uk-sticky="media: 1024; end: #js-oversized; offset: 80">
-
-                        <div class="box p-5 px-6 pr-0">
-
-                            <h3 class="font-semibold text-lg text-black dark:text-white"> Status </h3>
-
-                            <div class="grid grid-cols-2 gap-2 text-sm mt-4">
-                                <div class="flex gap-3">
-                                    <div class="p-2 inline-flex rounded-full bg-rose-50 self-center">
-                                        <ion-icon name="leaf-outline" class="text-2xl text-rose-600"></ion-icon>
-                                    </div>
-                                    <div>
-                                        <h3 class="sm:text-xl sm:font-semibold mt-1 text-black dark:text-white text-base font-normal"
-                                            th:text="${event.participants.size()}"></h3>
-                                        <p>Participants</p>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="flex items-baseline justify-between text-black dark:text-white">
+                            <h3 class="font-bold text-base"> Friends I may know </h3>
                         </div>
 
-                        <div class="box p-5 px-6 space-y-4">
-
-                            <h3 class="font-bold text-base text-black"> Créer par </h3>
+                        <div class="side-list" th:each="user : ${recommande}">
 
                             <div class="side-list-item">
-                                <a th:href="'/user/'+${event.createur.idUti}+'/profil'">
-                                    <img th:if="${event.createur.avatar == null}"
-                                         src="/assets/images/avatars/avatar-4.jpg" alt=""
-                                         class="side-list-image rounded-full">
-                                    <img th:if="${event.createur.avatar != null}"
-                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(session.user.avatar)}"
-                                         alt="" class="side-list-image rounded-full">
+                                <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                    <img th:if="${user.avatar != null}"
+                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                         alt="avatar"
+                                         class="side-list-image rounded-full"/>
+
+                                    <img th:if="${user.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         alt="avatar par défaut"
+                                         class="side-list-image rounded-full"/>
                                 </a>
                                 <div class="flex-1">
-                                    <a th:href="'/user/'+${event.createur.idUti}+'/profil'"><h4 class="side-list-title"
-                                                                                                th:text="${event.createur.prenomU} + ' ' + ${event.createur.nomU}">
-                                        Maria Gray</h4></a>
+                                    <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                        <h4 class="side-list-title" th:text="${user.prenomU} + ' ' + ${user.nomU}"> John
+                                            Michael</h4>
+                                    </a>
                                 </div>
-                                <a th:href="'/user/'+${event.createur.idUti}+'/profil'"
-                                   class="bg-secondery/60 button rounded-full">Profile</a>
+                                <a th:href="@{/demande/ajouterAmi(idAmi=${user.idUti})}"
+                                   class="button bg-primary-soft text-primary dark:text-white">Ajouter</a>
                             </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- Demande d'ami envoyée -->
+                    <div class="bg-white rounded-xl shadow p-5 px-6 border1 dark:bg-dark2">
+
+                        <div class="flex items-baseline justify-between text-black dark:text-white">
+                            <h3 class="font-bold text-base"> Demande d'ami envoyée </h3>
                         </div>
 
+                        <div class="side-list" th:each="user : ${almostFriends}">
+
+                            <div class="side-list-item">
+                                <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                    <img th:if="${user.avatar != null}"
+                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(user.avatar)}"
+                                         alt="avatar"
+                                         class="side-list-image rounded-full"/>
+
+                                    <img th:if="${user.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         alt="avatar par défaut"
+                                         class="side-list-image rounded-full"/>
+                                </a>
+                                <div class="flex-1">
+                                    <a th:href="'/user/'+${user.idUti}+'/profil'">
+                                        <h4 class="side-list-title" th:text="${user.prenomU} + ' ' + ${user.nomU}"> John
+                                            Michael</h4>
+                                    </a>
+                                </div>
+                            </div>
+
+
+                        </div>
                     </div>
+
 
                 </div>
 
@@ -622,6 +709,7 @@
     </main>
 
 </div>
+
 
 <!-- create status -->
 <div id="create-status" uk-modal>
@@ -639,17 +727,17 @@
         </div>
 
         <div class="space-y-5 mt-3 p-2">
-                      <textarea th:field="*{titrePost}"
-                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                                rows="1"
-                                placeholder="À quoi pensez-vous ?"></textarea>
+                  <textarea th:field="*{titrePost}"
+                            class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                            rows="1"
+                            placeholder="À quoi pensez-vous ?"></textarea>
         </div>
 
         <div class="space-y-5 mt-3 p-2">
-                      <textarea th:field="*{textePost}"
-                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                                rows="6"
-                      ></textarea>
+                  <textarea th:field="*{textePost}"
+                            class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                            rows="6"
+                  ></textarea>
         </div>
 
         <input type="file"
@@ -788,6 +876,8 @@
         </form>
     </div>
 </div>
+
+
 <!-- Javascript  -->
 <script src="/assets/js/uikit.min.js"></script>
 <script src="/assets/js/simplebar.js"></script>

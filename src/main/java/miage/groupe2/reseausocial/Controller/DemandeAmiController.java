@@ -9,10 +9,13 @@ import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+
 
 /**
  * Contrôleur pour la gestion des demandes d'amis.
@@ -83,6 +86,7 @@ public class DemandeAmiController {
         return RedirectUtil.getSafeRedirectUrl(referer, "/home");
     }
 
+
     /**
      * Envoie une demande d'ami à un utilisateur.
      *
@@ -93,33 +97,25 @@ public class DemandeAmiController {
      * @param referer URL précédente
      * @return redirection
      */
-    @PostMapping("/ajouterAmi")
+    @RequestMapping("/ajouterAmi")
     public String envoyerDemandeAmi(@RequestParam("idAmi") Integer idAmi,
-                                    @RequestParam(value = "nom", required = false) String nomRecherche,
                                     HttpSession session,
-                                    RedirectAttributes redirectAttributes,
-                                    @RequestHeader(value = "Referer", required = false) String referer) {
+                                    @RequestHeader(value = "Referer", required = false) String referer
+    ) {
+
         Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
-        if (idAmi.equals(userConnecte.getIdUti())) {
-            redirectAttributes.addFlashAttribute("error", "Vous ne pouvez pas vous ajouter vous-même.");
-            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
+        boolean demandeExist = demandeAmiRepository.findByDemandeur(userConnecte).stream()
+                .filter(d -> d.getStatut().equals("en attente"))
+                .anyMatch(d -> d.getRecepteur().getIdUti().equals(idAmi));
+
+        boolean dejaAmis = userConnecte.getAmis().stream().anyMatch(a -> a.getIdUti().equals(idAmi));
+
+        if (demandeExist || dejaAmis) {
+            return RedirectUtil.getSafeRedirectUrl(referer, "/mes-amis");
         }
 
         Utilisateur recepteur = utilisateurRepository.findByidUti(idAmi);
-        if (recepteur == null) {
-            redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
-            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
-        }
-
-        boolean demandeExistante = demandeAmiRepository.existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(
-                userConnecte.getIdUti(), idAmi, List.of("en attente"));
-
-        boolean dejaAmis = demandeAmiRepository.sontDejaAmis(userConnecte.getIdUti(), idAmi);
-        if (demandeExistante || dejaAmis) {
-            redirectAttributes.addFlashAttribute("error", "Une demande d'ami existe déjà.");
-            return "redirect:/user/rechercher?nom=" + (nomRecherche != null ? nomRecherche : "");
-        }
 
         DemandeAmi demande = new DemandeAmi();
         demande.setDemandeur(userConnecte);
@@ -129,18 +125,7 @@ public class DemandeAmiController {
 
         demandeAmiRepository.save(demande);
 
-        redirectAttributes.addFlashAttribute("success", "Demande d'ami envoyée à " + recepteur.getNomU() + ".");
-
-        if (referer != null) {
-            return RedirectUtil.getSafeRedirectUrl(referer, "/home");
-        }
-
-        String redirectUrl = "/home";
-        if (nomRecherche != null && !nomRecherche.isEmpty()) {
-            redirectUrl = "/user/rechercher?nom=" + nomRecherche;
-        }
-
-        return "redirect:" + redirectUrl;
+        return RedirectUtil.getSafeRedirectUrl(referer, "/user/rechercher" );
     }
 
 }

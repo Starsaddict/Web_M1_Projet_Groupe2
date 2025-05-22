@@ -131,11 +131,12 @@
                                         </div>
                                     </li>
 
-                                    <li class="flex items-center gap-4 hover:bg-secondery rounded-md p-1.5 cursor-pointer dark:hover:bg-white/10">
-                                        <img src="/assets/images/icons/group-2.png" class="w-7">
+                                    <li class="flex items-center gap-4 hover:bg-secondery rounded-md p-1.5 cursor-pointer dark:hover:bg-white/10"
+                                        uk-toggle="target: #modal-creer-conversation">
+                                        <img src="/assets/images/icons/group-2.png" alt="" class="w-7">
                                         <div class="flex-1">
-                                            <a href="/groupechat/creer"><h4 class="font-medium text-sm text-black dark:text-white"> GroupChat </h4></a>
-                                            <div class="mt-1">Parler avec ton amis </div>
+                                            <h4 class="font-medium text-sm text-black dark:text-white">GroupChat</h4>
+                                            <div class="mt-1 text-xs text-gray-500 dark:text-white">Créer une conversation de groupe</div>
                                         </div>
                                     </li>
 
@@ -333,7 +334,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="messages.html">
+                                <a href = "/messages">
                                     <img src="/assets/images/icons/message.png" alt="messages" class="w-5">
                                     <span> Messages </span>
                                 </a>
@@ -1082,7 +1083,44 @@
             </form>
         </div>
     </div>
-    
+    <!-- Créer groupe chat -->
+    <div id="modal-creer-conversation" uk-modal>
+        <div class="uk-modal-dialog bg-white dark:bg-dark2 rounded-lg shadow-xl w-full max-w-lg mx-auto overflow-hidden">
+            <form th:action="@{/conversation/groupe/creer}" method="post" class="p-6 space-y-4">
+
+                <h2 class="text-lg font-semibold text-center border-b pb-2 mb-4 dark:text-white">
+                    Créer une conversation de groupe
+                </h2>
+
+                <!-- 会话名称 -->
+                <div>
+                    <label class="text-sm font-medium">Nom de la discussion :</label>
+                    <input type="text" name="nomdiscussion"
+                           class="w-full px-3 py-2 border rounded dark:bg-slate-800 dark:text-white"
+                           placeholder="Nom de la discussion" required>
+                </div>
+
+                <!-- 好友列表复选框 -->
+                <div>
+                    <label class="text-sm font-medium">Sélectionnez les amis :</label>
+                    <ul class="max-h-48 overflow-y-auto space-y-2 mt-2">
+                        <li th:each="ami : ${Amis}" class="flex items-center gap-2">
+                            <input type="checkbox"
+                                   name="participantIds"
+                                   th:value="${ami.idUti}"
+                                   class="h-4 w-4 border rounded dark:bg-slate-800">
+                            <span th:text="${ami.nomU + ' ' + ami.prenomU}"
+                                  class="text-sm text-gray-700 dark:text-white"></span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="flex justify-end pt-4 border-t">
+                    <button type="submit" class="button bg-blue-600 text-white">Créer</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <!-- Javascript  -->
     <script src="/assets/js/uikit.min.js"></script>
     <script src="/assets/js/simplebar.js"></script>

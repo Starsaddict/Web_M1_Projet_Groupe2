@@ -10,7 +10,7 @@
     <link th:href="@{/assets/images/favicon.png}" rel="icon" type="image/png">
 
     <!-- title and description-->
-    <title>Events profil</title>
+    <title>Friend Posts</title>
     <meta name="description" content="Socialite - Social sharing network HTML Template">
 
     <!-- CSS -->
@@ -25,6 +25,7 @@
 <body>
 
 <div id="wrapper">
+
 
     <!-- header -->
     <header class="z-[100] h-[--m-top] fixed top-0 left-0 w-full flex items-center bg-white/80 sky-50 backdrop-blur-xl border-b border-slate-200 dark:bg-dark2 dark:border-slate-800">
@@ -362,7 +363,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href = "/messages">
+                            <a href="/messages">
                                 <img src="/assets/images/icons/message.png" alt="messages" class="w-5">
                                 <span> Messages </span>
                             </a>
@@ -459,160 +460,387 @@
     <main id="site__main"
           class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
 
-        <div class="max-w-[1065px] mx-auto">
+        <div class="relative overflow-hidden border -m-2.5 dark:border-slate-700">
 
-            <!-- cover  -->
-            <div class="bg-white shadow lg:rounded-b-2xl lg:-mt-10 dark:bg-dark2">
+            <div class="flex bg-white dark:bg-dark2">
 
-                <!-- cover -->
-                <div class="relative overflow-hidden lg:h-72 h-36 w-full">
-                    <img src="/assets/images/group/group-cover-4.jpg" alt="" class="h-full w-full object-cover inset-0">
+                <!-- sidebar -->
+                <div class="md:w-[360px] relative border-r dark:border-slate-700">
+
+                    <div id="side-chat"
+                         class="top-0 left-0 max-md:fixed max-md:w-5/6 max-md:h-screen bg-white z-50 max-md:shadow max-md:-translate-x-full dark:bg-dark2">
+
+                        <!-- heading title -->
+                        <div class="p-4 border-b dark:border-slate-700">
+
+                            <div class="flex mt-2 items-center justify-between">
+
+                                <h2 class="text-2xl font-bold text-black ml-1 dark:text-white"> Chats </h2>
+
+
+
+                            </div>
+
+                            <!-- search -->
+                            <div class="relative mt-4">
+                                <div class="absolute left-3 bottom-1/2 translate-y-1/2 flex">
+                                    <ion-icon name="search" class="text-xl"></ion-icon>
+                                </div>
+                                <input type="text" placeholder="Search" class="w-full !pl-10 !py-2 !rounded-lg">
+                            </div>
+
+                        </div>
+
+
+                        <!-- Conversation list -->
+                        <div class="space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-204px)] h-[calc(100vh-130px)]">
+                            <th:block th:each="conv : ${conversations}">
+                                <a  th:id="${'conv-' + conv.idConv}"
+                                    th:href="@{/messages(idConv=${conv.idConv})}"
+                                   class="relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery">
+                                    <div class="relative w-14 h-14 shrink-0">
+                                        <img th:if="${conv.estconversationDeGroupe}"
+                                             th:src="@{/assets/images/icons/group-2.png}"
+                                             alt="Groupe"
+                                             class="object-cover w-full h-full rounded-full"/>
+
+                                        <img th:if="${!conv.estconversationDeGroupe and conv.participants[0].avatar != null}"
+                                             th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(conv.participants[0].avatar)}"
+                                             alt="Avatar de l’ami"
+                                             class="object-cover w-full h-full rounded-full"/>
+
+                                        <img th:if="${!conv.estconversationDeGroupe and conv.participants[0].avatar == null}"
+                                             th:src="@{/assets/images/avatars/avatar-0.png}"
+                                             alt="Avatar par défaut"
+                                             class="object-cover w-full h-full rounded-full"/>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-1.5">
+                                            <div
+                                                    th:if="${!#strings.isEmpty(conv.nomConv)}"
+                                                    class="mr-auto text-sm text-black dark:text-white font-medium"
+                                                    th:text="${conv.nomConv}">
+                                            </div>
+
+                                            <div
+                                                    th:if="${#strings.isEmpty(conv.nomConv)}"
+                                                    class="mr-auto text-sm text-black dark:text-white font-medium"
+                                                    th:text="${conv.participants.getFirst().prenomU} + ' ' + ${conv.participants.getFirst().nomU}">
+                                            </div>
+
+                                            <div class="text-xs font-light text-gray-500 dark:text-white/70">
+                                                <span th:if="${!#lists.isEmpty(conv.messages)}"
+                                                      th:text="${@dateUtil.formatString(conv.messages[conv.messages.size() - 1].dateM)}"></span>
+                                                <span th:if="${#lists.isEmpty(conv.messages)}">–</span>
+
+                                            </div>
+                                        </div>
+                                        <div class="font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap"
+                                             th:if="${!#lists.isEmpty(conv.messages)}"
+                                             th:text="${conv.messages[conv.messages.size() - 1].textM}">
+                                        </div>
+                                        <div class="font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap"
+                                             th:if="${#lists.isEmpty(conv.messages)}">
+                                        </div>
+                                    </div>
+                                </a>
+                            </th:block>
+                        </div>
+
+                    </div>
 
                     <!-- overly -->
-                    <div class="w-full bottom-0 absolute left-0 bg-gradient-to-t from -black/60 pt-10 z-10"></div>
-
+                    <div id="side-chat"
+                         class="bg-slate-100/40 backdrop-blur w-full h-full dark:bg-slate-800/40 z-40 fixed inset-0 max-md:-translate-x-full md:hidden"
+                         uk-toggle="target: #side-chat ; cls: max-md:-translate-x-full"></div>
 
                 </div>
 
-                <div class="lg:px-10 md:p-5 p-3">
+                <!-- message center -->
+                <div class="flex-1"
+                     th:if="${selectedConv != null}">
 
-                    <div class="flex flex-col justify-center md:-mt-20 -mt-12">
+                    <!-- chat heading -->
+                    <div class="flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
 
-                        <div class="md:w-20 md:h-20 w-12 h-12 overflow-hidden bg-white shadow-md rounded-md z-10 mb-5">
-                            <div class="w-full md:h-5 bg-rose-500 h-3"></div>
-                            <div class="grid place-items-center text-black font-semibold md:text-3xl text-lg h-full md:pb-5 pb-3">
-                                14
+                        <div class="flex items-center sm:gap-4 gap-2">
+
+                            <!-- toggle for mobile -->
+                            <button type="button" class="md:hidden"
+                                    uk-toggle="target: #side-chat ; cls: max-md:-translate-x-full">
+                                <ion-icon name="chevron-back-outline" class="text-2xl -ml-4"></ion-icon>
+                            </button>
+
+                            <div class="relative cursor-pointer max-md:hidden"
+                                 uk-toggle="target: .rightt ; cls: hidden">
+
+                                <img th:if="${selectedConv.estconversationDeGroupe}"
+                                     th:src="@{/assets/images/icons/group-2.png}"
+                                     alt="Groupe"
+                                     class="w-8 h-8 rounded-full shadow"/>
+
+                                <img th:if="${!selectedConv.estconversationDeGroupe and selectedConv.participants[0].avatar != null}"
+                                     th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(selectedConv.participants[0].avatar)}"
+                                     alt="Avatar de l’ami"
+                                     class="w-8 h-8 rounded-full shadow"/>
+
+                                <img th:if="${!selectedConv.estconversationDeGroupe and selectedConv.participants[0].avatar == null}"
+                                     th:src="@{/assets/images/avatars/avatar-0.png}"
+                                     alt="Avatar par défaut"
+                                     class="w-8 h-8 rounded-full shadow"/>
                             </div>
-                        </div>
-
-                        <div class="flex lg:items-center justify-between max-lg:flex-col max-lg:gap-2">
-
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-rose-600 mb-1.5"
-                                   th:text="${@dateUtil.formatRange(event)}"> 7 OCT AT 07:00 – 11 OCT AT 12:00 </p>
-                                <h3 class="md:text-2xl text-base font-bold text-black dark:text-white"
-                                    th:text="${event.nomE}"> Webinar - Raising Ducks For Egg Production </h3>
-                            </div>
-
-                            <div>
-                                <div th:attr="uk-countdown='date: ' + ${eventDate}"
-                                     class="flex gap-3 text-2xl font-semibold text-primary dark:text-white max-lg:justify-center">
-
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <span class="uk-countdown-days"></span>
-                                        <span class="inline-block text-xs">Days</span>
-                                    </div>
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <div class="uk-countdown-hours"></div>
-                                        <span class="inline-block text-xs">Hours</span>
-                                    </div>
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <div class="uk-countdown-minutes"></div>
-                                        <span class="inline-block text-xs">min </span>
-                                    </div>
-                                    <div class="bg-primary-soft/40 flex flex-col items-center justify-center rounded-lg w-16 h-16 lg:border-4 border-white md:shadow dark:border-slate-700">
-                                        <div class="uk-countdown-seconds"></div>
-                                        <span class="inline-block text-xs">sec </span>
+                                <div class="cursor-pointer" uk-toggle="target: .rightt ; cls: hidden">
+                                    <div class="text-base font-bold"
+                                         th:if="${!#strings.isEmpty(selectedConv.nomConv)}"
+                                         th:text="${selectedConv.nomConv}">
                                     </div>
 
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="flex items-center justify-between px-2 max-md:flex-col">
-
-                    <div class="flex items-center gap-2 text-sm py-2 pr-1 ml-auto">
-                        <a type="button" class="button bg-secondery flex items-center gap-2 py-2 px-3.5 dark:bg-dark3"
-                           th:if="${estParticipants}" th:href="@{/evenement/quitter(id=${event.idEve})}">
-                            <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
-                            <span class="text-sm"> Quitter </span>
-                        </a>
-                        <a type="button" class="button bg-secondery flex items-center gap-2 py-2 px-3.5 dark:bg-dark3"
-                           th:if="${!estParticipants}" th:href="@{/evenement/rejoindre(id=${event.idEve})}">
-                            <ion-icon name="person-add-outline" class="text-xl"></ion-icon>
-                            <span class="text-sm"> Participer </span>
-                        </a>
-                    </div>
-
-                </div>
-
-
-            </div>
-
-            <div class="flex 2xl:gap-12 gap-10 mt-8 max-lg:flex-col" id="js-oversized">
-
-                <div class="flex-1 space-y-4">
-
-                    <div class="box p-5 px-6 relative">
-
-                        <!-- intro -->
-                        <h3 class="font-semibold text-lg text-black dark:text-white"> Intro </h3>
-
-                        <div class="space-y-4 leading-7 tracking-wide mt-4 text-black text-sm dark:text-white">
-                            <p th:text="${event.description}"> Lorem ipsum dolor sit amet, consectetuer adipiscing elit,
-                                sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-                                Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis
-                                nisl ut aliquip ex ea commodo consequat</p>
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-                <div class="lg:w-[400px]">
-
-                    <div class="lg:space-y-4 lg:pb-8 max-lg:grid sm:grid-cols-2 max-lg:gap-6"
-                         uk-sticky="media: 1024; end: #js-oversized; offset: 80">
-
-                        <div class="box p-5 px-6 pr-0">
-
-                            <h3 class="font-semibold text-lg text-black dark:text-white"> Status </h3>
-
-                            <div class="grid grid-cols-2 gap-2 text-sm mt-4">
-                                <div class="flex gap-3">
-                                    <div class="p-2 inline-flex rounded-full bg-rose-50 self-center">
-                                        <ion-icon name="leaf-outline" class="text-2xl text-rose-600"></ion-icon>
-                                    </div>
-                                    <div>
-                                        <h3 class="sm:text-xl sm:font-semibold mt-1 text-black dark:text-white text-base font-normal"
-                                            th:text="${event.participants.size()}"></h3>
-                                        <p>Participants</p>
+                                    <div class="text-base font-bold"
+                                         th:unless="${!#strings.isEmpty(selectedConv.nomConv)}"
+                                         th:text="${selectedConv.participants[0].prenomU} + ' ' + ${selectedConv.participants[0].nomU}">
                                     </div>
                                 </div>
-                            </div>
+
                         </div>
 
-                        <div class="box p-5 px-6 space-y-4">
+                        <div class="flex items-center gap-2">
 
-                            <h3 class="font-bold text-base text-black"> Créer par </h3>
+                            <button type="button" class="hover:bg-slate-100 p-1.5 rounded-full"
+                                    uk-toggle="target: .rightt ; cls: hidden">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+                                </svg>
+                            </button>
+                        </div>
 
-                            <div class="side-list-item">
-                                <a th:href="'/user/'+${event.createur.idUti}+'/profil'">
-                                    <img th:if="${event.createur.avatar == null}"
-                                         src="/assets/images/avatars/avatar-4.jpg" alt=""
-                                         class="side-list-image rounded-full">
-                                    <img th:if="${event.createur.avatar != null}"
+                    </div>
+
+                    <!-- chats bubble -->
+                    <div class="w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-204px)] h-[calc(100vh-195px)]">
+
+                        <div class="text-sm font-medium space-y-6" id="chat-bubbles">
+
+                            <th:block th:each="msg : ${selectedConv.getMessages()}">
+                                <!-- time -->
+                                <div class="flex justify-center">
+                                    <div class="font-medium text-gray-500 text-sm dark:text-white/70"
+                                         th:text="${@dateUtil.formatString(msg.dateM)}"></div>
+                                </div>
+                                <!-- not me -->
+                                <div th:if="${msg.expediteur.idUti != session.user.idUti}"
+                                     class="flex gap-3">
+                                    <img th:if="${msg.expediteur.avatar != null}"
+                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(msg.expediteur.avatar)}"
+                                         alt="avatar"
+                                         class="w-9 h-9 rounded-full shadow"/>
+                                    <img th:if="${msg.expediteur.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         alt="avatar par défaut"
+                                         class="w-9 h-9 rounded-full shadow"/>
+
+                                    <div class="px-4 py-2 rounded-[20px] max-w-sm bg-secondery"
+                                         th:text="${msg.textM}"></div>
+                                </div>
+
+                                <!-- me -->
+                                <div th:if="${msg.expediteur.idUti == session.user.idUti}"
+                                     class="flex gap-2 flex-row-reverse items-end">
+                                    <img th:if="${session.user.avatar != null}"
                                          th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(session.user.avatar)}"
-                                         alt="" class="side-list-image rounded-full">
-                                </a>
-                                <div class="flex-1">
-                                    <a th:href="'/user/'+${event.createur.idUti}+'/profil'"><h4 class="side-list-title"
-                                                                                                th:text="${event.createur.prenomU} + ' ' + ${event.createur.nomU}">
-                                        Maria Gray</h4></a>
+                                         alt="avatar"
+                                         class="w-5 h-5 rounded-full shadow"/>
+                                    <img th:if="${session.user.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         alt="avatar par défaut"
+                                         class="w-5 h-5 rounded-full shadow"/>
+
+                                    <div class="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow"
+                                         th:text="${msg.textM}"></div>
                                 </div>
-                                <a th:href="'/user/'+${event.createur.idUti}+'/profil'"
-                                   class="bg-secondery/60 button rounded-full">Profile</a>
-                            </div>
+
+
+                            </th:block>
+
                         </div>
 
                     </div>
 
+                    <!-- sending message area -->
+                    <div class="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden">
+                        <div class="relative flex-1">
+                            <form th:action="@{'/message/envoyer/' + ${selectedConv.idConv}}" method="post"
+                                  class="relative flex-1">
+                                <input name="texte"
+                                          placeholder="Write your message"
+                                          required
+                                          class="w-full resize-none bg-secondery rounded-full px-4 p-2"></input>
+
+                                <button type="submit"
+                                        class="text-white shrink-0 p-2 absolute right-0.5 top-0">
+                                    <ion-icon class="text-xl flex" name="send-outline"></ion-icon>
+                                </button>
+                            </form>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <!-- user profile right info -->
+                <div class="rightt w-full h-full absolute top-0 right-0 z-10 hidden transition-transform">
+
+                    <div th:if="${!selectedConv.estconversationDeGroupe}"
+                         class="w-[360px] border-l shadow-lg h-screen bg-white absolute right-0 top-0 uk-animation-slide-right-medium delay-200 z-50 dark:bg-dark2 dark:border-slate-700">
+
+                        <div class="py-10 text-center text-sm pt-20">
+                            <img th:if="${selectedConv.participants[0].avatar != null}"
+                                 th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(selectedConv.participants[0].avatar)}"
+                                 class="w-24 h-24 rounded-full mx-auto mb-3" alt="Avatar"/>
+                            <img th:if="${selectedConv.participants[0].avatar == null}"
+                                 th:src="@{/assets/images/avatars/avatar-0.png}"
+                                 class="w-24 h-24 rounded-full mx-auto mb-3" alt="Avatar par défaut"/>
+
+                            <div class="mt-8">
+                                <div class="md:text-xl text-base font-medium text-black dark:text-white"
+                                     th:text="${selectedConv.participants[0].prenomU + ' ' + selectedConv.participants[0].nomU}">
+                                    Nom
+                                </div>
+                                <div class="text-gray-500 text-sm mt-1 dark:text-white/80"
+                                     th:text="'@'+${selectedConv.participants[0].pseudoU}">
+                                    @pseudo
+                                </div>
+                            </div>
+
+                            <!-- View profile  -->
+                            <div class="mt-5">
+                                <a th:href="@{'/user/' + ${selectedConv.participants[0].idUti} + '/profil'}"
+                                   class="inline-block rounded-full px-4 py-1.5 text-sm font-semibold bg-secondery">
+                                    View profile
+                                </a>
+                            </div>
+                        </div>
+
+                        <hr class="opacity-80 dark:border-slate-700"/>
+
+                        <ul class="text-base font-medium p-3 space-y-2">
+                            <li>
+                                <form th:action="@{/user/supprimer-ami(idAmi=${selectedConv.participants[0].idUti})}"
+                                      method="post" class="w-full">
+                                    <button type="submit"
+                                            class="flex items-center gap-5 w-full rounded-md p-3 hover:bg-red-50 text-red-500">
+                                        <ion-icon name="trash-outline" class="text-2xl"></ion-icon>
+                                        Remove Friend
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+
+                        <button type="button"
+                                class="absolute top-0 right-0 m-4 p-2 bg-secondery rounded-full"
+                                uk-toggle="target: .rightt ; cls: hidden">
+                            <ion-icon name="close" class="text-2xl flex"></ion-icon>
+                        </button>
+                    </div>
+
+                    <!-- groupe pannel -->
+                    <div th:if="${selectedConv.estconversationDeGroupe}"
+                         class="w-[360px] border-l shadow-lg h-screen bg-white absolute right-0 top-0 uk-animation-slide-right-medium delay-200 z-50 dark:bg-dark2 dark:border-slate-700">
+
+                        <div class="py-10 text-center text-sm pt-20">
+                            <div class="md:text-2xl text-lg font-bold text-black dark:text-white"
+                                 th:text="${selectedConv.nomConv}">Group Name</div>
+                        </div>
+
+                        <hr class="opacity-80 dark:border-slate-700"/>
+
+                        <ul class="text-base font-medium p-3 space-y-2 overflow-y-auto h-[calc(100vh-200px)]">
+                            <li th:each="u : ${selectedConv.participants}"
+                                class="flex items-center justify-between rounded-md p-3 hover:bg-secondery">
+
+                                <a th:href="@{/message/vers-conversation(idAmi=${u.idUti})}"
+                                   class="flex items-center gap-3">
+                                    <img th:if="${u.avatar != null}"
+                                         th:src="'data:image/jpeg;base64,' + ${@picUtil.encodeBase64(u.avatar)}"
+                                         class="w-8 h-8 rounded-full" alt="Avatar"/>
+                                    <img th:if="${u.avatar == null}"
+                                         th:src="@{/assets/images/avatars/avatar-0.png}"
+                                         class="w-8 h-8 rounded-full" alt="Avatar par défaut"/>
+                                    <span th:text="${u.prenomU + ' ' + u.nomU}">Participant</span>
+                                </a>
+
+                                <form th:if="${selectedConv.createur.idUti == session.user.idUti and u.idUti != session.user.idUti}"
+                                      th:action="@{/conversation/supprimerParticipant(idConv=${selectedConv.idConv}, idUti=${u.idUti})}"
+                                      method="post">
+                                    <button type="submit"
+                                            class="text-sm text-red-500 hover:underline">
+                                        Kick
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+
+                        <hr class="opacity-80 dark:border-slate-700" th:if="${selectedConv.createur.idUti == session.user.idUti}"/>
+
+                        <div class="p-3" th:if="${selectedConv.createur.idUti == session.user.idUti}">
+                            <button type="button"
+                                    class="w-full text-center rounded-md py-2 bg-blue-500 text-white"
+                                    uk-toggle="target: #modal-ajouter-membre">
+                                Add Member
+                            </button>
+                        </div>
+
+                        <div class="p-3" th:if="${selectedConv.createur.idUti == session.user.idUti}">
+                            <form th:action="@{/conversation/supprimer/{idConv}(idConv=${selectedConv.idConv})}"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete this group?');">
+                                <button type="submit"
+                                        class="w-full text-center rounded-md py-2 bg-red-600 text-white hover:bg-red-700">
+                                    Delete Group
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="p-3" th:if="${selectedConv.createur.idUti != session.user.idUti}">
+                            <form th:action="@{/conversation/quitter/{idConv}(idConv=${selectedConv.idConv})}"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to quit this group?');">
+                                <button type="submit"
+                                        class="w-full text-center rounded-md py-2 bg-red-600 text-white hover:bg-red-700">
+                                    Quitter Group
+                                </button>
+                            </form>
+                        </div>
+
+                        <button type="button"
+                                class="absolute top-0 right-0 m-4 p-2 bg-secondery rounded-full"
+                                uk-toggle="target: .rightt ; cls: hidden">
+                            <ion-icon name="close" class="text-2xl flex"></ion-icon>
+                        </button>
+                    </div>
+
+                    <div id="modal-ajouter-membre" uk-modal>
+                        <div class="uk-modal-dialog p-6 bg-white rounded-lg dark:bg-dark2">
+                            <h2 class="text-lg font-medium mb-4">Add a friend to group</h2>
+                            <form th:action="@{/conversation/ajouterParticipant}" method="post">
+                                <input type="hidden" name="idConv" th:value="${selectedConv.idConv}"/>
+                                <select name="idUti" required class="w-full mb-4 p-2 border rounded">
+                                    <option th:each="ami : ${amisDisponibles}"
+                                            th:value="${ami.idUti}"
+                                            th:text="${ami.prenomU + ' ' + ami.nomU}"></option>
+                                </select>
+                                <button type="submit"
+                                        class="px-4 py-2 bg-blue-500 text-white rounded">
+                                    Ajouter
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-100/40 backdrop-blur absolute w-full h-full dark:bg-slate-800/40"
+                         uk-toggle="target: .rightt ; cls: hidden"></div>
                 </div>
 
             </div>
@@ -639,17 +867,17 @@
         </div>
 
         <div class="space-y-5 mt-3 p-2">
-                      <textarea th:field="*{titrePost}"
-                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                                rows="1"
-                                placeholder="À quoi pensez-vous ?"></textarea>
+                  <textarea th:field="*{titrePost}"
+                            class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                            rows="1"
+                            placeholder="À quoi pensez-vous ?"></textarea>
         </div>
 
         <div class="space-y-5 mt-3 p-2">
-                      <textarea th:field="*{textePost}"
-                                class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
-                                rows="6"
-                      ></textarea>
+                  <textarea th:field="*{textePost}"
+                            class="w-full !text-black placeholder:!text-black !bg-white !border-transparent focus:!border-transparent focus:!ring-transparent !font-normal !text-xl"
+                            rows="6"
+                  ></textarea>
         </div>
 
         <input type="file"
@@ -788,10 +1016,111 @@
         </form>
     </div>
 </div>
+
+
 <!-- Javascript  -->
 <script src="/assets/js/uikit.min.js"></script>
 <script src="/assets/js/simplebar.js"></script>
 <script src="/assets/js/script.js"></script>
+<!-- 1)  SockJS + StompJS -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<!-- 2) connection -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 从 Thymeleaf 拿到当前会话 ID
+    const conversationId = /*[[${selectedConv.idConv}]]*/ 0;
+
+    // 建立 SockJS + STOMP 连接
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+    stompClient.debug = null; // 关闭调试日志
+
+    stompClient.connect({}, function() {
+        stompClient.subscribe('/topic/conversation/' + conversationId, function(frame) {
+            const msg = JSON.parse(frame.body);
+            appendMessage(msg);
+        });
+    });
+
+    // 3) add msg to chat bubbles
+    function appendMessage(msg) {
+        const container = document.getElementById('chat-bubbles');
+        if (!container) return;
+
+        // time
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'flex justify-center';
+        const ts = document.createElement('div');
+        ts.className = 'font-medium text-gray-500 text-sm dark:text-white/70 mb-2';
+        ts.textContent = "à l’instant";
+        timeDiv.appendChild(ts);
+        container.appendChild(timeDiv);
+
+        // message
+        const isMine = (msg.expediteurId === /*[[${session.user.idUti}]]*/ 0);
+        const msgDiv = document.createElement('div');
+        msgDiv.className = isMine
+            ? 'flex gap-2 flex-row-reverse items-end'
+            : 'flex gap-3';
+
+        // avatar
+        const img = document.createElement('img');
+        img.className = isMine
+            ? 'w-5 h-5 rounded-full shadow'
+            : 'w-9 h-9 rounded-full shadow';
+
+        if (msg.expediteur.avatar) {
+            // 如果已经是 data URL，就直接用；否则拼接 base64 前缀
+            img.src = msg.expediteur.avatar.startsWith('data:')
+                ? msg.expediteur.avatar
+                : 'data:image/jpeg;base64,' + msg.expediteur.avatar;
+        } else {
+            img.src = '/assets/images/avatars/avatar-0.png';
+        }
+
+// 加个加载失败的回退
+        img.onerror = () => {
+            console.warn('头像加载失败，使用默认头像');
+            img.src = '/assets/images/avatars/avatar-0.png';
+        };
+
+        msgDiv.appendChild(img);
+
+
+
+        // chatbubble
+        const bubble = document.createElement('div');
+        bubble.className = isMine
+            ? 'px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow'
+            : 'px-4 py-2 rounded-[20px] max-w-sm bg-secondery';
+        bubble.textContent = msg.textM;
+        msgDiv.appendChild(bubble);
+
+        container.appendChild(msgDiv);
+
+
+        container.parentNode.scrollTop = container.parentNode.scrollHeight;
+    }
+    /*]]>*/
+</script>
+
+<!-- row automatiquement -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatContainer = document.getElementById('chat-bubbles');
+        if (chatContainer) {
+            const scrollable = chatContainer.parentNode;
+            scrollable.scrollTop = scrollable.scrollHeight;
+        }
+    });
+    /*]]>*/
+</script>
+
+</body>
+
 
 
 <!-- Ion icon -->

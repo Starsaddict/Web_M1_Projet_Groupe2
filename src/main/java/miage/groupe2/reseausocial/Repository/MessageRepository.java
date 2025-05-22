@@ -8,7 +8,4 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Integer> {
 
-    // Trouver tous les messages d'une conversation, triés par date croissante
-    List<Message> findByConversationOrderByDateMAsc(Conversation conversation);
-
 }

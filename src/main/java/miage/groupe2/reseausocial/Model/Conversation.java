@@ -2,7 +2,8 @@ package miage.groupe2.reseausocial.Model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+import java.util.List;import jakarta.persistence.CascadeType;
+
 
 @Entity
 public class Conversation implements Serializable {
@@ -18,8 +19,15 @@ public class Conversation implements Serializable {
     @JoinColumn(name = "idUtiCreateur")
     private Utilisateur createur;
 
-    @OneToMany(mappedBy = "conversation")
+    @OneToMany(
+            mappedBy = "conversation",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
     private List<Message> messages;
+
+
+    private Long dateConv;
 
     @ManyToMany
     @JoinTable(
@@ -88,5 +96,13 @@ public class Conversation implements Serializable {
 
     public void setEstconversationDeGroupe(boolean estconversationDeGroupe) {
         this.estconversationDeGroupe = estconversationDeGroupe;
+    }
+
+    public long getDateConv() {
+        return dateConv;
+    }
+
+    public void setDateConv(long dateConv) {
+        this.dateConv = dateConv;
     }
 }
