@@ -803,6 +803,17 @@
                             </form>
                         </div>
 
+                        <div class="p-3" th:if="${selectedConv.createur.idUti != session.user.idUti}">
+                            <form th:action="@{/conversation/quitter/{idConv}(idConv=${selectedConv.idConv})}"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to quit this group?');">
+                                <button type="submit"
+                                        class="w-full text-center rounded-md py-2 bg-red-600 text-white hover:bg-red-700">
+                                    Quitter Group
+                                </button>
+                            </form>
+                        </div>
+
                         <button type="button"
                                 class="absolute top-0 right-0 m-4 p-2 bg-secondery rounded-full"
                                 uk-toggle="target: .rightt ; cls: hidden">
@@ -1056,11 +1067,28 @@
 
         // avatar
         const img = document.createElement('img');
-        img.className = isMine ? 'w-5 h-5 rounded-full shadow' : 'w-9 h-9 rounded-full shadow';
-        img.src = msg.avatar
-            ? msg.avatar
-            : '/assets/images/avatars/avatar-0.png';
+        img.className = isMine
+            ? 'w-5 h-5 rounded-full shadow'
+            : 'w-9 h-9 rounded-full shadow';
+
+        if (msg.expediteur.avatar) {
+            // 如果已经是 data URL，就直接用；否则拼接 base64 前缀
+            img.src = msg.expediteur.avatar.startsWith('data:')
+                ? msg.expediteur.avatar
+                : 'data:image/jpeg;base64,' + msg.expediteur.avatar;
+        } else {
+            img.src = '/assets/images/avatars/avatar-0.png';
+        }
+
+// 加个加载失败的回退
+        img.onerror = () => {
+            console.warn('头像加载失败，使用默认头像');
+            img.src = '/assets/images/avatars/avatar-0.png';
+        };
+
         msgDiv.appendChild(img);
+
+
 
         // chatbubble
         const bubble = document.createElement('div');
@@ -1077,6 +1105,22 @@
     }
     /*]]>*/
 </script>
+
+<!-- row automatiquement -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatContainer = document.getElementById('chat-bubbles');
+        if (chatContainer) {
+            const scrollable = chatContainer.parentNode;
+            scrollable.scrollTop = scrollable.scrollHeight;
+        }
+    });
+    /*]]>*/
+</script>
+
+</body>
+
 
 
 <!-- Ion icon -->

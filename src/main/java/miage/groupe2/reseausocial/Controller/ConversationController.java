@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Controller
 public class ConversationController {
 
+    public static final String MESSAGES = "/messages";
     private final ConversationRepository conversationRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final MessageRepository messageRepository;
@@ -68,6 +69,8 @@ public class ConversationController {
 
             conv = new Conversation();
             conv.setCreateur(user);
+            long timestamp = Instant.now().toEpochMilli();
+            conv.setDateConv(timestamp);
 
             List<Utilisateur> participants = new ArrayList<>();
             participants.add(user);
@@ -138,8 +141,7 @@ public class ConversationController {
 
     @GetMapping("/conversation/groupe/nouvelle")
     public String voirMesAmis1(HttpSession session, Model model) {
-        Utilisateur userConnecte = (Utilisateur) session.getAttribute("user");
-        if (userConnecte == null) return "redirect:/auth/login";
+        Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
         Utilisateur utilisateurAvecAmis = utilisateurRepository.findById(userConnecte.getIdUti()).orElse(null);
         if (utilisateurAvecAmis == null) return "redirect:/auth/login";
@@ -164,6 +166,8 @@ public class ConversationController {
         List<Utilisateur> participants = utilisateurRepository.findAllById(participantIds);
 
         Conversation conversation = new Conversation();
+        long timestamp = Instant.now().toEpochMilli();
+        conversation.setDateConv(timestamp);
         conversation.setNomConv(nomdiscussion);
         conversation.setParticipants(participants);
         conversation.setCreateur(utilisateurConnecte);
@@ -219,42 +223,56 @@ public class ConversationController {
     }
 
     @PostMapping("/conversation/quitter/{idConv}")
-    public String quitterConversation(@PathVariable("idConv") Integer idConv, HttpSession session, RedirectAttributes redirectAttributes) {
-        Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
+    public String quitterConversation(@PathVariable("idConv") Integer idConv,
+                                      HttpSession session,
+                                      RedirectAttributes redirectAttributes,
+                                      @RequestHeader(value = "Referer", required = false) String referer
+
+    ) {
+        Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         Conversation conv = conversationRepository.findById(idConv).orElse(null);
         if (conv == null) {
-            redirectAttributes.addFlashAttribute("error", "Conversation introuvable.");
-            return "redirect:/conversation/groupes";
+            return MESSAGES;
         }
 
-        // Vérifier que ce n’est pas le créateur
         if (conv.getCreateur().getIdUti().equals(user.getIdUti())) {
-            redirectAttributes.addFlashAttribute("error", "Le créateur ne peut pas quitter la conversation. Supprime-la si nécessaire.");
-            return "redirect:/conversation/groupes";
+            return RedirectUtil.getSafeRedirectUrl(referer,MESSAGES);
         }
 
         // Supprimer l'utilisateur des participants
-        conv.getParticipants().removeIf(p -> p.getIdUti().equals(user.getIdUti()));
+        conv.getParticipants().remove(user);
         conversationRepository.save(conv);
 
-        redirectAttributes.addFlashAttribute("success", "Vous avez quitté la conversation.");
-        return "redirect:/conversation/groupes";
+        return MESSAGES;
     }
 
 
-    @GetMapping("/messages")
+    @GetMapping(MESSAGES)
     public String afficherMessages(HttpSession session,
                                    Model model,
                                    @RequestParam(value = "idConv", required = false) Integer idConv
                                    ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-        List <Conversation> Convs = user.getConversationsParticipees();
-        Convs.forEach(c -> c.getParticipants().remove(user));
-        model.addAttribute("conversations", Convs);
+        List<Conversation> convs = user.getConversationsParticipees().stream()
+                .sorted((c1, c2) -> {
+                    boolean empty1 = c1.getMessages().isEmpty();
+                    boolean empty2 = c2.getMessages().isEmpty();
+                    if (empty1 && empty2) {
+                        return Long.compare(c2.getDateConv(), c1.getDateConv());
+                    } else if (empty1) {
+                        return 1;
+                    } else if (empty2) {
+                        return -1;
+                    } else {
+                        long t1 = c1.getMessages().get(c1.getMessages().size() - 1).getDateM();
+                        long t2 = c2.getMessages().get(c2.getMessages().size() - 1).getDateM();
+                        return Long.compare(t2, t1);
+                    }
+                })
+                .toList();
+        convs.forEach(c -> c.getParticipants().remove(user));
+        model.addAttribute("conversations", convs);
         if (idConv != null) {
             Conversation selected = conversationRepository.findByIdConv(idConv);
             model.addAttribute("selectedConv", selected);

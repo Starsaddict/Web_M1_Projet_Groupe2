@@ -27,6 +27,8 @@ public class Conversation implements Serializable {
     private List<Message> messages;
 
 
+    private Long dateConv;
+
     @ManyToMany
     @JoinTable(
         name = "participer_conv",
@@ -94,5 +96,13 @@ public class Conversation implements Serializable {
 
     public void setEstconversationDeGroupe(boolean estconversationDeGroupe) {
         this.estconversationDeGroupe = estconversationDeGroupe;
+    }
+
+    public long getDateConv() {
+        return dateConv;
+    }
+
+    public void setDateConv(long dateConv) {
+        this.dateConv = dateConv;
     }
 }
