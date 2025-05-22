@@ -1,7 +1,6 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
-import miage.groupe2.reseausocial.Model.DemandeAmi;
 import miage.groupe2.reseausocial.Model.Groupe;
 import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
@@ -10,10 +9,10 @@ import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 
 import miage.groupe2.reseausocial.Util.ImageUtil;
 import miage.groupe2.reseausocial.Util.RedirectUtil;
+import miage.groupe2.reseausocial.Util.TextUtil;
 import miage.groupe2.reseausocial.service.GroupeService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -72,17 +72,93 @@ public class UtilisateurController {
     }
 
     @GetMapping("/rechercher")
-    public String rechercherUtilisateurs(@RequestParam("nom") String nom, Model model, HttpSession session) {
+    public String rechercherUtilisateurs(@RequestParam("nom") String nom,
+                                         Model model,
+                                         HttpSession session) {
         Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
 
-        List<Utilisateur> utilisateurs = utilisateurRepository.findByNomUContainingIgnoreCase(nom);
+        // 全部用户
+        List<Utilisateur> all = utilisateurRepository.findAll();
 
-        // Supprimer l'utilisateur connecté des résultats
-        utilisateurs.removeIf(u -> u.getIdUti().equals(userConnecte.getIdUti()));
+        // 1. almostFriends：已经发出“en attente”请求的对方
+        List<Utilisateur> almostFriends = userConnecte.getDemandesEnvoyees().stream()
+                .filter(d -> "en attente".equals(d.getStatut()))
+                .map(d -> d.getRecepteur())
+                .collect(Collectors.toCollection(ArrayList::new));
+        model.addAttribute("almostFriends", almostFriends);
 
-        model.addAttribute("utilisateurs", utilisateurs);
-        return "search_results";
+        // 2. recommande：随机推荐（不是自己、不是好友、也没发请求），限制 5 个
+        List<Utilisateur> notFriends = all.stream()
+                .filter(u -> !u.getIdUti().equals(userConnecte.getIdUti()))
+                .filter(u -> !userConnecte.getAmis().contains(u))
+                .filter(u -> !almostFriends.contains(u))
+                .limit(5)
+                .collect(Collectors.toCollection(ArrayList::new));
+        model.addAttribute("recommande", notFriends);
+
+        // 3. 搜索匹配：按 姓、名、昵称、姓名组合、反向组合 分别搜集
+        List<Utilisateur> results = new ArrayList<>();
+
+        List<Utilisateur> nomMatch = all.stream()
+                .filter(u -> TextUtil.containsIgnoreAccent(u.getNomU(), nom))
+                .collect(Collectors.toCollection(ArrayList::new));
+        results.addAll(nomMatch);
+
+        List<Utilisateur> prenomMatch = all.stream()
+                .filter(u -> TextUtil.containsIgnoreAccent(u.getPrenomU(), nom))
+                .collect(Collectors.toCollection(ArrayList::new));
+        results.addAll(prenomMatch);
+
+        List<Utilisateur> pseudoMatch = all.stream()
+                .filter(u -> TextUtil.containsIgnoreAccent(u.getPseudoU(), nom))
+                .collect(Collectors.toCollection(ArrayList::new));
+        results.addAll(pseudoMatch);
+
+        List<Utilisateur> nomPrenomMatch = all.stream()
+                .filter(u -> TextUtil.containsIgnoreAccent(u.getNomU() + " " + u.getPrenomU(), nom))
+                .collect(Collectors.toCollection(ArrayList::new));
+        results.addAll(nomPrenomMatch);
+
+        List<Utilisateur> prenomNomMatch = all.stream()
+                .filter(u -> TextUtil.containsIgnoreAccent(u.getPrenomU() + " " + u.getNomU(), nom))
+                .collect(Collectors.toCollection(ArrayList::new));
+        results.addAll(prenomNomMatch);
+
+        // 4. 去掉自己
+        results.removeIf(u -> u.getIdUti().equals(userConnecte.getIdUti()));
+
+        // 5. 去重并保持插入顺序
+        LinkedHashSet<Utilisateur> dedup = new LinkedHashSet<>(results);
+        results.clear();
+        results.addAll(dedup);
+
+        // 6. alreadyFriend：在 results 里已是好友的
+        List<Utilisateur> alreadyFriend = results.stream()
+                .filter(u -> userConnecte.getAmis().stream()
+                        .anyMatch(a -> a.getIdUti().equals(u.getIdUti()))
+                )
+                .collect(Collectors.toCollection(ArrayList::new));
+        model.addAttribute("alreadyFriend", alreadyFriend);
+
+        // 从 results 中移除好友，剩下“非好友”
+        results.removeIf(u -> userConnecte.getAmis().stream()
+                .anyMatch(a -> a.getIdUti().equals(u.getIdUti()))
+        );
+
+        // 7. alreadySent：非好友里已经发过请求的
+        List<Utilisateur> alreadySent = results.stream()
+                .filter(almostFriends::contains)
+                .collect(Collectors.toCollection(ArrayList::new));
+        model.addAttribute("alreadySent", alreadySent);
+
+        // 从 results 中移除已发请求的，剩下“完全不是好友的”
+        results.removeIf(almostFriends::contains);
+
+        model.addAttribute("notFriendsAtAll", results);
+
+        return "results";
     }
+
 
     @GetMapping("/mes-amis")
     public String voirMesAmis(HttpSession session, Model model) {
@@ -90,7 +166,6 @@ public class UtilisateurController {
         // Rafraîchir l’utilisateur depuis la BDD pour charger les relations (lazy loading)
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
-        model.addAttribute("Amis", user.getAmis());
         List<Utilisateur> allUtilisateurs = utilisateurRepository.findAll();
         List<Utilisateur> almostFriends = user.getDemandesEnvoyees().stream()
                 .filter(d -> d.getStatut().equals("en attente"))

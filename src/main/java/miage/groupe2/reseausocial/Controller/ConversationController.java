@@ -138,18 +138,6 @@ public class ConversationController {
     }
 
 
-
-    @GetMapping("/conversation/groupe/nouvelle")
-    public String voirMesAmis1(HttpSession session, Model model) {
-        Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
-
-        Utilisateur utilisateurAvecAmis = utilisateurRepository.findById(userConnecte.getIdUti()).orElse(null);
-        if (utilisateurAvecAmis == null) return "redirect:/auth/login";
-
-        model.addAttribute("amis", utilisateurAvecAmis.getAmis());
-        return "conversationgroupe"; // ❗affiche la page avec les amis à cocher
-    }
-
     @PostMapping("/conversation/groupe/creer")
     public String creerConversationGroupe(
             @RequestParam("participantIds") List<Integer> participantIds,
@@ -179,26 +167,7 @@ public class ConversationController {
     }
 
 
-    @GetMapping("/conversation/groupes")
-    public String afficherConversationsDeGroupe(HttpSession session, Model model) {
-        Utilisateur utilisateurConnecte = (Utilisateur) session.getAttribute("user");
-        if (utilisateurConnecte == null) {
-            return "redirect:/auth/login";
-        }
 
-        // On récupère toutes les conversations où l'utilisateur participe
-        List<Conversation> toutesConversations = conversationRepository.findByParticipants_IdUti(utilisateurConnecte.getIdUti());
-
-        // On filtre pour ne garder que les conversations avec 3 participants ou plus
-        List<Conversation> conversationsDeGroupe = toutesConversations.stream()
-                .filter(conv -> conv.getParticipants().size() >= 2)
-                .toList();
-
-        model.addAttribute("groupes", conversationsDeGroupe);
-        model.addAttribute("userConnecteId", utilisateurConnecte.getIdUti());
-
-        return "afficherconversationgroupe";
-    }
     @PostMapping("/conversation/supprimer/{idConv}")
     public String supprimerConversation(
             @PathVariable("idConv") Integer idConv,

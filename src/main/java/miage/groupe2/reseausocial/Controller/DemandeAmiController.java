@@ -70,9 +70,7 @@ public class DemandeAmiController {
 
     @RequestMapping("/ajouterAmi")
     public String envoyerDemandeAmi(@RequestParam("idAmi") Integer idAmi,
-                                    @RequestParam(value = "nom", required = false) String nomRecherche,
                                     HttpSession session,
-                                    RedirectAttributes redirectAttributes,
                                     @RequestHeader(value = "Referer", required = false) String referer
     ) {
         Utilisateur userConnecte = utilisateurService.getUtilisateurFromSession(session);
@@ -84,7 +82,6 @@ public class DemandeAmiController {
         boolean dejaAmis = userConnecte.getAmis().stream().anyMatch(a -> a.getIdUti().equals(idAmi));
 
         if (demandeExist || dejaAmis) {
-            redirectAttributes.addFlashAttribute("error", "Une demande d'ami existe déjà.");
             return RedirectUtil.getSafeRedirectUrl(referer, "/mes-amis");
         }
 
@@ -99,18 +96,7 @@ public class DemandeAmiController {
 
         demandeAmiRepository.save(demande);
 
-        redirectAttributes.addFlashAttribute("success", "Demande d'ami envoyée à " + recepteur.getNomU() + ".");
-
-        if (referer != null) {
-            return RedirectUtil.getSafeRedirectUrl(referer, "/home");
-        }
-
-        String redirectUrl = "/home";
-        if (nomRecherche != null && !nomRecherche.isEmpty()) {
-            redirectUrl = "/user/rechercher?nom=" + nomRecherche;
-        }
-
-        return "redirect:" + redirectUrl;
+        return RedirectUtil.getSafeRedirectUrl(referer, "/user/rechercher" );
     }
 
 }

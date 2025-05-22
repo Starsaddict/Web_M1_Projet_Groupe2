@@ -439,7 +439,7 @@
 
                     <div class="page-heading">
 
-                        <h1 class="page-title"> Mon Amis </h1>
+                        <h1 class="page-title"> Résultats de recherche </h1>
 
                     </div>
 
@@ -455,10 +455,11 @@
                         </a>
 
                     </div>
+
                     <div class="grid sm:grid-cols-2 gap-3"
                          uk-scrollspy="target: > div; cls: uk-animation-scale-up; delay: 100 ;repeat: true">
                         <!-- chaque personne -->
-                        <th:block th:each="user :${Amis}">
+                        <th:block th:each="user :${results}">
 
                             <div class="card flex space-x-5 p-5 relative">
 
@@ -791,7 +792,6 @@
         </form>
     </div>
 </div>
-
 <!-- Javascript  -->
 <script src="/assets/js/uikit.min.js"></script>
 <script src="/assets/js/simplebar.js"></script>
