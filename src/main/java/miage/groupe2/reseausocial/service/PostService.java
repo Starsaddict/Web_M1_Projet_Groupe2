@@ -13,15 +13,21 @@ import java.util.List;
 
 @Service
 public class PostService {
+    private final PostRepository postRepository;
+    private final UtilisateurRepository utilisateurRepository;
+    private final GroupeRepository groupeRepository;
+    private final UtilisateurService utilisateurService;
 
     @Autowired
-    private PostRepository postRepository;
-    @Autowired
-    private UtilisateurRepository utilisateurRepository;
-    @Autowired
-    private GroupeRepository groupeRepository;
-    @Autowired
-    private UtilisateurService utilisateurService;
+    public PostService(PostRepository postRepository,
+                       UtilisateurRepository utilisateurRepository,
+                       GroupeRepository groupeRepository,
+                       UtilisateurService utilisateurService) {
+        this.postRepository = postRepository;
+        this.utilisateurRepository = utilisateurRepository;
+        this.groupeRepository = groupeRepository;
+        this.utilisateurService = utilisateurService;
+    }
 
     public void publierPostDansGroupe(Post post, Utilisateur auteur, Groupe groupe) {
         post.setDatePost(System.currentTimeMillis());

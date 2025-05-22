@@ -20,6 +20,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Gère les conversations privées et de groupe.
+ */
 @Controller
 public class ConversationController {
 
@@ -27,12 +30,12 @@ public class ConversationController {
     private final ConversationRepository conversationRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final MessageRepository messageRepository;
+
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private UtilisateurService utilisateurService;
 
-    // ✅ Constructeur avec injection de dépendances
     @Autowired
     public ConversationController(ConversationRepository conversationRepository, UtilisateurRepository utilisateurRepository, MessageRepository messageRepository) {
         this.conversationRepository = conversationRepository;
@@ -55,6 +58,7 @@ public class ConversationController {
                         .anyMatch(id -> id == idAmi)
                 )
                 .toList();
+
         Conversation conv = null;
 
         boolean ifHaveConversations = !monConv.isEmpty();
@@ -64,8 +68,8 @@ public class ConversationController {
 
         // Si aucune conversation privée n'existe, en créer une
         if (!ifHaveConversations) {
-            Utilisateur ami = utilisateurRepository.findByidUti(idAmi);
 
+            Utilisateur ami = utilisateurRepository.findByidUti(idAmi);
             conv = new Conversation();
             conv.setCreateur(user);
             long timestamp = Instant.now().toEpochMilli();
@@ -74,9 +78,7 @@ public class ConversationController {
             List<Utilisateur> participants = new ArrayList<>();
             participants.add(user);
             participants.add(ami);
-
             conv.setParticipants(participants);
-
             conversationRepository.save(conv);
         }
 
@@ -84,9 +86,9 @@ public class ConversationController {
     }
 
 
-
-
-
+    /**
+     * Envoie un message dans une conversation.
+     */
     @PostMapping("/message/envoyer/{idConv}")
     public String envoyerMessage(@PathVariable("idConv") Integer idConv,
                                  @RequestParam("texte") String texte,
@@ -96,6 +98,7 @@ public class ConversationController {
     ) {
 
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+
 
         Conversation conv = conversationRepository.findById(idConv).orElse(null);
         if (conv == null) {
@@ -108,14 +111,12 @@ public class ConversationController {
         msg.setExpediteur(user);
         msg.setTextM(texte);
         msg.setDateM(Instant.now().toEpochMilli());
-
         messageRepository.save(msg);
 
         messagingTemplate.convertAndSend("/topic/conversation/" + idConv, msg);
 
         return RedirectUtil.getSafeRedirectUrl(referer,"/message/conversation/" + idConv);
     }
-
 
     @PostMapping("/conversation/groupe/creer")
     public String creerConversationGroupe(
@@ -127,11 +128,10 @@ public class ConversationController {
 
         Utilisateur utilisateurConnecte = utilisateurService.getUtilisateurFromSession(session);
 
-        // On ajoute l'utilisateur lui-même dans la conversation
+
         participantIds.add(utilisateurConnecte.getIdUti());
 
         List<Utilisateur> participants = utilisateurRepository.findAllById(participantIds);
-
         Conversation conversation = new Conversation();
         long timestamp = Instant.now().toEpochMilli();
         conversation.setDateConv(timestamp);
@@ -139,7 +139,6 @@ public class ConversationController {
         conversation.setParticipants(participants);
         conversation.setCreateur(utilisateurConnecte);
         conversation.setEstconversationDeGroupe(true);
-
         conversationRepository.save(conversation);
 
         return "redirect:/messages?idConv=" + conversation.getIdConv();
@@ -154,12 +153,12 @@ public class ConversationController {
             RedirectAttributes redirectAttributes,
             @RequestHeader(value = "Referer", required = false) String referer
     ) {
+
         Utilisateur user = (Utilisateur) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
+        if (user == null) return "redirect:/auth/login";
 
         Conversation conv = conversationRepository.findByIdConv(idConv);
+
 
         assert conv != null;
         if (conv.getCreateur().getIdUti().equals(user.getIdUti())) {
@@ -168,8 +167,12 @@ public class ConversationController {
         }else{
             return "redirect:/messages?idConv=" + idConv;
         }
+
     }
 
+    /**
+     * Permet à un utilisateur de quitter une conversation.
+     */
     @PostMapping("/conversation/quitter/{idConv}")
     public String quitterConversation(@PathVariable("idConv") Integer idConv,
                                       HttpSession session,
@@ -178,6 +181,7 @@ public class ConversationController {
 
     ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
+
 
         Conversation conv = conversationRepository.findById(idConv).orElse(null);
         if (conv == null) {
@@ -277,6 +281,4 @@ public class ConversationController {
         }
         return RedirectUtil.getSafeRedirectUrl(referer,"/messages?idConv="+idConv);
     }
-
-
 }
