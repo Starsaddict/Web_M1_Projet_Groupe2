@@ -1,10 +1,8 @@
 package miage.groupe2.reseausocial.Controller;
 
 import jakarta.servlet.http.HttpSession;
-
 import miage.groupe2.reseausocial.Model.Post;
 import miage.groupe2.reseausocial.Model.Utilisateur;
-
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import miage.groupe2.reseausocial.service.DemandeAmiService;
 import miage.groupe2.reseausocial.service.PostService;
@@ -15,8 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 
 @Controller

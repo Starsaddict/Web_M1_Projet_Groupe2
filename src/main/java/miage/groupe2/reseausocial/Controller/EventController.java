@@ -5,14 +5,6 @@ import miage.groupe2.reseausocial.Model.Evenement;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.EvenementRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
-
-
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import miage.groupe2.reseausocial.Util.DateUtil;
 import miage.groupe2.reseausocial.Util.RedirectUtil;
 import miage.groupe2.reseausocial.service.UtilisateurService;
@@ -20,6 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Contrôleur pour la gestion des événements
