@@ -1,6 +1,5 @@
 package miage.groupe2.reseausocial.Controller;
 
-
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import miage.groupe2.reseausocial.Model.*;
@@ -14,11 +13,9 @@ import miage.groupe2.reseausocial.service.PostService;
 import miage.groupe2.reseausocial.service.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 
 import java.io.IOException;
 import java.util.List;
@@ -35,17 +32,24 @@ public class PostController {
 
     @Autowired
     CommentaireRepository commentaireRepository;
+
     @Autowired
     private UtilisateurService utilisateurService;
+
     @Autowired
     private GroupeService groupeService;
+
     @Autowired
     private PostService postService;
+
     @Autowired
     ReactionRepository reactionRepository;
 
     public static final String HOME_PAGE = "/home";
 
+    /**
+     * Crée un post avec ou sans groupe, avec image facultative.
+     */
     @PostMapping("/creer")
     public String creerPost(
             @ModelAttribute("post") Post post,
@@ -65,12 +69,12 @@ public class PostController {
         } else {
             postService.publierPostSansGroupe(post, user);
             return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
-
         }
     }
 
-
-
+    /**
+     * Modifie un post existant (titre, texte, image).
+     */
     @PostMapping("/modifier")
     public String modifierPost(@RequestParam(name = "titre", required = false ) String titre,
                                @RequestParam(name = "text", required = false ) String text,
@@ -90,16 +94,18 @@ public class PostController {
 
         if (imageFile != null && !imageFile.isEmpty()) {
             post.setImagePost(imageFile.getBytes());
-
-        }else if (Boolean.TRUE.equals(deleteImage)) {
+        } else if (Boolean.TRUE.equals(deleteImage)) {
             post.setImagePost(null);
         }
 
         postRepository.save(post);
 
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
 
+    /**
+     * Supprime un post si l'utilisateur en est le créateur.
+     */
     @GetMapping("/supprimer")
     public String supprimerPost(@RequestParam("id") Integer id,
                                 HttpSession session,
@@ -115,15 +121,16 @@ public class PostController {
         return RedirectUtil.getSafeRedirectUrl(referer,"/user/" + user.getIdUti() + "/profil");
     }
 
+    /**
+     * Reposte un post s'il ne l'a pas déjà été par l'utilisateur.
+     */
     @GetMapping("/repost")
     public String repostPost(@RequestParam("id") Integer postId,
                              HttpSession session,
                              RedirectAttributes redirectAttributes,
                              @RequestHeader(value = "Referer", required = false) String referer
     ) {
-
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-
         Post post = postService.findPostById(postId);
 
         List<Post> repostList = user.getPostsRepostes();
@@ -132,15 +139,19 @@ public class PostController {
             user.setPostsRepostes(repostList);
             utilisateurRepository.save(user);
         }
+
         session.setAttribute("user", user);
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
 
+    /**
+     * Annule un repost si l'utilisateur l'avait reposté.
+     */
     @GetMapping("/repost/annuler")
     public String repostAnnuler(@RequestParam("id") Integer postId,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes,
-                             @RequestHeader(value = "Referer", required = false) String referer
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes,
+                                @RequestHeader(value = "Referer", required = false) String referer
     ) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Post post = postService.findPostById(postId);
@@ -151,10 +162,14 @@ public class PostController {
             user.setPostsRepostes(repostList);
             utilisateurRepository.save(user);
         }
-        session.setAttribute("user", user);
 
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        session.setAttribute("user", user);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
+
+    /**
+     * Ajoute un commentaire à un post.
+     */
     @PostMapping("/commenter")
     public String ajouterCommentaire(@ModelAttribute("nouveauCommentaire") Commentaire commentaire,
                                      @RequestParam("postId") Integer postId,
@@ -173,9 +188,12 @@ public class PostController {
 
         commentaireRepository.save(commentaire);
 
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
 
+    /**
+     * Ajoute une réaction à un post en remplaçant l'éventuelle réaction précédente.
+     */
     @PostMapping("/react")
     @Transactional
     public String ajouterReaction(@RequestParam("id") Integer postId,
@@ -193,11 +211,6 @@ public class PostController {
         reaction.setType(emoji);
         reactionRepository.save(reaction);
 
-        return RedirectUtil.getSafeRedirectUrl(referer,HOME_PAGE);
+        return RedirectUtil.getSafeRedirectUrl(referer, HOME_PAGE);
     }
-
-
-
-
-
 }

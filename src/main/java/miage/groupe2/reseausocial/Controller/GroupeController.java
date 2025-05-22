@@ -15,9 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/groupe")
@@ -25,24 +23,31 @@ public class GroupeController {
 
     @Autowired
     GroupeRepository groupeRepository;
+
     @Autowired
     UtilisateurRepository utilisateurRepository;
+
     @Autowired
     GroupeService groupeService;
+
     @Autowired
     private UtilisateurService utilisateurService;
 
     public static final String LIST_GROUPS = "redirect:/groupe/list";
+
+    /**
+     * Redirige vers la liste des groupes.
+     */
     @RequestMapping("")
     public String index(Model model) {
         return LIST_GROUPS;
     }
 
+    /**
+     * Affiche les groupes de l'utilisateur et les suggestions.
+     */
     @RequestMapping("/list")
-    public String groupeList(
-            Model model,
-            HttpSession session
-    ) {
+    public String groupeList(Model model, HttpSession session) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
 
         List<Groupe> recommandGroupes = groupeRepository.findAll().stream()
@@ -58,35 +63,27 @@ public class GroupeController {
         return "groups";
     }
 
+    /**
+     * Crée un nouveau groupe.
+     */
     @PostMapping("/creer")
-    public String creerGroupe(
-            HttpSession session,
-            @ModelAttribute Groupe groupe,
-            Model model,
-            @RequestHeader(value = "Referer", required = false) String referer
-
-    ){
+    public String creerGroupe(HttpSession session, @ModelAttribute Groupe groupe, Model model,
+                              @RequestHeader(value = "Referer", required = false) String referer) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-
         groupeService.createGroupe(user, groupe);
-
         session.setAttribute("user", user);
-        return RedirectUtil.getSafeRedirectUrl(referer,LIST_GROUPS);
+        return RedirectUtil.getSafeRedirectUrl(referer, LIST_GROUPS);
     }
 
+    /**
+     * Affiche les détails d'un groupe.
+     */
     @GetMapping("/{id}")
-    public String afficherGroupe(
-            @PathVariable("id") int id,
-            Model model,
-            HttpSession session
-    ) {
+    public String afficherGroupe(@PathVariable("id") int id, Model model, HttpSession session) {
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
         if (groupe == null) return LIST_GROUPS;
 
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
-
-
-
         boolean estMembre = user.getGroupesAppartenance().stream()
                 .anyMatch(g -> g.getIdGrp().equals(groupe.getIdGrp()));
 
@@ -111,12 +108,11 @@ public class GroupeController {
         return "group_detail";
     }
 
+    /**
+     * Publie un post dans un groupe.
+     */
     @PostMapping("/{id}/poster")
-    public String posterDansGroupe(
-            @PathVariable("id") int id,
-            @ModelAttribute Post post,
-            HttpSession session
-    ) {
+    public String posterDansGroupe(@PathVariable("id") int id, @ModelAttribute Post post, HttpSession session) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
 
@@ -134,12 +130,13 @@ public class GroupeController {
         return "redirect:/groupe/" + id;
     }
 
+    /**
+     * Supprime un membre du groupe (si utilisateur est créateur).
+     */
     @PostMapping("/{id}/supprimerMembre")
-    public String supprimerMembreDuGroupe(
-            @PathVariable("id") int id,
-            @RequestParam("idMembre") int idMembre,
-            HttpSession session
-    ) {
+    public String supprimerMembreDuGroupe(@PathVariable("id") int id,
+                                          @RequestParam("idMembre") int idMembre,
+                                          HttpSession session) {
         Utilisateur user = utilisateurService.getUtilisateurFromSession(session);
         Groupe groupe = groupeRepository.findGroupeByidGrp(id);
 
@@ -152,10 +149,5 @@ public class GroupeController {
 
         return "redirect:/groupe/" + id;
     }
-
-    public void setUtilisateurService(UtilisateurService utilisateurService) {
-    this.utilisateurService = utilisateurService;
-    }
-
 
 }
