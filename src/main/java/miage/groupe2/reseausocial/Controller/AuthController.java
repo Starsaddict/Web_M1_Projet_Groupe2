@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UtilisateurRepository utilisateurRepository;
+    @Autowired UtilisateurRepository utilisateurRepository;
 
     /**
      * Affiche la page de connexion.

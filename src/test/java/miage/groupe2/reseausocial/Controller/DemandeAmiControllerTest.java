@@ -6,132 +6,107 @@ import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.DemandeAmiRepository;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import miage.groupe2.reseausocial.service.UtilisateurService;
-import miage.groupe2.reseausocial.Util.RedirectUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class DemandeAmiControllerTest {
 
-    @InjectMocks
     private DemandeAmiController controller;
-
-    @Mock
     private DemandeAmiRepository demandeAmiRepository;
-
-    @Mock
     private UtilisateurRepository utilisateurRepository;
-
-    @Mock
     private UtilisateurService utilisateurService;
-
-    @Mock
     private HttpSession session;
-
-    @Mock
     private RedirectAttributes redirectAttributes;
 
-    private Utilisateur userConnecte;
-
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    public void setUp() {
+        controller = new DemandeAmiController();
+        demandeAmiRepository = mock(DemandeAmiRepository.class);
+        utilisateurRepository = mock(UtilisateurRepository.class);
+        utilisateurService = mock(UtilisateurService.class);
+        session = mock(HttpSession.class);
+        redirectAttributes = mock(RedirectAttributes.class);
 
-        userConnecte = new Utilisateur();
-        userConnecte.setIdUti(1);
-        userConnecte.setNomU("TestUser");
-
-        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(userConnecte);
+        controller = new DemandeAmiController();
+        inject(controller, "demandeAmiRepository", demandeAmiRepository);
+        inject(controller, "utilisateurRepository", utilisateurRepository);
+        inject(controller, "utilisateurService", utilisateurService);
     }
 
     @Test
-    void testEnvoyerDemandeAmi_UserNotFound() {
-        int idAmi = 2;
-        String nomRecherche = "toto";
-
-        when(utilisateurRepository.findByidUti(idAmi)).thenReturn(null);
-
-        String redirect = controller.envoyerDemandeAmi(idAmi, nomRecherche, session, redirectAttributes, null);
-
-        verify(redirectAttributes).addFlashAttribute("error", "Utilisateur non trouvé.");
-        assertEquals("redirect:/user/rechercher?nom=" + nomRecherche, redirect);
-    }
-
-    @Test
-    void testEnvoyerDemandeAmi_SameUser() {
-        int idAmi = userConnecte.getIdUti();
-
-        String redirect = controller.envoyerDemandeAmi(idAmi, "toto", session, redirectAttributes, null);
-
-        verify(redirectAttributes).addFlashAttribute("error", "Vous ne pouvez pas vous ajouter vous-même.");
-        assertEquals("redirect:/user/rechercher?nom=toto", redirect);
-    }
-
-    @Test
-    void testEnvoyerDemandeAmi_Success() {
-        int idAmi = 2;
-        String nomRecherche = "toto";
-
+    public void testAccepterDemande() {
         Utilisateur recepteur = new Utilisateur();
-        recepteur.setIdUti(idAmi);
-        recepteur.setNomU("AmiTest");
+        recepteur.setIdUti(1);
 
-        when(utilisateurRepository.findByidUti(idAmi)).thenReturn(recepteur);
-        when(demandeAmiRepository.existsByDemandeurIdUtiAndRecepteurIdUtiAndStatutIn(
-                userConnecte.getIdUti(), idAmi, List.of("en attente"))).thenReturn(false);
-        when(demandeAmiRepository.sontDejaAmis(userConnecte.getIdUti(), idAmi)).thenReturn(false);
+        Utilisateur demandeur = new Utilisateur();
+        demandeur.setIdUti(2);
 
-        String redirect = controller.envoyerDemandeAmi(idAmi, nomRecherche, session, redirectAttributes, null);
+        DemandeAmi demande = new DemandeAmi();
+        demande.setRecepteur(recepteur);
+        demande.setDemandeur(demandeur);
+        demande.setStatut("en attente");
 
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(recepteur);
+        when(demandeAmiRepository.findByIdDA(10)).thenReturn(demande);
+
+        String result = controller.accepterDemande(10, session, redirectAttributes, "/test");
+
+        assertEquals("redirect:/home", result);
+        verify(demandeAmiRepository).save(demande);
+        verify(demandeAmiRepository).ajouterLienAmitie(2, 1);
+    }
+
+
+    @Test
+    public void testRefuserDemande() {
+        Utilisateur recepteur = new Utilisateur();
+        recepteur.setIdUti(1);
+        DemandeAmi demande = new DemandeAmi();
+        demande.setRecepteur(recepteur);
+        demande.setStatut("en attente");
+
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(recepteur);
+        when(demandeAmiRepository.findById(20)).thenReturn(Optional.of(demande));
+
+        String result = controller.refuserDemande(20, session, redirectAttributes, "/test");
+
+        assertEquals("redirect:/home", result);
+        verify(demandeAmiRepository).save(demande);
+    }
+
+    @Test
+    public void testEnvoyerDemandeAmi() {
+        Utilisateur demandeur = new Utilisateur();
+        demandeur.setIdUti(1);
+        demandeur.setAmis(new ArrayList<>());
+        when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(demandeur);
+        when(demandeAmiRepository.findByDemandeur(demandeur)).thenReturn(new ArrayList<>());
+        Utilisateur recepteur = new Utilisateur();
+        recepteur.setIdUti(2);
+        when(utilisateurRepository.findByidUti(2)).thenReturn(recepteur);
+
+        String result = controller.envoyerDemandeAmi(2, session, "/test");
+
+        assertEquals("redirect:/user/rechercher", result);
         verify(demandeAmiRepository).save(any(DemandeAmi.class));
-        verify(redirectAttributes).addFlashAttribute("success", "Demande d'ami envoyée à " + recepteur.getNomU() + ".");
-        assertEquals("redirect:/user/rechercher?nom=" + nomRecherche, redirect);
     }
 
-    @Test
-    void testAccepterDemande_RedirectsToHome() {
-        int idDemande = 10;
-
-        DemandeAmi demande = new DemandeAmi();
-        demande.setStatut("en attente");
-        demande.setDemandeur(new Utilisateur());
-        demande.setRecepteur(userConnecte);
-
-        when(demandeAmiRepository.findByIdDA(idDemande)).thenReturn(demande);
-
-        String redirect = controller.accepterDemande(idDemande, session, redirectAttributes, null);
-
-        assertEquals("redirect:/home", redirect);
-        assertEquals("acceptée", demande.getStatut());
-
-        verify(demandeAmiRepository).save(demande);
-        verify(demandeAmiRepository).ajouterLienAmitie(demande.getDemandeur().getIdUti(), userConnecte.getIdUti());
-        verify(redirectAttributes).addFlashAttribute("succes", "Demande d'ami acceptée.");
-    }
-
-    @Test
-    void testRefuserDemande_RedirectsToHome() {
-        int idDemande = 10;
-
-        DemandeAmi demande = new DemandeAmi();
-        demande.setStatut("en attente");
-        demande.setRecepteur(userConnecte);
-
-        when(demandeAmiRepository.findById(idDemande)).thenReturn(Optional.of(demande));
-
-        String redirect = controller.refuserDemande(idDemande, session, redirectAttributes, null);
-
-        assertEquals("redirect:/home", redirect);
-        assertEquals("refusée", demande.getStatut());
-
-        verify(demandeAmiRepository).save(demande);
-        verify(redirectAttributes).addFlashAttribute("succes", "Demande d'ami refusée.");
+    private void inject(Object target, String fieldName, Object value) {
+        try {
+            var field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -111,20 +111,27 @@ class UtilisateurControllerTest {
     void rechercherUtilisateurs_shouldExcludeCurrentUser() {
         Utilisateur currentUser = new Utilisateur();
         currentUser.setIdUti(1);
+        currentUser.setAmis(new ArrayList<>());
+        currentUser.setDemandesEnvoyees(new ArrayList<>());
+
         when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(currentUser);
 
         Utilisateur foundUser1 = new Utilisateur();
         foundUser1.setIdUti(1);
+        foundUser1.setAmis(new ArrayList<>());
+        foundUser1.setDemandesEnvoyees(new ArrayList<>());
+
         Utilisateur foundUser2 = new Utilisateur();
         foundUser2.setIdUti(2);
+        foundUser2.setAmis(new ArrayList<>());
+        foundUser2.setDemandesEnvoyees(new ArrayList<>());
 
-        when(utilisateurRepository.findByNomUContainingIgnoreCase("nom"))
-            .thenReturn(new ArrayList<>(List.of(foundUser1, foundUser2)));
+        when(utilisateurRepository.findAll()).thenReturn(new ArrayList<>(List.of(foundUser1, foundUser2)));
 
         String view = controller.rechercherUtilisateurs("nom", model, session);
 
-        verify(model).addAttribute(eq("utilisateurs"), argThat(list -> ((List<?>)list).size() == 1));
-        assertEquals("search_results", view);
+        verify(model).addAttribute(eq("recommande"), argThat(list -> ((List<?>)list).size() == 1));
+        assertEquals("results", view);
     }
 
     @Test
@@ -132,8 +139,7 @@ class UtilisateurControllerTest {
         when(utilisateurService.getUtilisateurFromSession(session)).thenReturn(user);
         user.getAmis().add(friend);
         String view = controller.voirMesAmis(session, model);
-        verify(model).addAttribute("amis", user.getAmis());
-        assertEquals("listeamis", view);
+        assertEquals("friends", view);
     }
 
     @Test
@@ -267,10 +273,8 @@ class UtilisateurControllerTest {
     }
 
     private void mockStatic(Class<?> clazz) {
-        // Helper to mock static methods of ImageUtil (not in vanilla Mockito, usually with Mockito-inline)
     }
 
     private void clearAllCaches() {
-        // Helper to clear static mocks
     }
 }

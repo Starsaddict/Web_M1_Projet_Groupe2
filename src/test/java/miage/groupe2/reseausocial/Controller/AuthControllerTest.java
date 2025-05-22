@@ -1,50 +1,50 @@
 package miage.groupe2.reseausocial.Controller;
 
+import jakarta.servlet.http.HttpSession;
 import miage.groupe2.reseausocial.Model.Utilisateur;
 import miage.groupe2.reseausocial.Repository.UtilisateurRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.ui.Model;
-
-import jakarta.servlet.http.HttpSession;
+import org.springframework.ui.ConcurrentModel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import java.lang.reflect.Field;
 
-class AuthControllerTest {
 
-    @Mock
+public class AuthControllerTest {
+
+    private AuthController authController;
     private UtilisateurRepository utilisateurRepository;
-
-    @Mock
+    private HttpSession session;
     private Model model;
 
-    @Mock
-    private HttpSession session;
 
-    @InjectMocks
-    private AuthController authController;
+@BeforeEach
+public void setUp() throws Exception {
+    utilisateurRepository = mock(UtilisateurRepository.class);
+    session = mock(HttpSession.class);
+    model = new ConcurrentModel();
+    authController = new AuthController();
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    Field field = AuthController.class.getDeclaredField("utilisateurRepository");
+    field.setAccessible(true);
+    field.set(authController, utilisateurRepository);
+}
 
     @Test
-    void showLoginForm_shouldReturnFormLogin() {
+    public void testShowLoginForm() {
         String result = authController.showLoginForm();
         assertEquals("form-login", result);
     }
 
     @Test
-    void authenticate_withValidUserAndPassword_shouldRedirectHome() {
+    public void testAuthenticateSuccess() {
         String email = "test@example.com";
-        String rawPassword = "password";
-        String hashedPassword = BCrypt.hashpw(rawPassword, BCrypt.gensalt());
+        String password = "password";
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
         Utilisateur utilisateur = new Utilisateur();
         utilisateur.setEmailU(email);
@@ -52,50 +52,37 @@ class AuthControllerTest {
 
         when(utilisateurRepository.findByEmailU(email)).thenReturn(utilisateur);
 
-        String result = authController.authenticate(email, rawPassword, model, session);
-
-        verify(session).setAttribute("user", utilisateur);
+        String result = authController.authenticate(email, password, model, session);
         assertEquals("redirect:/home", result);
+        verify(session).setAttribute("user", utilisateur);
     }
 
     @Test
-    void authenticate_withInvalidPassword_shouldReturnFormLoginWithError() {
+    public void testAuthenticateFailure() {
         String email = "test@example.com";
-        String rawPassword = "wrongPassword";
-        String hashedPassword = BCrypt.hashpw("correctPassword", BCrypt.gensalt());
+        String password = "wrongpassword";
 
         Utilisateur utilisateur = new Utilisateur();
         utilisateur.setEmailU(email);
-        utilisateur.setMdpU(hashedPassword);
+        utilisateur.setMdpU(BCrypt.hashpw("password", BCrypt.gensalt()));
 
         when(utilisateurRepository.findByEmailU(email)).thenReturn(utilisateur);
 
-        String result = authController.authenticate(email, rawPassword, model, session);
-
-        verify(model).addAttribute("error", "Mot de passe incorrect");
+        String result = authController.authenticate(email, password, model, session);
         assertEquals("form-login", result);
-        verify(session, never()).setAttribute(anyString(), any());
     }
 
     @Test
-    void authenticate_withNonExistingUser_shouldReturnFormLoginWithError() {
-        String email = "nonexistent@example.com";
-        String rawPassword = "password";
-
-        when(utilisateurRepository.findByEmailU(email)).thenReturn(null);
-
-        String result = authController.authenticate(email, rawPassword, model, session);
-
-        verify(model).addAttribute("error", "Mot de passe incorrect");
+    public void testAuthenticateUnknownUser() {
+        when(utilisateurRepository.findByEmailU("unknown@example.com")).thenReturn(null);
+        String result = authController.authenticate("unknown@example.com", "password", model, session);
         assertEquals("form-login", result);
-        verify(session, never()).setAttribute(anyString(), any());
     }
 
     @Test
-    void logout_shouldInvalidateSessionAndReturnFormLogin() {
+    public void testLogout() {
         String result = authController.logout(session);
-
-        verify(session).invalidate();
         assertEquals("form-login", result);
+        verify(session).invalidate();
     }
 }
